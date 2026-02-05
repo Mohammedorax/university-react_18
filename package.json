@@ -15,6 +15,7 @@
     "lint": "pnpm install --prefer-offline && eslint .",
     "preview": "pnpm install --prefer-offline && vite preview",
     "test": "pnpm install --prefer-offline && vitest run -c vitest.unit.config.ts",
+    "typecheck": "npx tsc --noEmit",
     "test:e2e": "pnpm install --prefer-offline && playwright test",
     "test:storybook": "pnpm install --prefer-offline && vitest run",
     "install-deps": "pnpm install --prefer-offline",
