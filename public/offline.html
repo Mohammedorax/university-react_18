@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>غير متصل - نظام الجامعة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .offline-container {
+      background: white;
+      border-radius: 24px;
+      padding: 48px 32px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon {
+      width: 80px;
+      height: 80px;
+      background: #3b82f6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+
+    .icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    h1 {
+      color: #1f2937;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .retry-button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Cairo', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .retry-button:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    .retry-button:active {
+      transform: translateY(0);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+      padding: 12px;
+      background: #fef3c7;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #92400e;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #f59e0b;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .cached-info {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        <path d="M0 0h24v24H0z" fill="none"/>
+        <path d="M23.64 7c-.45-.34-4.93-4-11.64-4-1.32 0-2.55.14-3.69.38L18.46 16.46 23.64 7zM4.12 2.83C3.71 2.42 3.08 2.42 2.67 2.83s-.42 1.03 0 1.44l1.15 1.15C1.56 6.35.32 8.14.13 10.5c-.04.55.39 1.02.94 1.02.49 0 .9-.37.98-.86.18-1.58 1.03-2.95 2.26-3.83l2.24 2.24C4.56 9.64 3.5 11.06 3.11 12.76c-.12.52.2 1.04.73 1.15.52.11 1.04-.2 1.15-.73.26-1.1.9-2.06 1.78-2.68l3.3 3.3c-.55.42-1.2.75-1.91.91-.55.13-.88.69-.75 1.23.11.47.53.79 1 .79.08 0 .16-.01.24-.03 1.1-.26 2.1-.78 2.88-1.48l4.18 4.18c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L4.12 2.83z"/>
+      </svg>
+    </div>
+    <h1>أنت غير متصل بالإنترنت</h1>
+    <p>لا يوجد اتصال بالإنترنت حالياً. يرجى التحقق من إعدادات الشبكة والمحاولة مرة أخرى.</p>
+    <button class="retry-button" onclick="window.location.reload()">
+      إعادة المحاولة
+    </button>
+    <div class="status-indicator">
+      <span class="status-dot"></span>
+      <span>في وضع عدم الاتصال</span>
+    </div>
+    <div class="cached-info">
+      بعض البيانات المحفوظة قد تكون متاحة للعرض
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('online', () => {
+      window.location.href = '/';
+    });
+
+    if (navigator.onLine) {
+      window.location.href = '/';
+    }
+  </script>
+</body>
+</html>

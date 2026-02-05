@@ -1,0 +1,62 @@
+{
+  "todos": {
+    "Coordinator": {
+      "1": {
+        "id": "1",
+        "content": "تحليل شامل لبنية التطبيق الحالي Flutter",
+        "details": "1. استخراج وتحليل جميع الشاشات والكونات. 2. فهم منطق الأعمال والخدمات. 3. تحديد أنظمة إدارة الحالة. 4. تحليل التبعيات والحزم. 5. فهم بنية البيانات والنماذج. 6. تحليل نظام التوجيه والتنقل.",
+        "status": "completed",
+        "priority": "high"
+      },
+      "2": {
+        "id": "2",
+        "content": "تصميم معمارية React الكاملة للتطبيق",
+        "details": "1. تصميم هيكل المشروع React. 2. اختيار وإعداد أدوات إدارة الحالة (Redux Toolkit/Zustand). 3. تصميم نظام التوجيه (React Router). 4. اختيار مكتبات UI (Material-UI/Ant Design/Chakra UI). 5. تخطيط نظام التصميم والنماذج. 6. تصميم بنية API والتكامل مع الخدمات.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "3": {
+        "id": "3",
+        "content": "تحويل واجهات المستخدم والشاشات",
+        "details": "1. تحويل جميع الشاشات من Flutter إلى React components. 2. تحويل النماذج والبيانات. 3. تطبيق التصميم المتجاوب. 4. ضمان دعم RTL للعربية. 5. تحويل الرسوم البيانية التفاعلية. 6. تطبيق Material Design 3 في React.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "4": {
+        "id": "4",
+        "content": "تحويل منطق الأعمال والخدمات",
+        "details": "1. تحويل خدمات Flutter إلى React hooks/services. 2. تكامل Firebase مع React. 3. تحويل نظام المصادقة. 4. تحويل خدمات البيانات (SQLite إلى LocalStorage/IndexedDB). 5. تحويل خدمات التنقل والإشعارات. 6. تطبيق معالجة الأخطاء.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "5": {
+        "id": "5",
+        "content": "تحويل نظام إدارة الحالة",
+        "details": "1. إعداد Redux Toolkit أو Zustand. 2. تحويل جميع providers إلى Redux slices/Zustand stores. 3. تحويل حالة التطبيق المشتركة. 4. تطبيق middleware للمعالجة غير المتزامنة. 5. تطبيق persisting للحالة. 6. تحسين الأداء باستخدام memoization.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "6": {
+        "id": "6",
+        "content": "تكامل الخدمات والـ APIs",
+        "details": "1. تكامل Supabase مع React. 2. تحويل Firebase configuration. 3. إعداد Axios أو Fetch للـ API calls. 4. تطبيق caching strategy. 5. تحويل real-time subscriptions. 6. تطبيق error boundaries.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "7": {
+        "id": "7",
+        "content": "اختبار ونشر التطبيق React",
+        "details": "1. إعداد بيئة الاختبار (Jest + React Testing Library). 2. كتابة unit tests للمكونات. 3. تطبيق integration tests. 4. اختبار الأداء والتحسين. 5. إعداد Docker للنشر. 6. نشر على Vercel/Netlify/AWS.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "8": {
+        "id": "8",
+        "content": "توثيق ونشر المشروع",
+        "details": "1. إنشاء README شامل. 2. توثيق معمارية المشروع. 3. دليل المطور. 4. توثيق API. 5. دليل النشر والتشغيل. 6. إنشاء مقارنة Flutter vs React.",
+        "status": "pending",
+        "priority": "low"
+      }
+    }
+  }
+}

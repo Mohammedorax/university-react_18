@@ -1,0 +1,114 @@
+import { createContext, useContext, useEffect, useState } from 'react'
+
+type Theme = 'dark' | 'light' | 'system'
+
+interface ThemeProviderProps {
+  children: React.ReactNode
+  defaultTheme?: Theme
+  defaultPrimaryColor?: string
+  storageKey?: string
+}
+
+interface ThemeProviderState {
+  theme: Theme
+  primaryColor: string
+  logo: string | null
+  setTheme: (theme: Theme) => void
+  setPrimaryColor: (color: string) => void
+  setLogo: (logo: string | null) => void
+}
+
+const initialState: ThemeProviderState = {
+  theme: 'system',
+  primaryColor: '142.1 76.2% 36.3%',
+  logo: null,
+  setTheme: () => null,
+  setPrimaryColor: () => null,
+  setLogo: () => null,
+}
+
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+
+export function ThemeProvider({
+  children,
+  defaultTheme = 'system',
+  defaultPrimaryColor = '142.1 76.2% 36.3%',
+  storageKey = 'university-ui-theme',
+  ...props
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+  )
+  
+  const [primaryColor, setPrimaryColor] = useState<string>(
+    () => localStorage.getItem('university-ui-primary') || defaultPrimaryColor
+  )
+
+  const [logo, setLogo] = useState<string | null>(
+    () => localStorage.getItem('university-ui-logo')
+  )
+
+  useEffect(() => {
+    const root = window.document.documentElement
+
+    root.classList.remove('light', 'dark')
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
+        ? 'dark'
+        : 'light'
+
+      root.classList.add(systemTheme)
+      return
+    }
+
+    root.classList.add(theme)
+  }, [theme])
+
+  useEffect(() => {
+      const root = window.document.documentElement
+      root.style.setProperty('--primary', primaryColor)
+  }, [primaryColor])
+
+  const value = {
+    theme,
+    primaryColor,
+    logo,
+    setTheme: (theme: Theme) => {
+      localStorage.setItem(storageKey, theme)
+      setTheme(theme)
+    },
+    setPrimaryColor: (color: string) => {
+        localStorage.setItem('university-ui-primary', color)
+        setPrimaryColor(color)
+    },
+    setLogo: (logo: string | null) => {
+        if (logo) {
+            localStorage.setItem('university-ui-logo', logo)
+        } else {
+            localStorage.removeItem('university-ui-logo')
+        }
+        setLogo(logo)
+    }
+  }
+
+  return (
+    <ThemeProviderContext.Provider {...props} value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
+  )
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext)
+
+  if (context === undefined)
+    throw new Error('useTheme must be used within a ThemeProvider')
+
+  return context
+}
+
+// @ts-expect-error - Helper for HOC or other non-hook usages if needed
+useTheme.displayName = 'useTheme';

@@ -1,0 +1,216 @@
+{
+  "_source_id": 29,
+  "sources": {
+    "احتياجات المعلمين والأساتذة": {
+      "https://managedmethods.com/blog/online-classroom-management/": {
+        "id": 1,
+        "publisher": "ManagedMethods",
+        "url": "https://managedmethods.com/blog/online-classroom-management/",
+        "title": "إدارة الفصول الدراسية عبر الإنترنت: الدليل الشامل",
+        "info": "تعريف شامل لإدارة الفصول الدراسية الرقمية، تحديات المعلمين، واستراتيجيات إدارة الفصول الافتراضية مع مراجعات لأدوات الإدارة الشائعة"
+      },
+      "https://learningsciences.smu.edu/blog/learning-analytics-tools": {
+        "id": 2,
+        "publisher": "Southern Methodist University",
+        "url": "https://learningsciences.smu.edu/blog/learning-analytics-tools",
+        "title": "أدوات تحليل التعلم للمعلمين المعاصرين",
+        "info": "نظرة شاملة على أدوات تحليلات التعلم لمراقبة أداء الطلاب والتنبؤ بالنتائج التعليمية"
+      },
+      "https://pumble.com/blog/communication-tools-for-teachers/": {
+        "id": 3,
+        "publisher": "Pumble",
+        "url": "https://pumble.com/blog/communication-tools-for-teachers/",
+        "title": "20 أداة تواصل للمعلمين والمربين",
+        "info": "دليل شامل لأدوات التواصل المقسمة إلى ثلاث فئات: التعاون بين المعلمين، التواصل مع الطلاب، والتواصل مع أولياء الأمور"
+      },
+      "https://www.myattendancetracker.com/": {
+        "id": 4,
+        "publisher": "MyAttendanceTracker",
+        "url": "https://www.myattendancetracker.com/",
+        "title": "نظام تتبع الحضور عبر الإنترنت",
+        "info": "منصة مجانية لتتبع حضور الطلاب مع 110,000 مستخدم و840,000 فصل تم إنشاؤه تتبعاً للحضور"
+      },
+      "https://grade-calculator.io/blog/grade-calculators-for-teachers": {
+        "id": 5,
+        "publisher": "Grade-Calculator.io",
+        "url": "https://grade-calculator.io/blog/grade-calculators-for-teachers",
+        "title": "حاسبات الدرجات للمعلمين: توفير الوقت والتنظيم",
+        "info": "معلومات مفصلة عن أنواع حاسبات الدرجات المختلفة وحلول إدارة التقويم للمعلمين"
+      },
+      "https://livestorm.co/blog/online-teaching-tools-platforms": {
+        "id": 6,
+        "publisher": "Livestorm",
+        "url": "https://livestorm.co/blog/online-teaching-tools-platforms",
+        "title": "أفضل 11 برنامج للفصول الافتراضية",
+        "info": "مراجعة شاملة لمنصات الفصول الافتراضية مع التركيز على ميزات التفاعل والمراقبة"
+      },
+      "https://singlewire.com/informacast-k12-education": {
+        "id": 7,
+        "publisher": "Singlewire Software",
+        "url": "https://singlewire.com/informacast-k12-education",
+        "title": "نظام التنبيهات المدرسية للمدارس والمناطق التعليمية",
+        "info": "نظام شامل لإرسال التنبيهات والإشعارات الطارئة والمواعيد اليومية"
+      },
+      "https://feedbackfruits.com/solutions/assignment-review": {
+        "id": 8,
+        "publisher": "FeedbackFruits",
+        "url": "https://feedbackfruits.com/solutions/assignment-review",
+        "title": "مراجعة الواجبات المدعومة بالذكاء الاصطناعي",
+        "info": "نظام مراجعة الواجبات مدعوم بالذكاء الاصطناعي يساعد المعلمين في تبسيط عملية تقييم المهام وتقديم ملاحظات عالية الجودة"
+      },
+      "https://training.safetyculture.com/blog/10-learning-content-management-systems/": {
+        "id": 9,
+        "publisher": "SafetyCulture",
+        "url": "https://training.safetyculture.com/blog/10-learning-content-management-systems/",
+        "title": "أفضل 12 نظام إدارة المحتوى التعليمي 2025",
+        "info": "دليل شامل لأفضل أنظمة إدارة المحتوى التعليمي في 2025 مع مقارنة مفصلة بين LMS وLCMS"
+      },
+      "https://teacherwriter.co/best-3-teacher-tools/": {
+        "id": 10,
+        "publisher": "TeacherWriter",
+        "url": "https://teacherwriter.co/best-3-teacher-tools/",
+        "title": "أفضل 3 أدوات للمعلمين: دفتر الدرجات والتقارير",
+        "info": "دليل للمعلمين حول أفضل 3 أدوات رقمية: دفتر درجات رقمي، متتبع واجبات رقمي، ومولد تعليقات البطاقات التقريرية"
+      }
+    },
+    "تطبيقات إدارة الجامعات - أفضل الممارسات التقنية": {
+      "https://www.researchgate.net/publication/343164544_Design_and_Implementation_of_REST_API_for_Academic_Information_System": {
+        "id": 11,
+        "publisher": "ResearchGate",
+        "url": "https://www.researchgate.net/publication/343164544_Design_and_Implementation_of_REST_API_for_Academic_Information_System",
+        "title": "Design and Implementation of REST API for Academic Information System",
+        "info": "معلومات شاملة عن تصميم وتطبيق واجهات REST API للأنظمة الأكاديمية، مع مقارنة أداء NodeJS vs PHP وتطوير نموذج أولي لنظام معلومات أكاديمي"
+      },
+      "https://dev.to/ssoad/flutter-riverpod-clean-architecture-the-ultimate-production-ready-template-for-scalable-apps-gdh": {
+        "id": 12,
+        "publisher": "Dev.to",
+        "url": "https://dev.to/ssoad/flutter-riverpod-clean-architecture-the-ultimate-production-ready-template-for-scalable-apps-gdh",
+        "title": "Flutter Riverpod Clean Architecture: The Ultimate Production-Ready Template",
+        "info": "قالب جاهز للإنتاج يطبق هندسة Flutter Riverpod Clean Architecture مع أفضل الممارسات للمشاريع القابلة للتوسع، يشمل هيكل المشروع وإدارة الحالة والتوطين"
+      },
+      "https://ms3byoussef.medium.com/state-management-in-flutter-provider-vs-riverpod-vs-bloc-333795f0df22": {
+        "id": 13,
+        "publisher": "Medium",
+        "url": "https://ms3byoussef.medium.com/state-management-in-flutter-provider-vs-riverpod-vs-bloc-333795f0df22",
+        "title": "State Management in Flutter: Provider vs Riverpod vs Bloc",
+        "info": "تحليل مقارن شامل لحلول إدارة الحالة في Flutter: Provider, Riverpod, BLoC، مع أمثلة عملية وتوصيات للاستخدام"
+      },
+      "https://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/": {
+        "id": 14,
+        "publisher": "Stack Overflow",
+        "url": "https://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/",
+        "title": "Best practices for REST API design",
+        "info": "أفضل الممارسات الشاملة لتصميم واجهات REST API، مع تغطية الأمان، معالجة الأخطاء، إصدارات API، واعتبارات الأداء"
+      },
+      "https://curity.io/resources/learn/jwt-best-practices/": {
+        "id": 15,
+        "publisher": "Curity",
+        "url": "https://curity.io/resources/learn/jwt-best-practices/",
+        "title": "JWT Security Best Practices",
+        "info": "دليل شامل لأفضل ممارسات أمان رموز JWT، إدارة الرموز، وأنماط المصادقة للتطبيقات التعليمية والخدمية"
+      },
+      "https://medium.com/@mgbrmohimen/learning-management-system-an-operational-database-design-4dc04c2c863b": {
+        "id": 16,
+        "publisher": "Medium",
+        "url": "https://medium.com/@mgbrmohimen/learning-management-system-an-operational-database-design-4dc04c2c863b",
+        "title": "Learning Management System: An Operational Database Design",
+        "info": "تصميم قاعدة بيانات تشغيلية لنظام إدارة التعلم (LMS) مع تحليل المتطلبات، إدارة المؤسسات والبرامج، ونماذج البيانات"
+      },
+      "https://dev.to/chiragagg5k/architecture-patterns-for-beginners-mvc-mvp-and-mvvm-2pe7": {
+        "id": 17,
+        "publisher": "Dev.to",
+        "url": "https://dev.to/chiragagg5k/architecture-patterns-for-beginners-mvc-mvp-and-mvvm-2pe7",
+        "title": "Architecture Patterns for Beginners: MVC, MVP, and MVVM",
+        "info": "شرح تفصيلي لأنماط التصميم المعمارية MVC, MVP, MVVM مع مقارنة شاملة بين الأنماط وتطبيقاتها في تطوير البرمجيات"
+      },
+      "https://aderibigbejesutoni860.medium.com/flutter-and-clean-architecture-i-be75e13608d4": {
+        "id": 18,
+        "publisher": "Medium",
+        "url": "https://aderibigbejesutoni860.medium.com/flutter-and-clean-architecture-i-be75e13608d4",
+        "title": "Flutter and Clean Architecture",
+        "info": "مفهوم وتطبيق Clean Architecture في Flutter مع شرح الطبقات الثلاث الرئيسية (Presentation, Domain, Data) وأفضل الممارسات"
+      }
+    },
+    "تحليل العناصر غير المستخدمة في مشروع Flutter": {
+      "/workspace/university-arab-flutter/pubspec.yaml": {
+        "id": 19,
+        "publisher": "مشروع University Arabs Management System",
+        "url": "/workspace/university-arab-flutter/pubspec.yaml",
+        "title": "ملف pubspec.yaml - التبعيات والمكتبات",
+        "info": "تحليل بنية مشروع Flutter الشامل وتحديد 180+ تبعية في pubspec.yaml مع التركيز على التبعيات غير المستخدمة أو المتكررة"
+      },
+      "/workspace/university-arab-flutter/lib/main.dart": {
+        "id": 20,
+        "publisher": "مشروع University Arabs Management System",
+        "url": "/workspace/university-arab-flutter/lib/main.dart",
+        "title": "ملف main.dart - التطبيق الرئيسي",
+        "info": "تحليل ملف main.dart الأساسي الذي يحتوي على خدمات متقدمة مثل ThemeService، AccessibilityService، وإدارة دورة حياة التطبيق"
+      },
+      "/workspace/university-arab-flutter/lib/core/router/app_router.dart": {
+        "id": 21,
+        "publisher": "مشروع University Arabs Management System",
+        "url": "/workspace/university-arab-flutter/lib/core/router/app_router.dart",
+        "title": "ملف app_router.dart - توجيه التطبيق",
+        "info": "تحليل ملف التوجيه الذي يحتوي على 36+ مسار ويشمل شاشات معطلة مثل AdminUsersScreen و StudentScheduleScreen"
+      },
+      "/workspace/university-arab-flutter/lib/core/providers/app_providers.dart": {
+        "id": 22,
+        "publisher": "مشروع University Arabs Management System",
+        "url": "/workspace/university-arab-flutter/lib/core/providers/app_providers.dart",
+        "title": "ملف app_providers.dart - مقدمو الخدمات",
+        "info": "تحليل app_providers.dart الذي يحتوي على 600+ سطر من providers متقدمة مع خدمات مراقبة وتحليلات أمنية"
+      },
+      "/workspace/university-arab-flutter/lib/services/electron_service.dart": {
+        "id": 23,
+        "publisher": "مشروع University Arabs Management System",
+        "url": "/workspace/university-arab-flutter/lib/services/electron_service.dart",
+        "title": "ملف electron_service.dart - خدمة Electron",
+        "info": "خدمة Electron المكتوبة بـ 811 سطر مخصصة لتطبيقات سطح المكتب مع تزامن مع APIs في Electron"
+      }
+    },
+    "تحليل مشاكل UX/UI في تطبيق إدارة الجامعة": {
+      "file:///workspace/university-arab-flutter/lib/core/theme/app_theme.dart": {
+        "id": 24,
+        "publisher": "University Arab Flutter App",
+        "url": "file:///workspace/university-arab-flutter/lib/core/theme/app_theme.dart",
+        "title": "ملف نظام الموضوعات الرئيسي",
+        "info": "نظام موضوعات شامل مع Material Design 3، ألوان أساسية وثانوية، وتصميم Light/Dark themes"
+      },
+      "file:///workspace/university-arab-flutter/lib/core/theme/accessibility_service.dart": {
+        "id": 25,
+        "publisher": "University Arab Flutter App",
+        "url": "file:///workspace/university-arab-flutter/lib/core/theme/accessibility_service.dart",
+        "title": "خدمة إمكانية الوصول",
+        "info": "ميزات إمكانية الوصول شاملة تشمل الأوامر الصوتية، عالي التباين، النصوص الكبيرة، دعم قارئ الشاشة"
+      },
+      "file:///workspace/university-arab-flutter/lib/features/calendar/widgets/event_card.dart": {
+        "id": 26,
+        "publisher": "University Arab Flutter App",
+        "url": "file:///workspace/university-arab-flutter/lib/features/calendar/widgets/event_card.dart",
+        "title": "مكون بطاقة الحدث",
+        "info": "تطبيق Material Design مع استخدام flutter_screenutil، نصوص عربية ثابتة، وتخطيط متجاوب"
+      },
+      "file:///workspace/university-arab-flutter/lib/features/notifications/widgets/notification_card.dart": {
+        "id": 27,
+        "publisher": "University Arab Flutter App",
+        "url": "file:///workspace/university-arab-flutter/lib/features/notifications/widgets/notification_card.dart",
+        "title": "مكون بطاقة الإشعار",
+        "info": "واجهة تفاعلية مع الرسوم المتحركة، استخدام Theme.colors، ونصوص عربية مباشرة"
+      },
+      "file:///workspace/university-arab-flutter/lib/presentation/widgets/chat_message_widget.dart": {
+        "id": 28,
+        "publisher": "University Arab Flutter App",
+        "url": "file:///workspace/university-arab-flutter/lib/presentation/widgets/chat_message_widget.dart",
+        "title": "مكون رسالة الدردشة",
+        "info": "مكون شامل لعرض رسائل متعددة الأنواع مع RTL support أساسي"
+      },
+      "file:///workspace/university-arab-flutter/pubspec.yaml": {
+        "id": 29,
+        "publisher": "University Arab Flutter App",
+        "url": "file:///workspace/university-arab-flutter/pubspec.yaml",
+        "title": "إعدادات المشروع والتبعيات",
+        "info": "على flutter_localizations و intl لكن لا توجد ملفات .arb للتعريب، يحتوي على dependencies شاملة لتطوير الجامعات"
+      }
+    }
+  }
+}

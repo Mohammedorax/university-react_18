@@ -1,0 +1,66 @@
+import { memo } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { TrendingUp } from 'lucide-react'
+import { Student } from '@/features/students/types'
+import { cn } from '@/lib/utils'
+
+interface TopStudentsListProps {
+  students: Student[]
+  maxDisplay?: number
+}
+
+const topStudentsColumns: DataTableColumn<Student>[] = [
+  { 
+    key: 'name', 
+    title: 'الطالب',
+    sortable: true,
+    render: (value: unknown) => <span className="font-bold">{value as string}</span>
+  },
+  { 
+    key: 'department', 
+    title: 'القسم' 
+  },
+  { 
+    key: 'gpa', 
+    title: 'المعدل',
+    sortable: true,
+    render: (value: number) => (
+      <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-black bg-primary text-primary-foreground">
+        {value.toFixed(2)}
+      </span>
+    )
+  },
+]
+
+export const TopStudentsList = memo(function TopStudentsList({
+  students,
+  maxDisplay = 6
+}: TopStudentsListProps) {
+  const topStudents = students.slice(0, maxDisplay)
+
+  return (
+    <Card className="border-none shadow-2xl rounded-3xl overflow-hidden" role="region" aria-label="قائمة الطلاب الأوائل">
+      <CardHeader className="bg-card border-b border-border/50">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="text-primary" aria-hidden="true" />
+          <div>
+            <CardTitle className="text-xl font-black text-foreground">أوائل الطلاب</CardTitle>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="overflow-x-auto">
+          <DataTable 
+            data={topStudents}
+            columns={topStudentsColumns}
+            pageSize={maxDisplay}
+            searchPlaceholder="البحث في الطلاب..."
+          />
+        </div>
+      </CardContent>
+    </Card>
+  )
+})
+
+export default TopStudentsList
