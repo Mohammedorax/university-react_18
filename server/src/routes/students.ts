@@ -1,176 +1,60 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify'
+import { z } from 'zod'
+import { requireAuth, requireRole } from '../middleware/auth.js'
 
-async function studentRoutes(fastify: FastifyInstance) {
-  const prisma = fastify.prisma;
+const listQuery = z.object({
+  query: z.string().optional().default(''),
+  department: z.string().optional().default('all'),
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+})
 
-  fastify.get('/', async (request, reply) => {
-    const { page = 1, limit = 10, search, department, status } = request.query as any;
-    
-    const where: any = {};
-    
-    if (search) {
-      where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { studentId: { contains: search, mode: 'insensitive' } },
-        { user: { email: { contains: search, mode: 'insensitive' } } },
-      ];
-    }
-    
-    if (department) {
-      where.departmentId = department;
-    }
-    
-    if (status) {
-      where.status = status;
+export async function studentsRoutes(app: FastifyInstance) {
+  app.get('/', { preHandler: requireAuth }, async (req, reply) => {
+    const parsed = listQuery.safeParse(req.query)
+    if (!parsed.success) return reply.badRequest(parsed.error.message)
+    const { query, department, page, limit } = parsed.data
+
+    const where = {
+      deletedAt: null,
+      ...(query
+        ? {
+            OR: [
+              { universityId: { contains: query, mode: 'insensitive' as const } },
+              { user: { name: { contains: query, mode: 'insensitive' as const } } },
+            ],
+          }
+        : {}),
+      ...(department !== 'all' ? { department: { name: department } } : {}),
     }
 
-    const [students, total] = await Promise.all([
-      prisma.student.findMany({
+    const [items, total] = await Promise.all([
+      app.prisma.student.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
-        include: {
-          user: { select: { email: true } },
-          department: { select: { name: true, arabicName: true } },
-          major: { select: { name: true, arabicName: true } },
-        },
+        include: { user: true, department: true },
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.student.count({ where }),
-    ]);
+      app.prisma.student.count({ where }),
+    ])
 
-    return {
-      success: true,
-      data: students,
-      pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        totalItems: total,
-        itemsPerPage: limit,
-      },
-    };
-  });
+    return { items, total, page, limit }
+  })
 
-  fastify.get('/:id', async (request, reply) => {
-    const { id } = request.params as any;
-    
-    const student = await prisma.student.findUnique({
+  app.get('/:id', { preHandler: requireAuth }, async (req, reply) => {
+    const { id } = req.params as { id: string }
+    const s = await app.prisma.student.findUnique({
       where: { id },
-      include: {
-        user: { select: { email: true, lastLoginAt: true } },
-        department: true,
-        major: true,
-        enrollments: {
-          include: {
-            courseSection: {
-              include: { course: true, teacher: true },
-            },
-          },
-        },
-        grades: {
-          include: { courseSection: { include: { course: true } } },
-        },
-        payments: true,
-      },
-    });
+      include: { user: true, department: true, enrollments: { include: { course: true } } },
+    })
+    if (!s || s.deletedAt) return reply.notFound()
+    return s
+  })
 
-    if (!student) {
-      return reply.status(404).send({ success: false, error: 'الطالب غير موجود' });
-    }
-
-    return { success: true, data: student };
-  });
-
-  fastify.post('/', async (request, reply) => {
-    try {
-      const data = request.body as any;
-      
-      const passwordHash = await fastify.prisma.$queryRaw`SELECT crypt('${data.password}', gen_salt('bf'))`;
-      
-      const user = await prisma.user.create({
-        data: {
-          email: data.email,
-          passwordHash: passwordHash as string,
-          role: 'STUDENT',
-        },
-      });
-
-      const student = await prisma.student.create({
-        data: {
-          userId: user.id,
-          studentId: `STU-${Date.now()}`,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          arabicName: data.arabicName,
-          dateOfBirth: new Date(data.dateOfBirth),
-          gender: data.gender,
-          phone: data.phone,
-          address: data.address,
-          departmentId: data.departmentId,
-          majorId: data.majorId,
-          year: data.year || 1,
-        },
-      });
-
-      return { success: true, data: student };
-    } catch (error: any) {
-      request.log.error(error);
-      return reply.status(500).send({ success: false, error: error.message });
-    }
-  });
-
-  fastify.put('/:id', async (request, reply) => {
-    const { id } = request.params as any;
-    const data = request.body as any;
-
-    const student = await prisma.student.update({
-      where: { id },
-      data,
-    });
-
-    return { success: true, data: student };
-  });
-
-  fastify.delete('/:id', async (request, reply) => {
-    const { id } = request.params as any;
-
-    await prisma.student.delete({ where: { id } });
-
-    return { success: true, message: 'تم حذف الطالب بنجاح' };
-  });
-
-  fastify.get('/:id/grades', async (request, reply) => {
-    const { id } = request.params as any;
-    
-    const grades = await prisma.grade.findMany({
-      where: { studentId: id },
-      include: {
-        courseSection: {
-          include: { course: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return { success: true, data: grades };
-  });
-
-  fastify.get('/:id/enrollments', async (request, reply) => {
-    const { id } = request.params as any;
-    
-    const enrollments = await prisma.enrollment.findMany({
-      where: { studentId: id },
-      include: {
-        courseSection: {
-          include: { course: true, teacher: true },
-        },
-      },
-      orderBy: { enrolledAt: 'desc' },
-    });
-
-    return { success: true, data: enrollments };
-  });
+  app.delete('/:id', { preHandler: requireRole('admin') }, async (req, reply) => {
+    const { id } = req.params as { id: string }
+    await app.prisma.student.update({ where: { id }, data: { deletedAt: new Date() } })
+    return reply.code(204).send()
+  })
 }
-
-export { studentRoutes };
