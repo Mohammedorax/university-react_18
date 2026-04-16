@@ -1,16 +1,14 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
-
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', '.kilo/**', 'node_modules/**', 'playwright-report/**', 'coverage/**', 'storybook-static/**'] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended, jsxA11y.flatConfigs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -28,18 +26,6 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-    },
-  },
-  {
-    // Storybook specific configuration
-    files: ['**/*.stories.tsx', '**/*.stories.ts'],
-    plugins: {
-      storybook,
-    },
-    rules: {
-      'storybook/no-renderer-packages': 'off', // Disable this rule as it's causing false positives
-      'storybook/hierarchy-separator': 'error',
-      'storybook/default-exports': 'error',
     },
   },
   {

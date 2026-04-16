@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils"
 
 import { Slot } from "@radix-ui/react-slot"
 
+/**
+ * مكون البطاقة الأساسي لحاوية المحتوى.
+ */
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -19,6 +22,9 @@ const Card = React.forwardRef<
 ))
 Card.displayName = "Card"
 
+/**
+ * رأس البطاقة لعنوان ووصف البطاقة.
+ */
 const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -31,10 +37,16 @@ const CardHeader = React.forwardRef<
 ))
 CardHeader.displayName = "CardHeader"
 
+/**
+ * خصائص عنوان البطاقة
+ */
 interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   asChild?: boolean
 }
 
+/**
+ * عنوان البطاقة الرئيسي.
+ */
 const CardTitle = React.forwardRef<
   HTMLHeadingElement,
   CardTitleProps
@@ -44,7 +56,7 @@ const CardTitle = React.forwardRef<
     <Comp
       ref={ref}
       className={cn(
-        "text-2xl font-semibold leading-none tracking-tight",
+        "text-2xl font-semibold leading-none tracking-tight text-start",
         className
       )}
       {...props}
@@ -53,18 +65,24 @@ const CardTitle = React.forwardRef<
 })
 CardTitle.displayName = "CardTitle"
 
+/**
+ * وصف البطاقة الثانوي.
+ */
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-muted-foreground text-start", className)}
     {...props}
   />
 ))
 CardDescription.displayName = "CardDescription"
 
+/**
+ * محتوى البطاقة الرئيسي.
+ */
 const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -73,6 +91,9 @@ const CardContent = React.forwardRef<
 ))
 CardContent.displayName = "CardContent"
 
+/**
+ * تذييل البطاقة للأزرار أو المحتوى الإضافي.
+ */
 const CardFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>

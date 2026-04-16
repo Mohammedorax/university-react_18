@@ -1,12 +1,12 @@
 import { memo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/components/ui/select'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { DateRange } from 'react-day-picker'
@@ -36,60 +36,61 @@ export const ReportFilters = memo(function ReportFilters({
   onReset
 }: ReportFiltersProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-4 bg-primary-foreground/10 p-4 rounded-2xl backdrop-blur-sm border border-primary-foreground/10 print:hidden">
-      <div className="relative group w-full sm:w-64">
-        <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-foreground/60 group-focus-within:text-primary-foreground transition-colors" aria-hidden="true" />
+    <div className="flex flex-col sm:flex-row items-center gap-4 bg-background/10 dark:bg-primary/10 backdrop-blur-md p-4 rounded-3xl border border-white/10 dark:border-primary/20 print:hidden shadow-2xl">
+      <div className="relative group w-full sm:w-80">
+        <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-foreground/60 group-focus-within:text-white dark:group-focus-within:text-white transition-colors" aria-hidden="true" />
         <Input
           placeholder="بحث في التقارير..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="h-11 pr-11 bg-primary-foreground/10 border-none text-primary-foreground placeholder:text-primary-foreground/50 rounded-xl focus-visible:ring-1 focus-visible:ring-primary-foreground/30"
+          className="h-12 pr-11 bg-white/10 dark:bg-white/5 border-none text-white dark:text-white placeholder:text-white/40 dark:placeholder:text-white/30 rounded-2xl focus-visible:ring-2 focus-visible:ring-white/30 transition-all font-medium"
           aria-label="البحث في بيانات التقارير"
         />
       </div>
-      <div className="h-8 w-[1px] bg-primary-foreground/20 hidden sm:block" aria-hidden="true" />
+
       <div className="flex items-center gap-3 w-full sm:w-auto">
-        <Filter className="h-5 w-5 text-primary-foreground/70 shrink-0" aria-hidden="true" />
         <Select value={selectedDepartment} onValueChange={onDepartmentChange}>
-          <SelectTrigger className="w-full sm:w-[180px] h-11 bg-primary-foreground/10 border-none text-primary-foreground font-bold rounded-xl focus:ring-primary-foreground/30" aria-label="تصفية حسب القسم">
-            <SelectValue placeholder="تصفية حسب القسم" />
+          <SelectTrigger className="w-full sm:w-[200px] h-12 bg-white/10 dark:bg-white/5 border-none text-white dark:text-white font-bold rounded-2xl focus:ring-2 focus:ring-white/30 transition-all" aria-label="تصفية حسب القسم">
+            <div className="flex items-center gap-3">
+              <Filter className="h-4 w-4 opacity-70" />
+              <SelectValue placeholder="تصفية حسب القسم" />
+            </div>
           </SelectTrigger>
-          <SelectContent className="rounded-xl border-muted">
-            <SelectItem value="all">جميع الأقسام</SelectItem>
+          <SelectContent className="rounded-2xl border-none shadow-2xl">
+            <SelectItem value="all" className="font-bold">جميع الأقسام</SelectItem>
             {departments.filter(d => d !== 'all').map(dept => (
-              <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+              <SelectItem key={dept} value={dept} className="font-bold">{dept}</SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-      <div className="h-8 w-[1px] bg-primary-foreground/20 hidden sm:block" aria-hidden="true" />
-      <DateRangePicker 
-        date={dateRange} 
+
+      <DateRangePicker
+        date={dateRange}
         onDateChange={onDateRangeChange}
-        className="w-full sm:w-auto"
+        className="w-full sm:w-auto [&>button]:h-12 [&>button]:rounded-2xl [&>button]:bg-white/10 dark:[&>button]:bg-white/5 [&>button]:border-none [&>button]:text-white dark:[&>button]:text-white [&>button]:font-bold"
       />
+
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="h-11 w-11 rounded-xl text-primary-foreground hover:bg-primary-foreground/20 shrink-0 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2"
+        <Button
+          variant="secondary"
+          size="icon"
+          className="h-12 w-12 rounded-2xl bg-white shadow-xl text-primary hover:bg-white/90 active:scale-95 transition-all"
           onClick={onRefresh}
           aria-label="تحديث البيانات"
         >
           <RefreshCcw className="h-5 w-5" aria-hidden="true" />
         </Button>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="h-11 w-11 rounded-xl text-primary-foreground hover:bg-primary-foreground/20 shrink-0 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2"
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 rounded-2xl border-dashed border-white/30 dark:border-white/20 text-white dark:text-white hover:bg-white/10 dark:hover:bg-white/20 active:scale-95 transition-all"
           onClick={onReset}
           aria-label="إعادة ضبط فلاتر البحث"
         >
-          <Filter className="h-5 w-5 rotate-180" aria-hidden="true" />
+          <RefreshCcw className="h-5 w-5 rotate-180" aria-hidden="true" />
         </Button>
       </div>
     </div>
   )
 })
-
-export default ReportFilters

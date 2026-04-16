@@ -8,7 +8,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Info, CheckCircle, XCircle, Percent, Coins, Calendar, FileText } from 'lucide-react'
-import { Discount } from '@/services/mockApi'
+import type { Discount } from '@/services/api'
 import { cn } from '@/lib/utils'
 
 interface DiscountDetailsDialogProps {
@@ -35,7 +35,7 @@ export function DiscountDetailsDialog({ discount, trigger }: DiscountDetailsDial
             {discount.type === 'percentage' ? <Percent size={160} /> : <Coins size={160} />}
           </div>
           <div className="absolute inset-0 flex items-center justify-center pt-8">
-            <div className="h-20 w-20 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-2xl">
+            <div className="h-20 w-20 rounded-3xl bg-primary-foreground/20 backdrop-blur-md border border-primary-foreground/30 flex items-center justify-center text-primary-foreground shadow-2xl">
               {discount.type === 'percentage' ? <Percent size={40} /> : <Coins size={40} />}
             </div>
           </div>
@@ -46,7 +46,7 @@ export function DiscountDetailsDialog({ discount, trigger }: DiscountDetailsDial
             <div className="flex justify-between items-center mb-2">
               <Badge className={cn(
                 "rounded-lg px-3 py-1 font-bold",
-                discount.active ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-red-100 text-red-700 hover:bg-red-100"
+                discount.active ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 dark:bg-emerald-500/20 hover:bg-emerald-500/20" : "bg-destructive/10 text-destructive dark:bg-destructive/20 hover:bg-destructive/20"
               )}>
                 {discount.active ? (
                   <div className="flex items-center gap-1.5">

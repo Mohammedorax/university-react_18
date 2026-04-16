@@ -22,7 +22,26 @@ interface DataTableRowProps<T> {
   customRowActions?: (item: T) => React.ReactNode;
 }
 
-export function DataTableRowComponent<T extends { id: string | number }>({
+const areEqual = <T extends { id: string | number }>(prev: DataTableRowProps<T>, next: DataTableRowProps<T>) => {
+  if (prev.item.id !== next.item.id) return false;
+  if (prev.isSelected !== next.isSelected) return false;
+  if (prev.density !== next.density) return false;
+  if (prev.showCheckbox !== next.showCheckbox) return false;
+  if (prev.visibleColumns !== next.visibleColumns) return false;
+  if (prev.columns !== next.columns) return false;
+  if (prev.rowActions !== next.rowActions) return false;
+  if (prev.customRowActions !== next.customRowActions) return false;
+  if (prev.onToggleSelect !== next.onToggleSelect) return false;
+  
+  // Deep check for item changes if needed (optimized for common case)
+  for (const key in prev.item) {
+    if (prev.item[key] !== next.item[key]) return false;
+  }
+  
+  return true;
+};
+
+export const DataTableRowComponent = function DataTableRowComponent<T extends { id: string | number }>({
   item,
   columns,
   visibleColumns,
@@ -33,7 +52,10 @@ export function DataTableRowComponent<T extends { id: string | number }>({
   rowActions,
   customRowActions,
 }: DataTableRowProps<T>) {
-  const visibleCols = columns.filter(col => visibleColumns.has(String(col.key)) && !col.hidden);
+  const visibleCols = React.useMemo(() => 
+    columns.filter(col => visibleColumns.has(String(col.key)) && !col.hidden),
+    [columns, visibleColumns]
+  );
   
   return (
     <>
@@ -83,4 +105,8 @@ export function DataTableRowComponent<T extends { id: string | number }>({
       )}
     </>
   );
-}
+};
+
+
+
+

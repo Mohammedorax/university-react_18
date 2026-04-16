@@ -12,6 +12,11 @@ export interface SystemSettings {
     academicNotifications: boolean
     financialNotifications: boolean
     administrativeNotifications: boolean
+    reportHeaderSubtitle?: string
+    reportFooterText?: string
+    logoUrl?: string
+    language: 'ar' | 'en'
+    direction: 'rtl' | 'ltr'
 }
 
 export interface AppearanceSettings {

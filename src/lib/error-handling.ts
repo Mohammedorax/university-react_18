@@ -99,7 +99,7 @@ export class AppError extends Error {
  * const { t } = useTranslation();
  * handleError(error, t);
  */
-export function handleError(error: unknown, t?: (key: string) => string): void {
+function handleError(error: unknown, t?: (key: string) => string): void {
   const translate = t || ((key: string) => key);
 
   if (error instanceof AppError) {
@@ -192,7 +192,7 @@ function getDurationBySeverity(severity: ErrorSeverity): number {
  * const errorHandler = createErrorHandler(t);
  * errorHandler(new Error('حدث خطأ'));
  */
-export function createErrorHandler(t: (key: string) => string) {
+function createErrorHandler(t: (key: string) => string) {
   return (error: unknown) => handleError(error, t);
 }
 
@@ -217,7 +217,7 @@ export function createErrorHandler(t: (key: string) => string) {
  *   (err) => console.error('فشل جلب البيانات:', err)
  * );
  */
-export function withErrorHandling<T extends (...args: unknown[]) => Promise<unknown>>(
+function withErrorHandling<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   errorHandler?: (error: unknown) => void
 ): T {

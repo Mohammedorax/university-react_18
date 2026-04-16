@@ -3,6 +3,9 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * مكون الصورة الرمزية الأساسي.
+ */
 const Avatar = React.forwardRef<
     React.ElementRef<typeof AvatarPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
@@ -18,6 +21,9 @@ const Avatar = React.forwardRef<
 ))
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
+/**
+ * صورة المستخدم في الصورة الرمزية.
+ */
 const AvatarImage = React.forwardRef<
     React.ElementRef<typeof AvatarPrimitive.Image>,
     React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
@@ -30,6 +36,9 @@ const AvatarImage = React.forwardRef<
 ))
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
+/**
+ * نص بديل عند عدم توفر الصورة.
+ */
 const AvatarFallback = React.forwardRef<
     React.ElementRef<typeof AvatarPrimitive.Fallback>,
     React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>

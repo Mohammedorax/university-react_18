@@ -11,7 +11,7 @@ export const inventorySchema = z.object({
   quantity: commonSchemas.positiveNumber("الكمية"),
   min_quantity: commonSchemas.positiveNumber("الحد الأدنى"),
   unit: z.string().min(1, "يجب تحديد الوحدة (مثال: قطعة، صندوق)"),
-  location: z.string().optional(),
+  location: z.string().default(""),
   status: z.enum(["available", "low_stock", "out_of_stock"], {
     errorMap: () => ({ message: "يجب اختيار حالة صحيحة" }),
   }),

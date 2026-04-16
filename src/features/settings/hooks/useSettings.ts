@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { mockApi } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
 import { SystemSettings } from '@/features/settings/types'
 
 export const settingsKeys = {

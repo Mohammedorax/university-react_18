@@ -1,19 +1,37 @@
-// Mock API Service - Modular Architecture
-// This module provides mock data for development and testing with local storage
+/**
+ * ⚠️ DEV-ONLY: Mock API Service - Modular Architecture
+ * هذا الموديول يوفر بيانات وهمية للتطوير والاختبار فقط
+ * يتم استبعاده بالكامل من بناء الإنتاج عبر tree-shaking
+ * لا تستورد من هذا الملف مباشرة - استخدم @/services/api بدلاً من ذلك
+ * @see src/services/api.ts
+ */
 
-export type { 
-    Notification, 
-    NotificationType, 
+export { addAuditLog, getAuditLogs } from './auditLog'
+
+export type {
+    Notification,
+    NotificationType,
     NotificationSubscriber,
-    Discount, 
+    Discount,
     StudentDocument,
     Semester,
-    StorageKeys
+    StorageKeys,
+    User,
+    Student,
+    Teacher,
+    Staff,
+    Course,
+    Grade,
+    InventoryItem,
+    SystemSettings,
 } from './types'
 
-export { SEMESTERS, STORAGE_KEYS } from './types'
+import {
+    SEMESTERS,
+    STORAGE_KEYS
+} from './types'
 
-export {
+import {
     getStorageData,
     setStorageData,
     delay,
@@ -24,7 +42,7 @@ export {
     generateTimestampId,
 } from './utils'
 
-export {
+import {
     initialDocuments,
     initialDiscounts,
     initialNotifications,
@@ -48,18 +66,14 @@ import { inventoryApi } from './inventory'
 import { financeApi } from './finance'
 import { notificationApi } from './notifications'
 import { documentApi } from './documents'
-import { authApi, setAuthAuditLogFunction } from './auth'
-import { setAuditLogFunction } from './grades'
-
-// Connect audit log functions
-setAuditLogFunction(authApi.addAuditLog)
-setAuthAuditLogFunction(authApi.addAuditLog)
+import { authApi } from './auth'
+import { addAuditLog, getAuditLogs } from './auditLog'
 
 // Combined mock API object for backward compatibility
 export const mockApi = {
     // Audit Logs
-    getAuditLogs: authApi.getAuditLogs,
-    addAuditLog: authApi.addAuditLog,
+    getAuditLogs,
+    addAuditLog,
 
     // Authentication
     login: authApi.login,
@@ -80,6 +94,7 @@ export const mockApi = {
     deleteStudent: studentApi.deleteStudent,
     assignDiscountToStudent: studentApi.assignDiscountToStudent,
     removeDiscountFromStudent: studentApi.removeDiscountFromStudent,
+    getStudentStats: studentApi.getStudentStats,
 
     // Courses
     getCourses: courseApi.getCourses,
@@ -130,7 +145,7 @@ export const mockApi = {
     // System Settings
     getSettings: authApi.getSettings,
     updateSettings: authApi.updateSettings,
-    
+
     // Notifications
     getNotifications: notificationApi.getNotifications,
     markNotificationAsRead: notificationApi.markNotificationAsRead,
@@ -141,16 +156,4 @@ export const mockApi = {
     subscribeToNotifications: notificationApi.subscribeToNotifications,
 }
 
-// Export individual API modules for selective imports
-export {
-    studentApi,
-    courseApi,
-    gradeApi,
-    teacherApi,
-    staffApi,
-    inventoryApi,
-    financeApi,
-    notificationApi,
-    documentApi,
-    authApi,
-}
+// End of file

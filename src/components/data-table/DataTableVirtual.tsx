@@ -1,5 +1,6 @@
-import * as React from 'react';
-import { List as VirtualList } from 'react-window';
+  import * as React from 'react';
+import { List } from 'react-window';
+import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -23,21 +24,18 @@ interface DataTableVirtualProps<T extends { id: string | number }> {
   customRowActions?: (item: T) => React.ReactNode;
 }
 
-export function DataTableVirtual<T extends { id: string | number }>({
-  data,
-  columns,
-  visibleColumns,
-  density,
-  height = 400,
-  showCheckboxes,
-  selectedIds,
-  onToggleSelectRow,
-  rowActions,
-  customRowActions,
-}: DataTableVirtualProps<T>) {
-  const listRef = React.useRef(null);
-
-  const VirtualRow = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+function createRowRenderer<T extends { id: string | number }>(
+  data: T[],
+  columns: DataTableColumn<T>[],
+  visibleColumns: Set<string>,
+  density: Density,
+  showCheckboxes: boolean | undefined,
+  selectedIds: Set<string | number>,
+  onToggleSelectRow: (id: string | number) => void,
+  rowActions: ((item: T) => React.ReactNode) | undefined,
+  customRowActions: ((item: T) => React.ReactNode) | undefined,
+) {
+  return function Row({ index, style }: { index: number; style: React.CSSProperties }) {
     const item = data[index];
     if (!item) return null;
 
@@ -57,16 +55,16 @@ export function DataTableVirtual<T extends { id: string | number }>({
         {columns
           .filter(col => visibleColumns.has(String(col.key)) && !col.hidden)
           .map((col) => (
-            <div 
-              key={String(col.key)} 
+            <div
+              key={String(col.key)}
               className={cn(
                 "flex items-center text-right overflow-hidden text-ellipsis whitespace-nowrap px-4 border-l",
                 density === 'compact' ? "py-1 text-xs" : "py-4",
                 "flex-1"
               )}
             >
-              {col.render 
-                ? col.render((item as any)[col.key], item) 
+              {col.render
+                ? col.render((item as any)[col.key], item)
                 : String((item as any)[col.key] ?? '-')}
             </div>
           ))}
@@ -92,17 +90,70 @@ export function DataTableVirtual<T extends { id: string | number }>({
       </div>
     );
   };
+}
+
+export const DataTableVirtual = function DataTableVirtual<T extends { id: string | number }>({
+  data,
+  columns,
+  visibleColumns,
+  density,
+  height = 400,
+  showCheckboxes,
+  selectedIds,
+  onToggleSelectRow,
+  rowActions,
+  customRowActions,
+}: DataTableVirtualProps<T>) {
+  const itemSize = React.useMemo(() => 
+    density === 'compact' ? 40 : 60,
+    [density]
+  );
+  const Row = React.useMemo(
+    () => createRowRenderer(
+      data,
+      columns,
+      visibleColumns,
+      density,
+      showCheckboxes,
+      selectedIds,
+      onToggleSelectRow,
+      rowActions,
+      customRowActions,
+    ),
+    [data, columns, visibleColumns, density, showCheckboxes, selectedIds, onToggleSelectRow, rowActions, customRowActions],
+  );
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-12 text-muted-foreground">
+        لا توجد بيانات للعرض
+      </div>
+    );
+  }
 
   return (
-    <div style={{ height }}>
-      {/* @ts-expect-error - react-window List types are outdated */}
-      <VirtualList
-        listRef={listRef}
-        rowComponent={VirtualRow}
-        rowCount={data.length}
-        rowHeight={density === 'compact' ? 40 : 60}
-        width="100%"
+    <div style={{ height, width: '100%' }}>
+      <AutoSizer
+        renderProp={({ height: autoHeight, width: autoWidth }) => (
+          <List
+            height={autoHeight ?? 400}
+            width={autoWidth ?? 800}
+            rowCount={data.length}
+            rowHeight={itemSize}
+            rowComponent={Row}
+            // @ts-expect-error - rowProps type mismatch with react-window types
+            rowProps={{}}
+            className="rtl"
+            direction="rtl"
+          />
+        )}
       />
     </div>
   );
-}
+};
+
+
+
+
+
+

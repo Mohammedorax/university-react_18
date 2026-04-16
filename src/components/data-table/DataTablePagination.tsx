@@ -13,7 +13,7 @@ interface DataTablePaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function DataTablePagination({
+export const DataTablePagination = function DataTablePagination({
   currentPage,
   totalPages,
   totalItems,
@@ -22,11 +22,14 @@ export function DataTablePagination({
   sortedDataLength,
   onPageChange,
 }: DataTablePaginationProps) {
-  if (totalPages <= 1) return null;
+  const displayText = React.useMemo(() =>
+    externalTotalItems !== undefined
+      ? `${Math.min(externalTotalItems, (currentPage - 1) * pageSize + 1)} إلى ${Math.min(externalTotalItems, currentPage * pageSize)} من أصل ${externalTotalItems}`
+      : `${Math.min(sortedDataLength, (currentPage - 1) * pageSize + 1)} إلى ${Math.min(sortedDataLength, currentPage * pageSize)} من أصل ${sortedDataLength}`,
+    [currentPage, pageSize, externalTotalItems, sortedDataLength]
+  );
 
-  const displayText = externalTotalItems !== undefined 
-    ? `${Math.min(externalTotalItems, (currentPage - 1) * pageSize + 1)} إلى ${Math.min(externalTotalItems, currentPage * pageSize)} من أصل ${externalTotalItems}`
-    : `${Math.min(sortedDataLength, (currentPage - 1) * pageSize + 1)} إلى ${Math.min(sortedDataLength, currentPage * pageSize)} من أصل ${sortedDataLength}`;
+  if (totalPages <= 1) return null;
 
   return (
     <div 
@@ -111,4 +114,8 @@ export function DataTablePagination({
       </div>
     </div>
   );
-}
+};
+
+
+
+

@@ -1,6 +1,7 @@
 import { Course } from '@/features/courses/types'
-import { initialCourses, initialStudents } from './data'
 import { getStorageData, setStorageData, delay, applySearch, applyPagination } from './utils'
+import { initialCourses, initialStudents } from './data'
+import { authApi } from './auth'
 
 export const courseApi = {
     getCourses: async (params?: { query?: string, department?: string, page?: number, limit?: number }) => {
@@ -14,7 +15,7 @@ export const courseApi = {
         if (params?.department && params.department !== 'all') {
             courses = courses.filter(c => c.department === params.department)
         }
-        
+
         return applyPagination(courses, params?.page, params?.limit)
     },
 
@@ -31,7 +32,7 @@ export const courseApi = {
         const students = getStorageData('students', initialStudents)
         const student = students.find(s => s.id === studentId)
         if (!student) return []
-        
+
         const courses = getStorageData('courses', initialCourses)
         return courses.filter(c => student.enrolled_courses.includes(c.id))
     },
@@ -39,13 +40,17 @@ export const courseApi = {
     addCourse: async (courseData: Omit<Course, 'id' | 'enrolled_students'>) => {
         await delay(300)
         const courses = getStorageData('courses', initialCourses)
-        const newCourse: Course = { 
-            ...courseData, 
-            id: 'c' + (courses.length + 1), 
-            enrolled_students: 0 
+        const newCourse: Course = {
+            ...courseData,
+            id: 'c' + (courses.length + 1),
+            enrolled_students: 0
         }
         courses.push(newCourse)
         setStorageData('courses', courses)
+
+        // Audit Log
+        await authApi.addAuditLog('إضافة مقرر', `تم إضافة المقرر ${newCourse.name} (${newCourse.code})`)
+
         return newCourse
     },
 
@@ -54,17 +59,35 @@ export const courseApi = {
         const courses = getStorageData('courses', initialCourses)
         const index = courses.findIndex(c => c.id === id)
         if (index === -1) throw new Error('المقرر غير موجود')
-        
+
         courses[index] = { ...courses[index], ...data }
         setStorageData('courses', courses)
+
+        // Audit Log
+        await authApi.addAuditLog('تحديث مقرر', `تم تحديث بيانات المقرر ${courses[index].name}`)
+
         return courses[index]
     },
 
     deleteCourse: async (id: string) => {
         await delay(300)
         let courses = getStorageData('courses', initialCourses)
+        const courseToDelete = courses.find(c => c.id === id)
+        if (!courseToDelete) throw new Error('المقرر غير موجود')
+
         courses = courses.filter(c => c.id !== id)
         setStorageData('courses', courses)
+
+        // Cascading: Remove course from students' enrolled_courses
+        const students = getStorageData('students', initialStudents)
+        students.forEach(student => {
+            student.enrolled_courses = student.enrolled_courses.filter(cId => cId !== id)
+        })
+        setStorageData('students', students)
+
+        // Audit Log
+        await authApi.addAuditLog('حذف مقرر', `تم حذف المقرر ${courseToDelete.name}`)
+
         return id
     },
 
@@ -73,7 +96,7 @@ export const courseApi = {
         const students = getStorageData('students', initialStudents)
         const studentIndex = students.findIndex(s => s.id === studentId)
         if (studentIndex === -1) throw new Error('الطالب غير موجود')
-        
+
         if (!students[studentIndex].enrolled_courses.includes(courseId)) {
             students[studentIndex].enrolled_courses.push(courseId)
             setStorageData('students', students)
@@ -86,7 +109,7 @@ export const courseApi = {
             setStorageData('courses', courses)
             return courses[courseIndex]
         }
-        
+
         return courses[courseIndex]
     },
 

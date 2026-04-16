@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { mockApi, Discount } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
+import type { Discount } from '@/services/api'
 import { Student } from '@/features/students/types'
 
 /**
@@ -57,11 +58,12 @@ export const useStudent = (id: string) => {
  */
 export const useAddStudent = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: (newStudent: Omit<Student, 'id'>) => mockApi.addStudent(newStudent),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+            queryClient.invalidateQueries({ queryKey: ['audit-logs'] })
         },
     })
 }
@@ -73,12 +75,13 @@ export const useAddStudent = () => {
  */
 export const useUpdateStudent = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<Student> }) => mockApi.updateStudent(id, data),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
             queryClient.invalidateQueries({ queryKey: studentKeys.detail(data.id) })
+            queryClient.invalidateQueries({ queryKey: ['audit-logs'] })
         },
     })
 }
@@ -90,11 +93,15 @@ export const useUpdateStudent = () => {
  */
 export const useDeleteStudent = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: (id: string) => mockApi.deleteStudent(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
+            queryClient.invalidateQueries({ queryKey: ['grades'] })
+            queryClient.invalidateQueries({ queryKey: ['audit-logs'] })
+            // Note: Since courses are in Redux, they will need a manual refetch or page reload to show updated counts
+            // In a real app, we might dispatch a Redux action here.
         },
     })
 }
@@ -106,9 +113,9 @@ export const useDeleteStudent = () => {
  */
 export const useAssignDiscount = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
-        mutationFn: ({ studentId, discountId }: { studentId: string; discountId: string }) => 
+        mutationFn: ({ studentId, discountId }: { studentId: string; discountId: string }) =>
             mockApi.assignDiscountToStudent(studentId, discountId),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: studentKeys.detail(data.id) })
@@ -124,13 +131,25 @@ export const useAssignDiscount = () => {
  */
 export const useRemoveDiscount = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
-        mutationFn: ({ studentId, discountId }: { studentId: string; discountId: string }) => 
+        mutationFn: ({ studentId, discountId }: { studentId: string; discountId: string }) =>
             mockApi.removeDiscountFromStudent(studentId, discountId),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: studentKeys.detail(data.id) })
             queryClient.invalidateQueries({ queryKey: studentKeys.lists() })
         }
+    })
+}
+
+/**
+ * خطاف لجلب إحصائيات الطلاب (التوزيع والنمو).
+ * 
+ * @returns {UseQueryResult} كائن يحتوي على إحصائيات الطلاب
+ */
+export const useStudentStats = () => {
+    return useQuery({
+        queryKey: [...studentKeys.all, 'stats'],
+        queryFn: () => mockApi.getStudentStats(),
     })
 }

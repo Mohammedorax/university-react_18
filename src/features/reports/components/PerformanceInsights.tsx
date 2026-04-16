@@ -45,7 +45,7 @@ export const PerformanceInsights = memo(function PerformanceInsights({
             {avgGpa.toFixed(2)}
           </h3>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
             <p className="text-[10px] text-emerald-600 font-black uppercase mb-1">نسبة النجاح الكلية</p>
@@ -74,5 +74,3 @@ export const PerformanceInsights = memo(function PerformanceInsights({
     </Card>
   )
 })
-
-export default PerformanceInsights

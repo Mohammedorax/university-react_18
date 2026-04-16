@@ -33,13 +33,13 @@ export const CriticalAlerts = memo(function CriticalAlerts({
         </div>
       ) : (
         criticalStudents.slice(0, 5).map((student) => (
-          <div 
-            key={student.id} 
+          <div
+            key={student.id}
             className="p-4 hover:bg-muted/50 transition-colors flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <div 
-                className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center text-destructive font-bold" 
+              <div
+                className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center text-destructive font-bold"
                 aria-hidden="true"
               >
                 {student.name[0]}
@@ -61,8 +61,8 @@ export const CriticalAlerts = memo(function CriticalAlerts({
       )}
       {criticalStudents.length > 0 && (
         <div className="p-4 bg-muted/30">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full rounded-xl font-bold text-muted-foreground border-border hover:bg-card"
             aria-label="عرض كافة تنبيهات الحالات الحرجة"
           >
@@ -73,5 +73,3 @@ export const CriticalAlerts = memo(function CriticalAlerts({
     </div>
   )
 })
-
-export default CriticalAlerts

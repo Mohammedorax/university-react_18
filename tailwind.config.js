@@ -7,6 +7,12 @@ module.exports = {
 		'./app/**/*.{ts,tsx}',
 		'./src/**/*.{ts,tsx}',
 	],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  RTL: {
+    enabled: true,
+  },
 	theme: {
 		container: {
 			center: true,
@@ -16,6 +22,9 @@ module.exports = {
 			},
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Cairo', 'Segoe UI', 'Tahoma', 'Arial', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -50,6 +59,19 @@ module.exports = {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
 				},
+				sidebar: {
+					DEFAULT: 'hsl(var(--sidebar-background))',
+					foreground: 'hsl(var(--sidebar-foreground))',
+					primary: 'hsl(var(--sidebar-primary))',
+					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+					accent: 'hsl(var(--sidebar-accent))',
+					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+					border: 'hsl(var(--sidebar-border))',
+					ring: 'hsl(var(--sidebar-ring))',
+					'hover-bg': 'hsl(var(--sidebar-hover-bg))',
+					'active-bg': 'hsl(var(--sidebar-active-bg))',
+					'active-foreground': 'hsl(var(--sidebar-active-foreground))',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -72,5 +94,7 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [require('tailwindcss-animate')],
+	plugins: [
+    require('tailwindcss-animate')
+  ],
 }

@@ -14,15 +14,15 @@ import { useStudents } from '@/features/students/hooks/useStudents'
 import { Student } from '@/features/students/types'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-import { 
-    Loader2, 
-    Award, 
-    Clock, 
-    BookOpen, 
-    MoreVertical, 
-    Edit2, 
-    Users, 
-    GraduationCap, 
+import {
+    Loader2,
+    Award,
+    Clock,
+    BookOpen,
+    MoreVertical,
+    Edit2,
+    Users,
+    GraduationCap,
     Search,
     ChevronRight,
     ChevronLeft,
@@ -32,16 +32,17 @@ import {
     RefreshCcw
 } from 'lucide-react'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 import { cn } from '@/lib/utils'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import React from 'react'
 
 /**
  * صفحة سجل الدرجات الأكاديمي.
@@ -59,18 +60,18 @@ const GradesPage = () => {
     // React Query Hooks
     const { data: studentGrades = [], isLoading: isLoadingStudentGrades, error: studentError, refetch: refetchStudentGrades } = useStudentGrades(user?.role === 'student' ? user?.id || '' : '')
     const { data: statistics } = useGradeStatistics(user?.role === 'student' ? user?.id || '' : '')
-    
+
     // Teacher specific hooks
     const { data: coursesResponse } = useCourses()
     const allCourses = useMemo(() => coursesResponse?.items || [], [coursesResponse])
-    
+
     const { data: studentsResponse } = useStudents()
     const allStudents = useMemo(() => studentsResponse?.items || [], [studentsResponse])
-    
+
     const { data: courseGrades = [], isLoading: isLoadingCourseGrades, error: courseError, refetch: refetchCourseGrades } = useCourseGrades(selectedCourse)
 
-    const isLoading = user?.role === 'student' 
-        ? isLoadingStudentGrades 
+    const isLoading = user?.role === 'student'
+        ? isLoadingStudentGrades
         : isLoadingCourseGrades
     const error = user?.role === 'student' ? studentError : (selectedCourse ? courseError : null)
 
@@ -103,27 +104,28 @@ const GradesPage = () => {
     /**
      * قائمة المقررات التي يقوم المعلم بتدريسها
      */
-    const teacherCourses = useMemo(() =>
-        allCourses.filter((course) => course.teacher_id === user?.id || course.teacher_name === user?.name),
-    [allCourses, user?.id, user?.name])
+    const teacherCourses = useMemo(() => {
+        if (user?.role === 'admin') return allCourses;
+        return allCourses.filter((course) => course.teacher_id === user?.id || course.teacher_name === user?.name)
+    }, [allCourses, user?.id, user?.name, user?.role])
 
     /**
      * المقرر الدراسي المختار حالياً
      */
-    const currentCourse = useMemo(() => 
+    const currentCourse = useMemo(() =>
         teacherCourses.find((c) => c.id === selectedCourse),
-    [teacherCourses, selectedCourse])
-    
+        [teacherCourses, selectedCourse])
+
     /**
      * قائمة الطلاب المسجلين في المقرر المختار مع تصفية البحث
      */
     const enrolledStudents = useMemo(() => {
         if (!selectedCourse) return []
-        
+
         return allStudents.filter(s => {
             const matchesCourse = s.enrolled_courses.includes(selectedCourse)
-            const matchesSearch = !searchTerm || 
-                s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            const matchesSearch = !searchTerm ||
+                s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 s.university_id.toLowerCase().includes(searchTerm.toLowerCase())
             return matchesCourse && matchesSearch
         })
@@ -142,7 +144,7 @@ const GradesPage = () => {
     /**
      * أعمدة جدول عرض درجات الطلاب (واجهة المعلم)
      */
-    const teacherColumns: DataTableColumn<Student>[] = [
+    const teacherColumns: DataTableColumn<Student>[] = useMemo(() => [
         {
             key: 'name',
             title: 'اسم الطالب',
@@ -161,19 +163,25 @@ const GradesPage = () => {
             key: 'midterm_score',
             title: 'أعمال السنة',
             sortable: true,
-            render: (value, student) => studentGradesMap[student.id]?.midterm_score || '-'
+            render: (_: unknown, student: Student) => {
+                const grade = studentGradesMap[student.id];
+                return grade?.midterm_score !== undefined && grade?.midterm_score !== null ? grade.midterm_score : '-'
+            }
         },
         {
             key: 'final_score',
             title: 'النهائي',
             sortable: true,
-            render: (value, student) => studentGradesMap[student.id]?.final_score || '-'
+            render: (_: unknown, student: Student) => {
+                const grade = studentGradesMap[student.id];
+                return grade?.final_score !== undefined && grade?.final_score !== null ? grade.final_score : '-'
+            }
         },
         {
             key: 'total_score',
             title: 'المجموع',
             sortable: true,
-            render: (value, student) => {
+            render: (_: unknown, student: Student) => {
                 const grade = studentGradesMap[student.id];
                 return <span className="font-bold text-primary">{grade?.total_score?.toFixed(1) || '-'}</span>
             }
@@ -182,36 +190,36 @@ const GradesPage = () => {
             key: 'letter_grade',
             title: 'التقدير',
             sortable: true,
-            render: (value, student) => {
+            render: (_: unknown, student: Student) => {
                 const grade = studentGradesMap[student.id];
                 if (!grade) return <span className="text-muted-foreground text-xs">لم يرصد</span>;
                 return (
                     <Badge className={cn(
                         "font-bold",
                         grade.letter_grade === 'F' ? 'bg-destructive hover:bg-destructive/90' :
-                        grade.letter_grade.startsWith('A') ? 'bg-primary hover:bg-primary/90' :
-                        'bg-primary/80 hover:bg-primary/90'
+                            grade.letter_grade.startsWith('A') ? 'bg-primary hover:bg-primary/90' :
+                                'bg-primary/80 hover:bg-primary/90'
                     )}>
                         {grade.letter_grade}
                     </Badge>
                 )
             }
         }
-    ];
+    ], [studentGradesMap]);
 
     /**
      * إجراءات الصف لجدول المعلم (رصد/تعديل الدرجة)
      */
     const teacherRowActions = (student: Student) => (
-        <EditGradeDialog 
+        <EditGradeDialog
             student_id={student.id}
             studentName={student.name}
             course={currentCourse}
             currentGrade={studentGradesMap[student.id]}
             trigger={
-                <Button 
-                    variant="outline" 
-                    size="sm" 
+                <Button
+                    variant="outline"
+                    size="sm"
                     className="gap-2 hover:bg-primary hover:text-primary-foreground border-primary/20 transition-all duration-300"
                     aria-label={`${studentGradesMap[student.id] ? 'تعديل' : 'رصد'} درجة الطالب ${student.name}`}
                 >
@@ -252,19 +260,19 @@ const GradesPage = () => {
             key: 'midterm_score',
             title: 'أعمال السنة',
             sortable: true,
-            render: (val: unknown) => (val as number | undefined) || '-'
+            render: (val: unknown): React.ReactNode => val !== undefined && val !== null ? String(val) : '-'
         },
         {
             key: 'final_score',
             title: 'النهائي',
             sortable: true,
-            render: (val: unknown) => (val as number | undefined) || '-'
+            render: (val: unknown): React.ReactNode => val !== undefined && val !== null ? String(val) : '-'
         },
         {
             key: 'total_score',
             title: 'المجموع',
             sortable: true,
-            render: (val: unknown) => <span className="font-bold text-primary">{(val as number).toFixed(1)}</span>
+            render: (val: unknown) => <span className="font-bold text-primary">{(val as number)?.toFixed(1) ?? '-'}</span>
         },
         {
             key: 'letter_grade',
@@ -276,8 +284,8 @@ const GradesPage = () => {
                     <Badge className={cn(
                         "font-bold",
                         grade === 'F' ? 'bg-destructive hover:bg-destructive/90' :
-                        grade.startsWith('A') ? 'bg-primary hover:bg-primary/90' :
-                        'bg-primary/80 hover:bg-primary/90'
+                            grade.startsWith('A') ? 'bg-primary hover:bg-primary/90' :
+                                'bg-primary/80 hover:bg-primary/90'
                     )}>
                         {grade}
                     </Badge>
@@ -286,18 +294,18 @@ const GradesPage = () => {
         }
     ]
 
-    // Allow both students and teachers
-    if (user?.role !== 'student' && user?.role !== 'teacher') {
+    // Allow students, teachers and admins
+    if (user?.role !== 'student' && user?.role !== 'teacher' && user?.role !== 'admin') {
         return (
             <div className="container mx-auto py-10">
                 <h1 className="text-2xl font-bold mb-4">سجل الدرجات</h1>
-                <p className="text-muted-foreground">هذه الصفحة متاحة للطلاب والمعلمين فقط.</p>
+                <p className="text-muted-foreground">هذه الصفحة متاحة للطلاب والمعلمين والمسؤولين فقط.</p>
             </div>
         )
     }
 
-    if (isLoading && !selectedCourse && user?.role === 'teacher') {
-         // Should not block if just selecting course
+    if (isLoading && !selectedCourse && (user?.role === 'teacher' || user?.role === 'admin')) {
+        // Should not block if just selecting course
     } else if (isLoading && user?.role === 'student') {
         return (
             <div className="min-h-screen bg-background pb-10">
@@ -343,9 +351,9 @@ const GradesPage = () => {
                     <p className="font-bold mb-2">حدث خطأ أثناء جلب البيانات</p>
                     <p className="text-sm">{(error as any).message || 'يرجى المحاولة مرة أخرى لاحقاً'}</p>
                 </div>
-                <Button 
-                    onClick={() => user?.role === 'student' ? refetchStudentGrades() : refetchCourseGrades()} 
-                    variant="outline" 
+                <Button
+                    onClick={() => user?.role === 'student' ? refetchStudentGrades() : refetchCourseGrades()}
+                    variant="outline"
                     className="gap-2"
                 >
                     <RefreshCcw size={16} />
@@ -377,23 +385,23 @@ const GradesPage = () => {
 
                         {/* Quick Stats */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8" role="region" aria-label="إحصائيات الأداء الأكاديمي">
-                            <StatCard 
-                                icon={TrendingUp} 
-                                title="المعدل التراكمي (GPA)" 
-                                value={statistics?.cumulative_gpa?.toFixed(2) || '0.00'} 
+                            <StatCard
+                                icon={TrendingUp}
+                                title="المعدل التراكمي (GPA)"
+                                value={statistics?.cumulative_gpa?.toFixed(2) || '0.00'}
                                 description="معدلك التراكمي في كافة الفصول"
                                 variant="primary"
                             />
-                            <StatCard 
-                                icon={CheckCircle2} 
-                                title="الساعات المكتسبة" 
-                                value={(statistics?.earned_credits || 0).toString()} 
+                            <StatCard
+                                icon={CheckCircle2}
+                                title="الساعات المكتسبة"
+                                value={(statistics?.earned_credits || 0).toString()}
                                 description="إجمالي عدد الساعات المجتازة"
                             />
-                            <StatCard 
-                                icon={BookOpen} 
-                                title="إجمالي المقررات" 
-                                value={(studentGrades?.length || 0).toString()} 
+                            <StatCard
+                                icon={BookOpen}
+                                title="إجمالي المقررات"
+                                value={(studentGrades?.length || 0).toString()}
                                 description="عدد المقررات المسجلة في السجل"
                             />
                         </div>
@@ -523,10 +531,10 @@ const GradesPage = () => {
                             </div>
 
                             <div className="flex items-center gap-3 w-full lg:w-auto justify-end flex-wrap">
-                                <Button 
-                                    variant="secondary" 
-                                    size="icon" 
-                                    className="rounded-2xl h-12 w-12 shadow-xl transition-all hover:scale-[1.05]" 
+                                <Button
+                                    variant="secondary"
+                                    size="icon"
+                                    className="rounded-2xl h-12 w-12 shadow-xl transition-all hover:scale-[1.05]"
                                     onClick={handleRefresh}
                                     aria-label="تحديث البيانات"
                                     disabled={isLoading}

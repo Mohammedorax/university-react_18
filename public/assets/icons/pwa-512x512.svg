@@ -1,0 +1,4 @@
+&lt;svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"&gt;
+  &lt;rect width="512" height="512" fill="#007bff"/&gt;
+  &lt;text x="256" y="256" text-anchor="middle" dy=".3em" fill="white" font-size="128"&gt;App&lt;/text&gt;
+&lt;/svg&gt;

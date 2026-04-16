@@ -9,6 +9,7 @@ export interface InventoryItem {
   sku: string;
   min_quantity: number;
   unit: string;
+  image?: string;
 }
 
 export interface InventoryStats {

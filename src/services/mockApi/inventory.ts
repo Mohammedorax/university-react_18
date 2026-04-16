@@ -1,6 +1,7 @@
 import { InventoryItem } from '@/features/inventory/types'
-import { initialInventory, initialInventoryCategories } from './data'
 import { getStorageData, setStorageData, delay } from './utils'
+import { initialInventory, initialInventoryCategories } from './data'
+import { addAuditLog } from './auditLog'
 
 export const inventoryApi = {
     getInventory: async () => {
@@ -11,12 +12,16 @@ export const inventoryApi = {
     addInventoryItem: async (itemData: Omit<InventoryItem, 'id'>) => {
         await delay(500)
         const inventory = getStorageData('inventory', initialInventory)
-        const newItem: InventoryItem = { 
-            ...itemData, 
-            id: 'inv' + (inventory.length + 1) + Date.now() 
+        const newItem: InventoryItem = {
+            ...itemData,
+            id: 'inv' + (inventory.length + 1) + Date.now()
         }
         inventory.push(newItem)
         setStorageData('inventory', inventory)
+
+        // Audit Log
+        await addAuditLog('إضافة صنف للمخزن', `تم إضافة ${newItem.name} إلى المخزن`)
+
         return newItem
     },
 
@@ -25,17 +30,28 @@ export const inventoryApi = {
         const inventory = getStorageData('inventory', initialInventory)
         const index = inventory.findIndex(i => i.id === id)
         if (index === -1) throw new Error('العنصر غير موجود')
-        
+
         inventory[index] = { ...inventory[index], ...data }
         setStorageData('inventory', inventory)
+
+        // Audit Log
+        await addAuditLog('تحديث صنف في المخزن', `تم تحديث بيانات ${inventory[index].name}`)
+
         return inventory[index]
     },
 
     deleteInventoryItem: async (id: string) => {
         await delay(500)
         const inventory = getStorageData('inventory', initialInventory)
+        const itemToDelete = inventory.find(i => i.id === id)
+        if (!itemToDelete) throw new Error('العنصر غير موجود')
+
         const newInventory = inventory.filter(i => i.id !== id)
         setStorageData('inventory', newInventory)
+
+        // Audit Log
+        await addAuditLog('حذف صنف من المخزن', `تم حذف ${itemToDelete.name} من المخزن`)
+
         return id
     },
 
@@ -52,6 +68,10 @@ export const inventoryApi = {
         }
         categories.push(category)
         setStorageData('categories', categories)
+
+        // Audit Log
+        await addAuditLog('إضافة تصنيف مخزون', `تم إضافة تصنيف جديد للمخزن: ${category}`)
+
         return category
     },
 
@@ -60,6 +80,19 @@ export const inventoryApi = {
         let categories = getStorageData('categories', initialInventoryCategories)
         categories = categories.filter(c => c !== category)
         setStorageData('categories', categories)
+
+        // Cascading: Mark items in this category as 'غير مصنف'
+        const inventory = JSON.parse(JSON.stringify(getStorageData('inventory', initialInventory)))
+        inventory.forEach(item => {
+            if (item.category === category) {
+                item.category = 'غير مصنف'
+            }
+        })
+        setStorageData('inventory', inventory)
+
+        // Audit Log
+        await addAuditLog('حذف تصنيف مخزون', `تم حذف تصنيف ${category} وتحديث العناصر المرتبطة به`)
+
         return category
     },
 }

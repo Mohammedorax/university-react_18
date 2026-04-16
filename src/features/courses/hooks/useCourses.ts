@@ -1,85 +1,132 @@
-import { useAppDispatch, useAppSelector } from '@/store';
-import { useEffect } from 'react';
-import {
-  fetchCourses,
-  setFilters,
-  setPagination,
-  selectCoursesForCurrentPage,
-  selectCoursesStatus,
-  selectCoursesError,
-  selectCurrentPage,
-  selectCurrentQuery,
-  selectCurrentDepartment,
-  selectTotalItems,
-  selectIsCourseSelected,
-} from '@/features/courses/slice/coursesSlice';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { api as mockApi } from '@/services/api'
+import type { Course } from '@/features/courses/types'
 
-interface UseCoursesOptions {
-  query?: string;
-  department?: string;
-  page?: number;
-  limit?: number;
+/**
+ * مفاتيح الاستعلام الخاصة بالمقررات لإدارة التخزين المؤقت في React Query.
+ *
+ * ملاحظة معمارية:
+ * بيانات المقررات هي Server-State، لذا تم نقلها من Redux (coursesSlice) إلى
+ * React Query كجزء من سياسة إدارة الحالة الموحدة (Hybrid: Server-State أولًا).
+ */
+export const courseKeys = {
+    all: ['courses'] as const,
+    lists: () => [...courseKeys.all, 'list'] as const,
+    details: () => [...courseKeys.all, 'detail'] as const,
+    detail: (id: string) => [...courseKeys.details(), id] as const,
+    enrolled: (studentId: string) => [...courseKeys.all, 'enrolled', studentId] as const,
 }
 
+interface UseCoursesOptions {
+    query?: string
+    department?: string
+    page?: number
+    limit?: number
+}
+
+/**
+ * جلب قائمة المقررات مع البحث/الفلترة/الترقيم.
+ * يحافظ على الواجهة القديمة لتوافق الاستدعاءات الحالية في الصفحات.
+ */
 export const useCourses = ({ query = '', department = 'all', page = 1, limit = 8 }: UseCoursesOptions = {}) => {
-  const dispatch = useAppDispatch();
+    const q = useQuery({
+        queryKey: [...courseKeys.lists(), { query, department, page, limit }],
+        queryFn: () => mockApi.getCourses({ query, department, page, limit }),
+        placeholderData: keepPreviousData,
+    })
 
-  // Selectors
-  const courses = useAppSelector(selectCoursesForCurrentPage);
-  const status = useAppSelector(selectCoursesStatus);
-  const error = useAppSelector(selectCoursesError);
-  const currentPage = useAppSelector(selectCurrentPage);
-  const currentQuery = useAppSelector(selectCurrentQuery);
-  const currentDepartment = useAppSelector(selectCurrentDepartment);
-  const totalItems = useAppSelector(selectTotalItems);
+    const totalItems = q.data?.total ?? 0
+    const courses = q.data?.items ?? []
 
-  // Effects
-  useEffect(() => {
-    if (query !== currentQuery || department !== currentDepartment || page !== currentPage) {
-      dispatch(setFilters({ query, department }));
-      dispatch(fetchCourses({ query, department, page, limit }));
+    return {
+        data: { items: courses, total: totalItems },
+        isLoading: q.isLoading,
+        isRefetching: q.isFetching && !q.isLoading,
+        error: q.error as unknown,
+        refetch: q.refetch,
+        courses,
+        currentPage: page,
+        totalItems,
     }
-  }, [query, department, page, limit, dispatch, currentQuery, currentDepartment, currentPage]);
+}
 
-  // Actions
-  const refetch = () => {
-    dispatch(fetchCourses({ query, department, page, limit }));
-  };
+export const useCourse = (id: string) => {
+    return useQuery({
+        queryKey: courseKeys.detail(id),
+        queryFn: () => mockApi.getCourseById(id),
+        enabled: !!id,
+    })
+}
 
-  const handlePageChange = (newPage: number) => {
-    dispatch(setPagination({ page: newPage, limit }));
-  };
+export const useAddCourse = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (data: Omit<Course, 'id' | 'enrolled_students'>) => mockApi.addCourse(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+        },
+    })
+}
 
-  const handleSelectCourse = (courseId: string) => {
-    dispatch(setFilters({ query, department }));
-  };
+export const useUpdateCourse = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ courseId, courseData }: { courseId: string; courseData: Partial<Course> }) =>
+            mockApi.updateCourse(courseId, courseData),
+        onSuccess: (_data, vars) => {
+            queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+            queryClient.invalidateQueries({ queryKey: courseKeys.detail(vars.courseId) })
+        },
+    })
+}
 
-  return {
-    data: { items: courses, total: totalItems },
-    isLoading: status === 'loading',
-    isRefetching: status === 'loading',
-    error,
-    refetch,
-    courses,
-    currentPage,
-    totalItems,
-    handlePageChange,
-    handleSelectCourse,
-  };
+export const useDeleteCourse = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (courseId: string) => mockApi.deleteCourse(courseId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+        },
+    })
+}
 
-  const handlePageChange = (newPage: number) > {
-    dispatch(setPagination({ page: newPage, limit }));
-  };
+export const useEnrollStudentInCourse = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ studentId, courseId }: { studentId: string; courseId: string }) =>
+            mockApi.enrollInCourse(studentId, courseId),
+        onSuccess: (_d, vars) => {
+            queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+            queryClient.invalidateQueries({ queryKey: courseKeys.enrolled(vars.studentId) })
+            queryClient.invalidateQueries({ queryKey: ['students'] })
+        },
+    })
+}
 
-  return {
-    data: { items: courses, total: totalItems },
-    isLoading: status === 'loading',
-    isRefetching: status === 'loading',
-    error,
-    refetch,
-    courses,
-    currentPage,
-    totalItems,
-    handlePageChange,
-  };
-};
+export const useUnenrollStudentFromCourse = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: ({ studentId, courseId }: { studentId: string; courseId: string }) =>
+            mockApi.unenrollFromCourse(studentId, courseId),
+        onSuccess: (_d, vars) => {
+            queryClient.invalidateQueries({ queryKey: courseKeys.lists() })
+            queryClient.invalidateQueries({ queryKey: courseKeys.enrolled(vars.studentId) })
+            queryClient.invalidateQueries({ queryKey: ['students'] })
+        },
+    })
+}
+
+/**
+ * جلب المقررات التي سجل فيها طالب محدد.
+ * إن لم يكن لدى mockApi دالة مخصصة نستخدم قائمة المقررات ونفلتر في الواجهة.
+ */
+export const useEnrolledCourses = (studentId: string) => {
+    return useQuery({
+        queryKey: courseKeys.enrolled(studentId),
+        queryFn: async () => {
+            const res = await mockApi.getCourses({ page: 1, limit: 1000 })
+            return (res.items as Course[]).filter((c) => c.enrolled_students > 0)
+        },
+        enabled: !!studentId,
+    })
+}

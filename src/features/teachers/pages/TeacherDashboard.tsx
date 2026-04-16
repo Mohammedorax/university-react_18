@@ -25,7 +25,8 @@ import {
     Loader2,
     LogOut,
     LayoutDashboard,
-    RefreshCcw
+    RefreshCcw,
+    UserCheck
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -50,7 +51,7 @@ export default function TeacherDashboard() {
     const courses = useMemo(() => coursesResponse?.items || [], [coursesResponse])
     const logoutMutation = useLogout()
     const queryClient = useQueryClient()
-    
+
     // حالة البحث والتصفية
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearchTerm = useDebounce(searchTerm, 500)
@@ -84,39 +85,39 @@ export default function TeacherDashboard() {
     }
 
     // تصفية المقررات التي يدرسها هذا المدرس
-    const teacherCourses = useMemo(() => 
+    const teacherCourses = useMemo(() =>
         courses.filter((course: Course) => course.teacher_id === user?.id),
         [courses, user?.id]
     )
-    
+
     // Filter courses based on search and department
-    const filteredCourses = useMemo(() => 
+    const filteredCourses = useMemo(() =>
         teacherCourses.filter((course: Course) => {
             const matchesSearch = debouncedSearchTerm === '' ||
                 course.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
                 course.code.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-            
+
             const matchesDepartment = selectedDepartment === 'all' ||
                 course.department === selectedDepartment
-            
+
             return matchesSearch && matchesDepartment
         }),
         [teacherCourses, debouncedSearchTerm, selectedDepartment]
     )
-    
+
     // Get unique departments for filter
-    const departments = useMemo(() => 
+    const departments = useMemo(() =>
         Array.from(new Set(teacherCourses.map((c: Course) => c.department))),
         [teacherCourses]
     )
-    
+
     // Calculate statistics
     const stats = useMemo(() => {
         const totalStudents = teacherCourses.reduce((sum: number, course: Course) => sum + course.enrolled_students, 0)
         const averageStudents = teacherCourses.length > 0 ? Math.round(totalStudents / teacherCourses.length) : 0
         const totalCapacity = teacherCourses.reduce((sum: number, course: Course) => sum + course.max_students, 0)
         const occupancyRate = totalCapacity > 0 ? Math.round((totalStudents / totalCapacity) * 100) : 0
-        
+
         return { totalStudents, averageStudents, totalCapacity, occupancyRate }
     }, [teacherCourses])
 
@@ -139,10 +140,10 @@ export default function TeacherDashboard() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button 
-                                variant="secondary" 
-                                size="icon" 
-                                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 backdrop-blur-sm rounded-xl" 
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 backdrop-blur-sm rounded-xl"
                                 onClick={handleRefresh}
                                 disabled={isRefreshing}
                                 aria-label="تحديث البيانات"
@@ -155,9 +156,9 @@ export default function TeacherDashboard() {
                             <Button variant="secondary" size="icon" className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 backdrop-blur-sm rounded-xl" onClick={() => navigate('/settings')} aria-label="الإعدادات">
                                 <Settings size={20} aria-hidden="true" />
                             </Button>
-                            <Button 
-                                variant="secondary" 
-                                onClick={handleLogout} 
+                            <Button
+                                variant="secondary"
+                                onClick={handleLogout}
                                 className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold rounded-2xl px-6 py-6 h-auto shadow-xl transition-all hover:scale-[1.02]"
                                 disabled={logoutMutation.isPending}
                                 aria-label="تسجيل الخروج من النظام"
@@ -304,7 +305,7 @@ export default function TeacherDashboard() {
                                                 </span>
                                             </div>
                                             <div className="w-full bg-muted h-2.5 rounded-full overflow-hidden shadow-inner">
-                                                <div 
+                                                <div
                                                     className={cn(
                                                         "h-full transition-all duration-1000 rounded-full",
                                                         (course.enrolled_students / course.max_students) > 0.9 ? 'bg-destructive' : 'bg-primary'
@@ -328,13 +329,22 @@ export default function TeacherDashboard() {
                                                 </div>
                                             )}
                                         </div>
-                                        
+
                                         <div className="flex gap-2 pt-2">
                                             <CourseStudentsDialog course={course} />
-                                            <Button 
-                                                variant="outline" 
-                                                size="sm" 
-                                                onClick={() => navigate('/grades')} 
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => navigate('/teacher/attendance')}
+                                                className="flex-1 hover:bg-primary/5 hover:text-primary hover:border-primary/20 rounded-xl font-bold h-10 transition-all"
+                                            >
+                                                <UserCheck className="ml-2 h-4 w-4" />
+                                                التحضير
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => navigate('/grades')}
                                                 className="flex-1 hover:bg-primary/5 hover:text-primary hover:border-primary/20 rounded-xl font-bold h-10 transition-all"
                                             >
                                                 <TrendingUp className="ml-2 h-4 w-4" />

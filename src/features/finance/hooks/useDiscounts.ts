@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { mockApi, Discount } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
+import type { Discount } from '@/services/api'
+export type { Discount };
 
 /**
  * مفاتيح الاستعلام الخاصة بالخصومات لإدارة التخزين المؤقت (Cache) في React Query.
@@ -35,7 +37,7 @@ export const useDiscounts = () => {
  */
 export const useAddDiscount = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: (newDiscount: Omit<Discount, 'id'>) => mockApi.addDiscount(newDiscount),
         onSuccess: () => {
@@ -51,7 +53,7 @@ export const useAddDiscount = () => {
  */
 export const useUpdateDiscount = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<Discount> }) => mockApi.updateDiscount(id, data),
         onSuccess: (data) => {
@@ -68,7 +70,7 @@ export const useUpdateDiscount = () => {
  */
 export const useDeleteDiscount = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: (id: string) => mockApi.deleteDiscount(id),
         onSuccess: () => {

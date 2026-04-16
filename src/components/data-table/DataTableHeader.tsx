@@ -21,7 +21,7 @@ interface DataTableHeaderProps<T> {
   exportDisabled?: boolean;
 }
 
-export function DataTableHeader<T>({
+export const DataTableHeader = function DataTableHeader<T>({
   columns,
   searchTerm,
   onSearchChange,
@@ -70,4 +70,8 @@ export function DataTableHeader<T>({
       </div>
     </div>
   );
-}
+};
+
+
+
+

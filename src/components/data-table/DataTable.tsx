@@ -10,7 +10,7 @@ import { DataTableVirtual } from './DataTableVirtual';
 import { DataTablePagination } from './DataTablePagination';
 import type { DataTableProps } from './types';
 
-export function DataTable<T extends { id: string | number }>({
+export const DataTable = function DataTable<T extends { id: string | number }>({
   data,
   columns,
   searchPlaceholder = "بحث...",
@@ -32,6 +32,17 @@ export function DataTable<T extends { id: string | number }>({
   const { data: systemSettings } = useSettings();
   const { primaryColor } = useTheme();
   
+  // Memoize table options to prevent hook recreation
+  const tableOptions = React.useMemo(() => ({
+    data,
+    columns,
+    pageSize,
+    onRowSelection,
+    onPageChange,
+    externalCurrentPage,
+    externalTotalPages,
+  }), [data, columns, pageSize, onRowSelection, onPageChange, externalCurrentPage, externalTotalPages]);
+  
   const {
     searchTerm,
     sortConfig,
@@ -52,25 +63,17 @@ export function DataTable<T extends { id: string | number }>({
     handleSearchChange,
     clearSelection,
     toggleDensity,
-  } = useDataTable({
-    data,
-    columns,
-    pageSize,
-    onRowSelection,
-    onPageChange,
-    externalCurrentPage,
-    externalTotalPages,
-  });
+  } = useDataTable(tableOptions);
 
   const { exportToCSV, exportToExcel, exportToPDF } = useDataTableExport(
     sortedData,
     columns,
     visibleColumns,
     systemSettings,
-    primaryColor
+    primaryColor,
   );
 
-  const showCheckboxes = !!onRowSelection || !!bulkActions;
+  const showCheckboxes = React.useMemo(() => !!onRowSelection || !!bulkActions, [onRowSelection, bulkActions]);
 
   return (
     <div className="space-y-4 w-full" dir="rtl">
@@ -103,7 +106,7 @@ export function DataTable<T extends { id: string | number }>({
       {virtualized ? (
         <div className="rounded-xl border bg-card shadow-sm overflow-hidden" role="region" aria-label="جدول البيانات">
           <DataTableVirtual
-            data={paginatedData}
+            data={sortedData}
             columns={columns}
             visibleColumns={visibleColumns}
             density={density}
@@ -135,15 +138,21 @@ export function DataTable<T extends { id: string | number }>({
         />
       )}
 
-      <DataTablePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={sortedData.length}
-        externalTotalItems={externalTotalItems}
-        pageSize={pageSize}
-        sortedDataLength={sortedData.length}
-        onPageChange={handlePageClick}
-      />
+      {!virtualized && (
+        <DataTablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={sortedData.length}
+          externalTotalItems={externalTotalItems}
+          pageSize={pageSize}
+          sortedDataLength={sortedData.length}
+          onPageChange={handlePageClick}
+        />
+      )}
     </div>
   );
-}
+};
+
+
+
+

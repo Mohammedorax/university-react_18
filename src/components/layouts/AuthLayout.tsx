@@ -1,6 +1,10 @@
 import { Outlet } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 
+/**
+ * تخطيط الصفحات المصادقة مثل تسجيل الدخول وإعادة تعيين كلمة المرور.
+ * يعرض شعار الجامعة ويحتوي على منطقة للنماذج.
+ */
 const AuthLayout = () => {
     return (
         <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40 p-4" dir="rtl">

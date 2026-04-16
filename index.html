@@ -3,21 +3,33 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#3b82f6" />
   <meta name="description" content="نظام إدارة الجامعة الشامل - إدارة الطلاب والمعلمين والموارد" />
   
-  <!-- Content Security Policy - حماية XSS -->
+  <!--
+    Content Security Policy - حماية XSS
+    ملاحظة: 'unsafe-inline' في style-src مطلوب لـ Tailwind/Vite runtime styles.
+    script-src لا يحتاج 'unsafe-inline' (جميع السكريبتات من ملفات bundled).
+    يُفضَّل تطبيق CSP عبر HTTP headers على الخادم (انظر vite.config.ts preview headers
+    و netlify.toml) بدلاً من meta tag في الإنتاج.
+  -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    script-src 'self';
+    script-src-attr 'none';
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
-    connect-src 'self' http://localhost:4000 ws://localhost:4000;
-    frame-ancestors 'none';
+    font-src 'self' https://fonts.gstatic.com data:;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' https: wss: http://localhost:* ws://localhost:*;
     base-uri 'self';
     form-action 'self';
+    frame-ancestors 'none';
+    object-src 'none';
+    worker-src 'self' blob:;
+    manifest-src 'self';
+    media-src 'self';
+    upgrade-insecure-requests;
   ">
   
   <!-- Apple Web App Meta Tags -->
@@ -29,8 +41,9 @@
   <link rel="manifest" href="/manifest.json" />
   
   <!-- Favicon and Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192x192.png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="/assets/icons/icon-192x192.png" />
+  <link rel="icon" type="image/svg+xml" sizes="192x192" href="/assets/icons/pwa-192x192.svg" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/assets/icons/pwa-192x192.svg" />
+  <link rel="icon" type="image/svg+xml" sizes="512x512" href="/assets/icons/pwa-512x512.svg" />
   
   <title>نظام الجامعة الإلكتروني</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">

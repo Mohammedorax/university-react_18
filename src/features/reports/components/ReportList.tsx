@@ -12,6 +12,7 @@ interface ReportListProps {
   columns: DataTableColumn<any>[]
   pageSize?: number
   searchPlaceholder?: string
+  virtualized?: boolean
   emptyState?: {
     icon: 'user' | 'book' | 'chart' | 'check'
     title: string
@@ -43,6 +44,7 @@ export const ReportList = memo(function ReportList({
   columns,
   pageSize = 10,
   searchPlaceholder = "بحث...",
+  virtualized = false,
   emptyState,
   isEmpty = false
 }: ReportListProps) {
@@ -73,11 +75,11 @@ export const ReportList = memo(function ReportList({
             columns={columns}
             pageSize={pageSize}
             searchPlaceholder={searchPlaceholder}
+            virtualized={virtualized}
+            virtualHeight={400}
           />
         )}
       </CardContent>
     </Card>
   )
 })
-
-export default ReportList

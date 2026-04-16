@@ -5,10 +5,10 @@ import { Course } from '@/features/courses/types'
 
 // Type for schedule entries within a course
 type ScheduleEntry = {
-  day: string
-  start_time: string
-  end_time: string
-  room: string
+    day: string
+    start_time: string
+    end_time: string
+    room: string
 }
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
@@ -16,8 +16,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
-import { 
-    Loader2, Clock, MapPin, Calendar, BookOpen, 
+import {
+    Loader2, Clock, MapPin, Calendar, BookOpen,
     GraduationCap, Layout, Printer, Download,
     ChevronRight, ChevronLeft, Info, RefreshCcw, Search,
     AlertCircle
@@ -73,11 +73,11 @@ const SchedulePage = () => {
         if (user.role === 'student') courses = enrolledCourses
         else if (user.role === 'teacher') courses = allCourses.filter(course => course.teacher_id === user.id)
         else if (user.role === 'admin') courses = allCourses
-        
+
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase()
-            courses = courses.filter(c => 
-                c.name.toLowerCase().includes(searchLower) || 
+            courses = courses.filter(c =>
+                c.name.toLowerCase().includes(searchLower) ||
                 c.code.toLowerCase().includes(searchLower)
             )
         }
@@ -88,19 +88,25 @@ const SchedulePage = () => {
      * بناء شبكة الجدول الزمني لربط المقررات بالأيام والساعات
      */
     const scheduleGrid = useMemo(() => {
-        const grid: Record<string, any> = {}
+        const grid: Record<string, any[]> = {}
         userCourses.forEach(course => {
             course.schedule?.forEach((s: ScheduleEntry) => {
                 const day = s.day
+                // Ensure times are zero-padded for string comparison (e.g. "08:00")
+                const start = s.start_time.length === 4 ? `0${s.start_time}` : s.start_time;
+                const end = s.end_time.length === 4 ? `0${s.end_time}` : s.end_time;
+
                 // تعيين المقرر لكل ساعة يغطيها في الجدول
                 TIME_SLOTS.forEach(slot => {
-                    if (s.start_time <= slot && s.end_time > slot) {
-                        grid[`${day}-${slot}`] = {
+                    if (start <= slot && end > slot) {
+                        const key = `${day}-${slot}`;
+                        if (!grid[key]) grid[key] = [];
+                        grid[key].push({
                             ...course,
                             currentRoom: s.room,
                             currentStartTime: s.start_time,
                             currentEndTime: s.end_time
-                        }
+                        })
                     }
                 })
             })
@@ -137,10 +143,11 @@ const SchedulePage = () => {
                     </div>
                     <h2 className="text-2xl font-bold mb-2">حدث خطأ أثناء تحميل البيانات</h2>
                     <p className="text-muted-foreground mb-6">
-                        {(error as Error)?.message || 'يرجى المحاولة مرة أخرى لاحقاً'}
+                        {String(error || 'يرجى المحاولة مرة أخرى لاحقاً')}
+
                     </p>
-                    <Button 
-                        onClick={() => user?.role === 'student' ? refetchEnrolled() : refetchCourses()} 
+                    <Button
+                        onClick={() => user?.role === 'student' ? refetchEnrolled() : refetchCourses()}
                         variant="outline"
                         className="gap-2"
                     >
@@ -213,26 +220,26 @@ const SchedulePage = () => {
                                     aria-label="البحث في الجدول الدراسي"
                                 />
                             </div>
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 size="icon"
-                                className="h-11 w-11 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 rounded-xl" 
+                                className="h-11 w-11 bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 rounded-xl"
                                 onClick={handleRefresh}
                                 aria-label="تحديث بيانات الجدول"
                             >
                                 <RefreshCcw className="h-5 w-5" aria-hidden="true" />
                             </Button>
-                            <Button 
-                                variant="outline" 
-                                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 h-11 px-6 rounded-xl" 
+                            <Button
+                                variant="outline"
+                                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 h-11 px-6 rounded-xl"
                                 onClick={handlePrint}
                                 aria-label="طباعة الجدول الدراسي"
                             >
                                 <Printer className="ml-2 h-4 w-4" aria-hidden="true" />
                                 طباعة
                             </Button>
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/20 h-11 px-6 rounded-xl"
                                 aria-label="تحميل الجدول الدراسي كملف PDF"
                             >
@@ -269,8 +276,8 @@ const SchedulePage = () => {
                             <div>
                                 <p className="text-sm opacity-80">نوع الحساب</p>
                                 <p className="text-2xl font-bold">
-                                    {user?.role === 'student' ? 'طالب' : 
-                                     user?.role === 'teacher' ? 'محاضر' : 'إدارة'}
+                                    {user?.role === 'student' ? 'طالب' :
+                                        user?.role === 'teacher' ? 'محاضر' : 'إدارة'}
                                 </p>
                             </div>
                         </div>
@@ -278,16 +285,16 @@ const SchedulePage = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 -mt-16 relative z-20">
-                <Card className="shadow-2xl border-none rounded-3xl overflow-hidden">
+            <div className="page-container -mt-16 relative z-20">
+                <Card className="card-unified shadow-2xl overflow-hidden">
                     <CardHeader className="bg-card border-b pb-6">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <CardTitle className="text-2xl">جدول المحاضرات</CardTitle>
                                 <CardDescription className="text-base mt-1">
-                                    {user?.role === 'student' ? 'متابعة مواعيد محاضراتك المسجلة للفصل الحالي' : 
-                                     user?.role === 'teacher' ? 'متابعة مواعيد محاضراتك التي تدرسها' :
-                                     'استعراض وتدقيق جميع المحاضرات المجدولة في النظام'}
+                                    {user?.role === 'student' ? 'متابعة مواعيد محاضراتك المسجلة للفصل الحالي' :
+                                        user?.role === 'teacher' ? 'متابعة مواعيد محاضراتك التي تدرسها' :
+                                            'استعراض وتدقيق جميع المحاضرات المجدولة في النظام'}
                                 </CardDescription>
                             </div>
                             <div className="bg-muted p-1 rounded-xl hidden md:flex" role="navigation" aria-label="اختر اليوم لعرض محاضراته">
@@ -299,8 +306,8 @@ const SchedulePage = () => {
                                         aria-label={`عرض محاضرات يوم ${day}`}
                                         className={cn(
                                             "px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                            selectedDay === day 
-                                                ? "bg-background text-primary shadow-sm" 
+                                            selectedDay === day
+                                                ? "bg-background text-primary shadow-sm"
                                                 : "text-muted-foreground hover:text-primary"
                                         )}
                                     >
@@ -338,15 +345,16 @@ const SchedulePage = () => {
                                                     {time}
                                                 </div>
                                                 {DAYS.map(day => {
-                                                    const course = scheduleGrid[`${day}-${time}`]
+                                                    const courses = scheduleGrid[`${day}-${time}`] || []
                                                     return (
                                                         <div key={`${day}-${time}`} className={cn(
-                                                            "p-1 border-l last:border-l-0 min-h-[80px] transition-all",
+                                                            "p-1 border-l last:border-l-0 min-h-[80px] transition-all flex flex-col gap-1",
                                                             selectedDay === day ? "bg-primary/5" : ""
                                                         )} role="gridcell">
-                                                            {course && (
-                                                                <div 
-                                                                    className="h-full rounded-lg bg-card border-2 border-primary/20 p-2 shadow-sm hover:border-primary/50 hover:shadow-md transition-all cursor-pointer overflow-hidden group/item"
+                                                            {courses.map((course: any, idx: number) => (
+                                                                <div
+                                                                    key={idx}
+                                                                    className="flex-1 rounded-lg bg-card border-2 border-primary/20 p-2 shadow-sm hover:border-primary/50 hover:shadow-md transition-all cursor-pointer overflow-hidden group/item"
                                                                     aria-label={`محاضرة ${course.name} في ${course.currentRoom} من ${course.currentStartTime} إلى ${course.currentEndTime}`}
                                                                 >
                                                                     <div className="font-bold text-primary text-[10px] truncate">{course.name}</div>
@@ -355,7 +363,7 @@ const SchedulePage = () => {
                                                                         <span>{course.currentRoom}</span>
                                                                     </div>
                                                                 </div>
-                                                            )}
+                                                            ))}
                                                         </div>
                                                     )
                                                 })}
@@ -370,7 +378,7 @@ const SchedulePage = () => {
                                                 <div className="w-2 h-8 bg-primary rounded-full" aria-hidden="true"></div>
                                                 <h3 className="text-xl font-bold">محاضرات يوم {selectedDay}</h3>
                                             </div>
-                                            
+
                                             {dayCourses.length === 0 ? (
                                                 <div className="py-12">
                                                     <EmptyState
@@ -427,8 +435,8 @@ const SchedulePage = () => {
                             <Tabs value={selectedDay} onValueChange={setSelectedDay} className="w-full">
                                 <TabsList className="grid grid-cols-5 h-auto p-1 bg-muted rounded-2xl" aria-label="اختر اليوم">
                                     {DAYS.map(day => (
-                                        <TabsTrigger 
-                                            key={day} 
+                                        <TabsTrigger
+                                            key={day}
                                             value={day}
                                             aria-label={`محاضرات يوم ${day}`}
                                             className="text-[10px] sm:text-xs py-3 px-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl transition-all"
@@ -452,8 +460,8 @@ const SchedulePage = () => {
                                     {dayCourses.map(course => {
                                         const schedule = course.schedule?.find((s: ScheduleEntry) => s.day === selectedDay);
                                         return (
-                                            <div 
-                                                key={`${selectedDay}-${course.id}`} 
+                                            <div
+                                                key={`${selectedDay}-${course.id}`}
                                                 className="bg-card border border-border rounded-3xl p-5 shadow-sm active:scale-[0.98] transition-all relative overflow-hidden group"
                                                 role="article"
                                                 aria-label={`محاضرة ${course.name} في ${schedule?.room} من ${schedule?.start_time} إلى ${schedule?.end_time}`}
@@ -466,7 +474,7 @@ const SchedulePage = () => {
                                                             <h4 className="font-bold text-lg text-card-foreground group-hover:text-primary transition-colors">{course.name}</h4>
                                                         </div>
                                                         <p className="text-primary text-xs font-mono mb-4 pr-4">{course.code}</p>
-                                                        
+
                                                         <div className="flex flex-wrap gap-4 mt-2">
                                                             <div className="flex items-center gap-2 text-muted-foreground text-sm">
                                                                 <div className="p-1.5 bg-muted rounded-lg" aria-hidden="true">

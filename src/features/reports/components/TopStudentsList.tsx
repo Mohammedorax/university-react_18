@@ -11,18 +11,18 @@ interface TopStudentsListProps {
 }
 
 const topStudentsColumns: DataTableColumn<Student>[] = [
-  { 
-    key: 'name', 
+  {
+    key: 'name',
     title: 'الطالب',
     sortable: true,
     render: (value: unknown) => <span className="font-bold">{value as string}</span>
   },
-  { 
-    key: 'department', 
-    title: 'القسم' 
+  {
+    key: 'department',
+    title: 'القسم'
   },
-  { 
-    key: 'gpa', 
+  {
+    key: 'gpa',
     title: 'المعدل',
     sortable: true,
     render: (value: number) => (
@@ -51,7 +51,7 @@ export const TopStudentsList = memo(function TopStudentsList({
       </CardHeader>
       <CardContent className="p-6">
         <div className="overflow-x-auto">
-          <DataTable 
+          <DataTable
             data={topStudents}
             columns={topStudentsColumns}
             pageSize={maxDisplay}
@@ -62,5 +62,3 @@ export const TopStudentsList = memo(function TopStudentsList({
     </Card>
   )
 })
-
-export default TopStudentsList

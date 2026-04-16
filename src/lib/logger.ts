@@ -63,7 +63,7 @@ class Logger {
   private logs: LogEntry[] = [];
   private maxLogs = 1000;
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): Logger {
     if (!Logger.instance) {
@@ -106,9 +106,12 @@ class Logger {
       }
     }
 
-    // TODO: في الإنتاج، أرسل إلى خدمة تتبع الأخطاء (Sentry, LogRocket, etc.)
     if (import.meta.env.PROD && level === 'error') {
-      // sendToErrorTracking(entry);
+      sentry.captureException(new Error(message), {
+        ...entry.context,
+        logLevel: level,
+        timestamp: entry.timestamp,
+      });
     }
   }
 
@@ -145,4 +148,3 @@ class Logger {
 }
 
 export const logger = Logger.getInstance();
-export default logger;

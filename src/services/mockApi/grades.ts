@@ -1,12 +1,7 @@
 import { Grade } from '@/features/grades/types'
 import { initialGrades, initialStudents } from './data'
 import { getStorageData, setStorageData, delay, calculateGradeLetter } from './utils'
-
-let addAuditLog: (action: string, details: string) => Promise<any>
-
-export const setAuditLogFunction = (fn: (action: string, details: string) => Promise<any>) => {
-    addAuditLog = fn
-}
+import { addAuditLog } from './auditLog'
 
 export const gradeApi = {
     getAllGrades: async () => {

@@ -1,10 +1,10 @@
 import { memo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState } from '@/components/EmptyState'
-import { 
-  BaseAreaChart, 
-  BasePieChart, 
-  BaseBarChart 
+import {
+  BaseAreaChart,
+  BasePieChart,
+  BaseBarChart
 } from '@/components/charts/BaseCharts'
 import { UserX, BookX, TrendingUp } from 'lucide-react'
 
@@ -81,18 +81,18 @@ export const ReportChart = memo(function ReportChart({
     switch (type) {
       case 'pie':
         return (
-          <BasePieChart 
-            data={data} 
-            colors={colors} 
+          <BasePieChart
+            data={data}
+            colors={colors}
             ariaLabel={title}
             height={height}
           />
         )
       case 'bar':
         return (
-          <BaseBarChart 
-            data={data} 
-            color={color} 
+          <BaseBarChart
+            data={data}
+            color={color}
             layout={layout}
             ariaLabel={title}
             height={height}
@@ -101,7 +101,7 @@ export const ReportChart = memo(function ReportChart({
         )
       case 'area':
         return (
-          <BaseAreaChart 
+          <BaseAreaChart
             data={data}
             dataKey={dataKey}
             categoryKey={categoryKey}
@@ -144,5 +144,3 @@ export const ReportChart = memo(function ReportChart({
     </Card>
   )
 })
-
-export default ReportChart

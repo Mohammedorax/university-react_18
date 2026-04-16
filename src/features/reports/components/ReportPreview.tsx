@@ -16,10 +16,10 @@ export const ReportPreview = memo(function ReportPreview({
   if (!isExporting) return null
 
   return (
-    <div 
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-300" 
-      role="alert" 
-      aria-busy="true" 
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-300"
+      role="alert"
+      aria-busy="true"
       aria-label="جاري تصدير التقرير"
     >
       <Card className="w-[400px] border-none shadow-2xl overflow-hidden">
@@ -33,15 +33,15 @@ export const ReportPreview = memo(function ReportPreview({
               <Download className="h-6 w-6 text-primary animate-bounce" aria-hidden="true" />
             </div>
           </div>
-          
+
           <div className="space-y-3">
             <div className="flex justify-between text-sm font-medium">
               <span>{exportProgress}% مكتمل</span>
               <span className="text-primary">{exportProgress === 100 ? 'تم بنجاح' : 'جاري المعالجة...'}</span>
             </div>
             <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary transition-all duration-500 ease-out rounded-full" 
+              <div
+                className="h-full bg-primary transition-all duration-500 ease-out rounded-full"
                 style={{ width: `${exportProgress}%` }}
                 role="progressbar"
                 aria-valuenow={exportProgress}
@@ -53,7 +53,7 @@ export const ReportPreview = memo(function ReportPreview({
 
           <div className="grid grid-cols-3 gap-2">
             {[20, 50, 80].map((step) => (
-              <div 
+              <div
                 key={step}
                 className={cn(
                   "h-1 rounded-full transition-colors duration-500",
@@ -68,5 +68,3 @@ export const ReportPreview = memo(function ReportPreview({
     </div>
   )
 })
-
-export default ReportPreview

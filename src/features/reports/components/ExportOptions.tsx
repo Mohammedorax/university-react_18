@@ -15,9 +15,9 @@ export const ExportOptions = memo(function ExportOptions({
 }: ExportOptionsProps) {
   return (
     <div className="flex flex-wrap justify-center gap-3 print:hidden">
-      <Button 
-        onClick={onExportExcel} 
-        className="bg-primary-foreground/10 hover:bg-primary-foreground/20 border-primary-foreground/20 backdrop-blur-md text-primary-foreground gap-2 rounded-2xl px-6 py-6 h-auto transition-all hover:scale-105 focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2"
+      <Button
+        onClick={onExportExcel}
+        className="bg-white/10 hover:bg-white/20 border-white/20 backdrop-blur-md text-white gap-3 rounded-2xl px-6 h-12 transition-all hover:scale-[1.02] active:scale-95 shadow-lg font-bold"
         disabled={isExporting}
         aria-label="تصدير البيانات بصيغة إكسل"
       >
@@ -26,11 +26,11 @@ export const ExportOptions = memo(function ExportOptions({
         ) : (
           <FileSpreadsheet className="h-5 w-5" aria-hidden="true" />
         )}
-        تصدير البيانات
+        تصدير Excel
       </Button>
-      <Button 
-        onClick={onPrint} 
-        className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 border-none gap-2 rounded-2xl px-6 py-6 h-auto shadow-xl transition-all hover:scale-105 font-bold focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2"
+      <Button
+        onClick={onPrint}
+        className="bg-white text-primary hover:bg-white/90 border-none gap-3 rounded-2xl px-6 h-12 shadow-2xl transition-all hover:scale-[1.02] active:scale-95 font-bold"
         aria-label="طباعة التقارير الحالية"
       >
         <Printer className="h-5 w-5" aria-hidden="true" />
@@ -39,5 +39,3 @@ export const ExportOptions = memo(function ExportOptions({
     </div>
   )
 })
-
-export default ExportOptions

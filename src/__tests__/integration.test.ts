@@ -15,9 +15,8 @@ describe('System Integration Tests', () => {
         department: 'علوم الحاسب',
         year: 1,
         gpa: 0,
-        enrolled_courses: []
       }
-      
+
       const created = await mockApi.addStudent(newStudent)
       expect(created.id).toBeDefined()
       expect(created.name).toBe(newStudent.name)
@@ -44,9 +43,9 @@ describe('System Integration Tests', () => {
         schedule: [],
         instructor: 'د. خالد'
       }
-      
+
       const course = await mockApi.addCourse(newCourse)
-      
+
       // 2. Create a student
       const student = await mockApi.addStudent({
         name: 'طالب تجريبي',
@@ -55,16 +54,15 @@ describe('System Integration Tests', () => {
         department: 'علوم الحاسب',
         year: 2,
         gpa: 0,
-        enrolled_courses: []
       })
 
       // 3. Enroll student
       await mockApi.enrollInCourse(student.id, course.id)
-      
+
       // 4. Verify enrollment
       const updatedStudent = await mockApi.getStudentById(student.id)
       expect(updatedStudent.enrolled_courses).toContain(course.id)
-      
+
       const updatedCourse = await mockApi.getCourseById(course.id)
       expect(updatedCourse.enrolled_students).toBeGreaterThan(0)
       expect(updatedStudent.enrolled_courses.length).toBeGreaterThan(0)
@@ -86,9 +84,11 @@ describe('System Integration Tests', () => {
         location: 'المبنى أ',
         status: 'available' as const,
         price: 250,
-        sku: 'OFF-CHR-01'
+        sku: 'OFF-CHR-01',
+        min_quantity: 5,
+        unit: 'piece'
       }
-      
+
       const item = await mockApi.addInventoryItem(newItem)
       expect(item.id).toBeDefined()
 

@@ -49,8 +49,8 @@ export function EditCourseDialog({ course, trigger }: EditCourseDialogProps) {
   const onSubmit = async (values: CourseFormValues) => {
     try {
       await updateCourseMutation.mutateAsync({
-        id: course.id,
-        data: values
+        courseId: course.id,
+        courseData: values,
       });
       toast.success("تم تحديث المقرر بنجاح");
       setIsOpen(false);

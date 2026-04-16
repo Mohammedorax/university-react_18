@@ -10,7 +10,7 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,26 +19,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run linter
-        run: npm run lint
+        run: pnpm run lint
+
+      - name: Run type check
+        run: pnpm run typecheck
 
       - name: Run tests
-        run: npm test
+        run: pnpm run test
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         if: success()
 
   build:
     name: Build
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,13 +50,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build:prod
+        run: pnpm run build:prod
         env:
           CI: true
 
@@ -68,7 +71,7 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: build
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -77,16 +80,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: pnpm playwright install --with-deps
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: pnpm run test:e2e
         env:
           CI: true
 
@@ -104,7 +107,7 @@ jobs:
     needs: e2e-tests
     if: github.ref == 'refs/heads/develop'
     environment: staging
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -113,18 +116,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build:prod
+        run: pnpm run build:prod
         env:
           CI: true
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v42.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
@@ -144,7 +147,7 @@ jobs:
     needs: e2e-tests
     if: github.ref == 'refs/heads/main'
     environment: production
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -153,18 +156,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build:prod
+        run: pnpm run build:prod
         env:
           CI: true
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v42.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
@@ -191,7 +194,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -210,26 +213,26 @@ jobs:
         with:
           context: .
           push: true
-          tags: username/university-react:latest,username/university-react:${{ github.sha }}
-          cache-from: type=registry,ref=username/university-react:latest
-          cache-to: type=registry,ref=username/university-react:latest,mode=max
+          tags: university-react:latest,university-react:${{ github.sha }}
+          cache-from: type=registry,ref=university-react:latest
+          cache-to: type=registry,ref=university-react:latest,mode=max
 
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'pull_request'
-    
+
     steps:
       - name: Run Snyk Security Scan
-        uses: snyk/actions/node@master
+        uses: snyk/actions/node@v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: '--severity-threshold=high'
 
       - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
 
   performance:
@@ -237,7 +240,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-production
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -246,10 +249,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli
+        run: pnpm add -g @lhci/cli
 
       - name: Run Lighthouse
         run: lhci autorun --collect.url=https://app.university.edu --upload.target=temporary-public-storage
@@ -259,7 +262,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, build, e2e-tests]
     if: always()
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

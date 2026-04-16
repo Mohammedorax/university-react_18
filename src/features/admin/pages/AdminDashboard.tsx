@@ -15,16 +15,16 @@ import { AddTeacherDialog } from '@/features/teachers/components/AddTeacherDialo
 import { AddStaffDialog } from '@/features/staff/components/AddStaffDialog'
 import { AddCourseDialog } from '@/features/courses/components/AddCourseDialog'
 import { StudentDetailsDialog } from '@/features/students/components/StudentDetailsDialog'
-import { useStudents } from '@/features/students/hooks/useStudents'
+import { useStudents, useStudentStats } from '@/features/students/hooks/useStudents'
 import { Student } from '@/features/students/types'
 import { useTeachers } from '@/features/teachers/hooks/useTeachers'
 import { useCourses } from '@/features/courses/hooks/useCourses'
 import { useStaff } from '@/features/staff/hooks/useStaff'
-import { 
-    GraduationCap, 
-    BookOpen, 
-    Package, 
-    Percent, 
+import {
+    GraduationCap,
+    BookOpen,
+    Package,
+    Percent,
     UserPlus,
     Briefcase,
     LayoutDashboard,
@@ -42,7 +42,8 @@ import {
     Calendar,
     ChevronLeft,
     PieChart as PieChartIcon,
-    Loader2
+    Loader2,
+    History
 } from 'lucide-react'
 import {
     ResponsiveContainer,
@@ -88,19 +89,20 @@ const RecentStudentItem = memo(({ student }: { student: Student }) => (
 export default function AdminDashboard() {
     const navigate = useNavigate()
     const { user } = useAuthState()
-    
+
     const [isRefreshing, setIsRefreshing] = useState(false)
-    
+
     const { data: studentsData, isLoading: studentsLoading, error: studentsError, refetch: refetchStudents } = useStudents({ limit: 5 })
+    const { data: statsData, isLoading: statsLoading } = useStudentStats()
     const { data: teachersData, isLoading: teachersLoading, error: teachersError, refetch: refetchTeachers } = useTeachers({ limit: 1 })
     const { data: coursesData, isLoading: coursesLoading, error: coursesError, refetch: refetchCourses } = useCourses({ limit: 1 })
     const { data: staffData, isLoading: staffLoading, error: staffError, refetch: refetchStaff } = useStaff({ limit: 1 })
 
-    const isLoading = studentsLoading || teachersLoading || coursesLoading || staffLoading
+    const isLoading = studentsLoading || teachersLoading || coursesLoading || staffLoading || statsLoading
     const hasError = studentsError || teachersError || coursesError || staffError
 
     const students = useMemo(() => studentsData?.items || [], [studentsData])
-    const totalStudents = useMemo(() => studentsData?.total || 0, [studentsData])
+    const totalStudents = useMemo(() => statsData?.totalStudents || studentsData?.total || 0, [statsData, studentsData])
     const totalTeachers = useMemo(() => teachersData?.total || 0, [teachersData])
     const totalCourses = useMemo(() => coursesData?.total || 0, [coursesData])
     const totalStaff = useMemo(() => staffData?.total || 0, [staffData])
@@ -125,24 +127,11 @@ export default function AdminDashboard() {
         }
     }
 
-    // بيانات نمو الطلاب (محاكاة)
-    const growthData = useMemo(() => [
-        { month: 'سبتمبر', students: 400 },
-        { month: 'أكتوبر', students: 600 },
-        { month: 'نوفمبر', students: 800 },
-        { month: 'ديسمبر', students: 1100 },
-        { month: 'يناير', students: 1400 },
-        { month: 'فبراير', students: totalStudents },
-    ], [totalStudents])
+    // بيانات نمو الطلاب (محاكاة أو فعلية)
+    const growthData = useMemo(() => statsData?.growthData || [], [statsData])
 
-    // توزيع الطلاب حسب التخصص (باستخدام البيانات الفعلية)
-    const deptDistribution = useMemo(() => {
-        const departments = ['علوم الحاسب', 'هندسة البرمجيات', 'نظم المعلومات', 'الذكاء الاصطناعي'];
-        return departments.map((dept, index) => ({
-            name: dept,
-            value: Math.floor(totalStudents * [0.4, 0.25, 0.15, 0.2][index]),
-        }));
-    }, [totalStudents])
+    // توزيع الطلاب حسب التخصص (من البيانات الفعلية عبر الـ API)
+    const deptDistribution = useMemo(() => statsData?.deptDistribution || [], [statsData])
 
     const COLORS = ['hsl(var(--primary))', 'hsl(var(--primary)/0.8)', 'hsl(var(--primary)/0.6)', 'hsl(var(--primary)/0.4)'];
 
@@ -195,8 +184,8 @@ export default function AdminDashboard() {
                     <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
                         فشل في تحميل بيانات لوحة التحكم. يرجى التحقق من الاتصال والمحاولة مرة أخرى.
                     </p>
-                    <Button 
-                        onClick={handleRefetchAll} 
+                    <Button
+                        onClick={handleRefetchAll}
                         className="w-full gap-2 rounded-2xl h-14 font-bold shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] bg-primary text-primary-foreground"
                         aria-label="إعادة محاولة تحميل بيانات لوحة التحكم"
                     >
@@ -215,7 +204,7 @@ export default function AdminDashboard() {
                 <div className="absolute top-0 right-0 p-10 opacity-5" aria-hidden="true">
                     <LayoutDashboard size={400} />
                 </div>
-                <div className="container mx-auto px-4 relative z-10">
+                <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">
                         <div className="flex flex-col md:flex-row items-center gap-6">
                             <div className="bg-primary-foreground/10 backdrop-blur-md p-5 rounded-3xl border border-primary-foreground/20 shadow-2xl" aria-hidden="true">
@@ -260,10 +249,10 @@ export default function AdminDashboard() {
                             { label: 'الموظفين', value: totalStaff, icon: Briefcase, color: 'bg-primary/10 text-primary', link: '/admin/staff', ariaLabel: `عرض طاقم العمل، الإجمالي ${totalStaff}` },
                         ].map((stat, i) => (
                             <Link key={i} to={stat.link} className="block transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary-foreground/50 rounded-2xl ring-offset-primary" aria-label={stat.ariaLabel}>
-                                <StatCard 
-                                    icon={stat.icon} 
-                                    label={stat.label} 
-                                    value={stat.value} 
+                                <StatCard
+                                    icon={stat.icon}
+                                    label={stat.label}
+                                    value={stat.value}
                                     colorClass={stat.color}
                                     className="bg-card/40 border-primary-foreground/10"
                                 />
@@ -274,7 +263,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Main Content */}
-            <div className="container mx-auto px-4 -mt-16 relative z-20 space-y-8">
+            <div className="-mt-16 relative z-20 w-full space-y-8 px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Section */}
                     <div className="lg:col-span-2 space-y-8">
@@ -292,10 +281,10 @@ export default function AdminDashboard() {
                                     <CardDescription>عدد الطلاب المسجلين خلال الأشهر الأخيرة</CardDescription>
                                 </CardHeader>
                                 <CardContent className="h-[300px] p-4">
-                                    <BaseAreaChart 
-                                        data={growthData} 
-                                        dataKey="students" 
-                                        categoryKey="month" 
+                                    <BaseAreaChart
+                                        data={growthData}
+                                        dataKey="students"
+                                        categoryKey="month"
                                         ariaLabel="رسم بياني لنمو الطلاب"
                                     />
                                 </CardContent>
@@ -313,8 +302,8 @@ export default function AdminDashboard() {
                                     <CardDescription>نسبة الطلاب في كل قسم أكاديمي</CardDescription>
                                 </CardHeader>
                                 <CardContent className="h-[300px] p-0">
-                                    <BasePieChart 
-                                        data={deptDistribution} 
+                                    <BasePieChart
+                                        data={deptDistribution}
                                         ariaLabel="رسم بياني لتوزيع التخصصات"
                                         colors={COLORS}
                                     />
@@ -454,6 +443,10 @@ export default function AdminDashboard() {
                             <Link to="/discounts" className="block p-4 bg-card rounded-2xl shadow-md hover:shadow-xl transition-all border border-muted group" aria-label="الانتقال إلى إدارة الخصومات">
                                 <Percent className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" aria-hidden="true" />
                                 <span className="text-sm font-black text-foreground">الخصومات</span>
+                            </Link>
+                            <Link to="/admin/logs" className="block p-4 bg-card rounded-2xl shadow-md hover:shadow-xl transition-all border border-muted group" aria-label="الانتقال إلى سجلات النظام">
+                                <History className="h-6 w-6 text-primary mb-2 group-hover:scale-110 transition-transform" aria-hidden="true" />
+                                <span className="text-sm font-black text-foreground">سجلات النظام</span>
                             </Link>
                         </div>
                     </div>

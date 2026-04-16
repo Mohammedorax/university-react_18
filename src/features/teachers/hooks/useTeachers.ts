@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { mockApi } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
 import { Teacher } from '@/features/teachers/types'
 
 export const teacherKeys = {
@@ -46,6 +46,7 @@ export const useUpdateTeacher = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: teacherKeys.lists() })
       queryClient.invalidateQueries({ queryKey: teacherKeys.detail(data.id) })
+      queryClient.invalidateQueries({ queryKey: ['audit-logs'] })
     },
   })
 }

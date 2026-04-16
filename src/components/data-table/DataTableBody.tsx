@@ -23,7 +23,7 @@ interface DataTableBodyProps<T extends { id: string | number }> {
   onToggleSelectRow: (id: string | number) => void;
 }
 
-export function DataTableBody<T extends { id: string | number }>({
+export const DataTableBody = function DataTableBody<T extends { id: string | number }>({
   data,
   columns,
   visibleColumns,
@@ -40,8 +40,15 @@ export function DataTableBody<T extends { id: string | number }>({
   onToggleSelectAll,
   onToggleSelectRow,
 }: DataTableBodyProps<T>) {
-  const visibleCols = columns.filter(col => visibleColumns.has(String(col.key)) && !col.hidden);
-  const colCount = visibleCols.length + (showCheckboxes ? 1 : 0) + (rowActions ? 1 : 0);
+  const visibleCols = React.useMemo(() => 
+    columns.filter(col => visibleColumns.has(String(col.key)) && !col.hidden),
+    [columns, visibleColumns]
+  );
+  
+  const colCount = React.useMemo(() => 
+    visibleCols.length + (showCheckboxes ? 1 : 0) + ((rowActions || customRowActions) ? 1 : 0),
+    [visibleCols.length, showCheckboxes, rowActions, customRowActions]
+  );
 
   return (
     <div className="rounded-xl border bg-card shadow-sm overflow-hidden" role="region" aria-label="جدول البيانات">
@@ -143,4 +150,8 @@ export function DataTableBody<T extends { id: string | number }>({
       </div>
     </div>
   );
-}
+};
+
+
+
+

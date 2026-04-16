@@ -8,16 +8,16 @@ import { toast } from 'sonner'
 import { AddCourseDialog } from '@/features/courses/components/AddCourseDialog';
 import { EditCourseDialog } from '@/features/courses/components/EditCourseDialog';
 import { CourseDetailsDialog } from '@/features/courses/components/CourseDetailsDialog';
-import { 
-    Loader2, 
-    Trash2, 
-    UserPlus, 
-    UserMinus, 
-    BookOpen, 
-    Users, 
-    GraduationCap, 
-    Info, 
-    LayoutGrid, 
+import {
+    Loader2,
+    Trash2,
+    UserPlus,
+    UserMinus,
+    BookOpen,
+    Users,
+    GraduationCap,
+    Info,
+    LayoutGrid,
     List,
     Pencil,
     RefreshCcw,
@@ -30,17 +30,17 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -48,16 +48,17 @@ import { useCourses, useDeleteCourse, useEnrollStudentInCourse, useUnenrollStude
 import { useStudent } from '@/features/students/hooks/useStudents'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable } from '@/components/DataTable'
+import { CoursesFilters } from '../components/CoursesFilters';
 import { StatCard } from '@/components/StatCard'
 import { ViewModeButton } from '@/components/ViewModeButton'
 import { Course } from '../types'
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
 } from "@/components/ui/pagination"
 
 /**
@@ -68,7 +69,7 @@ import {
  */
 const CoursesPage = () => {
     const { user } = useAuthState()
-    
+
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 500)
     const [selectedDepartment, setSelectedDepartment] = useState<string>('all')
@@ -89,13 +90,13 @@ const CoursesPage = () => {
     useEffect(() => {
         setPage(1)
     }, [debouncedSearch, selectedDepartment])
-    
+
     const courses = useMemo(() => data?.items || [], [data?.items])
     const totalItems = data?.total || 0
     const totalPages = Math.ceil(totalItems / limit)
 
     const { data: currentStudent } = useStudent(user?.role === 'student' ? user?.id || '' : '')
-    
+
     const enrollMutation = useEnrollStudentInCourse()
     const unenrollMutation = useUnenrollStudentFromCourse()
     const deleteMutation = useDeleteCourse()
@@ -132,7 +133,7 @@ const CoursesPage = () => {
             if (type === 'Excel') {
                 const { saveAs } = await import('file-saver');
                 const XLSX = await import('xlsx');
-                
+
                 const exportData = courses.map(course => ({
                     'اسم المقرر': course.name,
                     'رمز المقرر': course.code,
@@ -146,7 +147,7 @@ const CoursesPage = () => {
                 const worksheet = XLSX.utils.json_to_sheet(exportData);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "المقررات");
-                
+
                 // إضافة دعم RTL لملف Excel
                 worksheet['!dir'] = 'rtl';
 
@@ -162,7 +163,7 @@ const CoursesPage = () => {
                         const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
                         if (!worksheet[cell_address]) continue;
                         if (!worksheet[cell_address].s) worksheet[cell_address].s = {};
-                        
+
                         worksheet[cell_address].s.alignment = {
                             horizontal: 'right',
                             readingOrder: 2 // RTL
@@ -176,12 +177,12 @@ const CoursesPage = () => {
             } else {
                 const { default: jsPDF } = await import('jspdf');
                 const { default: autoTable } = await import('jspdf-autotable');
-                
+
                 const doc = new jsPDF({ orientation: 'landscape', format: 'a4' });
-                
+
                 // إضافة خط يدعم العربية (بافتراض وجوده أو استخدام الخط الافتراضي مع تحسينات)
                 // ملاحظة: jspdf يحتاج لخط خارجي لدعم العربية بشكل كامل، هنا نستخدم الإعدادات الأساسية
-                
+
                 const tableData = courses.map(course => [
                     course.max_students,
                     course.enrolled_students,
@@ -280,108 +281,108 @@ const CoursesPage = () => {
      */
     const columns = useMemo(() => [
         {
-          key: 'name',
-          title: 'المقرر',
-          sortable: true,
-          render: (_: string, course: Course) => (
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-lg shadow-sm">
-                {course.name.charAt(0)}
-              </div>
-              <div>
-                <div className="font-bold text-foreground">{course.name}</div>
-                <div className="text-xs text-muted-foreground font-medium">{course.code}</div>
-              </div>
-            </div>
-          )
+            key: 'name',
+            title: 'المقرر',
+            sortable: true,
+            render: (_: string, course: Course) => (
+                <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-lg shadow-sm">
+                        {course.name.charAt(0)}
+                    </div>
+                    <div>
+                        <div className="font-bold text-foreground">{course.name}</div>
+                        <div className="text-xs text-muted-foreground font-medium">{course.code}</div>
+                    </div>
+                </div>
+            )
         },
         {
-          key: 'department',
-          title: 'القسم',
-          sortable: true,
-          render: (value: string) => (
-            <Badge variant="outline" className="font-bold border-primary/20 text-primary bg-primary/5">
-              {value}
-            </Badge>
-          )
+            key: 'department',
+            title: 'القسم',
+            sortable: true,
+            render: (value: string) => (
+                <Badge variant="outline" className="font-bold border-primary/20 text-primary bg-primary/5">
+                    {value}
+                </Badge>
+            )
         },
         {
-          key: 'credits',
-          title: 'الساعات',
-          sortable: true,
-          render: (value: number) => (
-            <div className="flex items-center gap-2 font-bold text-foreground/80">
-              <Clock className="h-3 w-3" />
-              {value} ساعة
-            </div>
-          )
+            key: 'credits',
+            title: 'الساعات',
+            sortable: true,
+            render: (value: number) => (
+                <div className="flex items-center gap-2 font-bold text-foreground/80">
+                    <Clock className="h-3 w-3" />
+                    {value} ساعة
+                </div>
+            )
         },
         {
-          key: 'instructor',
-          title: 'المدرس',
-          sortable: true,
-          render: (value: string) => (
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">
-                {value?.charAt(0) || '?'}
-              </div>
-              <span className="text-sm font-medium">{value}</span>
-            </div>
-          )
+            key: 'instructor',
+            title: 'المدرس',
+            sortable: true,
+            render: (value: string) => (
+                <div className="flex items-center gap-2">
+                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold">
+                        {value?.charAt(0) || '?'}
+                    </div>
+                    <span className="text-sm font-medium">{value}</span>
+                </div>
+            )
         },
         {
-          key: 'code',
-          title: 'رمز المقرر',
-          sortable: true,
-          hidden: true
+            key: 'code',
+            title: 'رمز المقرر',
+            sortable: true,
+            hidden: true
         },
         {
-          key: 'enrolled_students',
-          title: 'الطلاب',
-          sortable: true,
-          render: (value: number, course: Course) => (
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <span className="font-bold">{course.enrolled_students}/{course.max_students}</span>
-            </div>
-          )
+            key: 'enrolled_students',
+            title: 'الطلاب',
+            sortable: true,
+            render: (value: number, course: Course) => (
+                <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-bold">{course.enrolled_students}/{course.max_students}</span>
+                </div>
+            )
         }
     ], []);
 
     const rowActions = useMemo(() => [
         {
-          label: 'تفاصيل',
-          icon: <Info className="h-4 w-4" />,
-          onClick: (course: Course) => {
-            // Details action - could open a details dialog
-          }
-        },
-        {
-          label: 'تعديل',
-          icon: <Pencil className="h-4 w-4" />,
-          show: user?.role === 'admin' || user?.role === 'teacher',
-          onClick: (course: Course) => {
-            // Edit action - could open edit dialog
-          }
-        },
-        {
-          label: isEnrolled('') ? 'إلغاء التسجيل' : 'تسجيل',
-          icon: isEnrolled('') ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />,
-          show: user?.role === 'student',
-          onClick: (course: Course) => {
-            if (isEnrolled(course.id)) {
-                handleUnenroll(course.id);
-            } else {
-                handleEnroll(course.id);
+            label: 'تفاصيل',
+            icon: <Info className="h-4 w-4" />,
+            onClick: (course: Course) => {
+                // Details action - could open a details dialog
             }
-          }
         },
         {
-          label: 'حذف',
-          icon: <Trash2 className="h-4 w-4" />,
-          variant: 'destructive' as const,
-          show: user?.role === 'admin' || user?.role === 'teacher',
-          onClick: (course: Course) => handleDelete(course.id)
+            label: 'تعديل',
+            icon: <Pencil className="h-4 w-4" />,
+            show: user?.role === 'admin' || user?.role === 'teacher',
+            onClick: (course: Course) => {
+                // Edit action - could open edit dialog
+            }
+        },
+        {
+            label: isEnrolled('') ? 'إلغاء التسجيل' : 'تسجيل',
+            icon: isEnrolled('') ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />,
+            show: user?.role === 'student',
+            onClick: (course: Course) => {
+                if (isEnrolled(course.id)) {
+                    handleUnenroll(course.id);
+                } else {
+                    handleEnroll(course.id);
+                }
+            }
+        },
+        {
+            label: 'حذف',
+            icon: <Trash2 className="h-4 w-4" />,
+            variant: 'destructive' as const,
+            show: user?.role === 'admin' || user?.role === 'teacher',
+            onClick: (course: Course) => handleDelete(course.id)
         }
     ], [user, handleDelete, handleEnroll, handleUnenroll, isEnrolled]);
 
@@ -437,7 +438,8 @@ const CoursesPage = () => {
                 </div>
                 <div className="text-center max-w-md">
                     <h2 className="text-2xl font-bold mb-2">حدث خطأ أثناء تحميل البيانات</h2>
-                    <p className="text-muted-foreground mb-6">{(error as Error).message || 'يرجى المحاولة مرة أخرى لاحقاً'}</p>
+                    <p className="text-muted-foreground mb-6">{String(error || 'يرجى المحاولة مرة أخرى لاحقاً')}</p>
+
                 </div>
                 <Button onClick={() => refetch()} className="gap-2">
                     <RefreshCcw size={16} />
@@ -472,146 +474,60 @@ const CoursesPage = () => {
 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700" role="region" aria-label="إحصائيات سريعة">
-                        <StatCard 
-                            icon={BookOpen} 
-                            title="إجمالي المقررات" 
-                            value={totalItems.toString()} 
+                        <StatCard
+                            icon={BookOpen}
+                            title="إجمالي المقررات"
+                            value={totalItems.toString()}
                             description="عدد المقررات المسجلة في النظام"
                         />
-                        <StatCard 
-                            icon={GraduationCap} 
-                            title="الأقسام" 
-                            value={departments.length.toString()} 
+                        <StatCard
+                            icon={GraduationCap}
+                            title="الأقسام"
+                            value={departments.length.toString()}
                             description="عدد الأقسام الأكاديمية"
                         />
-                        <StatCard 
-                            icon={Users} 
-                            title="إجمالي الطلاب المسجلين" 
-                            value="850+" 
+                        <StatCard
+                            icon={Users}
+                            title="إجمالي الطلاب المسجلين"
+                            value="850+"
                             description="الطلاب المسجلين في كافة المقررات"
                         />
                     </div>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 -mt-16 relative z-20">
-                <Card className="shadow-2xl border-none overflow-hidden bg-background/80 backdrop-blur-xl" role="region" aria-label="أدوات التصفية وعرض المقررات">
+            <div className="page-container -mt-16 relative z-20">
+                <Card className="card-unified shadow-2xl overflow-hidden mb-8">
                     <CardHeader className="pb-6 border-b border-muted">
-                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                            <div className="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
-                                <div className="relative w-full md:w-80 group">
-                                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
-                                    <Input
-                                        placeholder="بحث عن مقرر..."
-                                        value={searchTerm}
-                                        onChange={(e) => {
-                                            setSearchTerm(e.target.value)
-                                            setPage(1)
-                                        }}
-                                        className="h-12 pr-11 rounded-2xl bg-muted/50 border-none focus-visible:ring-2 focus-visible:ring-primary transition-all font-medium"
-                                        aria-label="البحث عن المقررات"
-                                    />
-                                </div>
-
-                                <Select value={selectedDepartment} onValueChange={(val) => {
-                                    setSelectedDepartment(val)
-                                    setPage(1)
-                                }}>
-                                    <SelectTrigger className="h-12 w-full md:w-56 rounded-2xl bg-muted/50 border-none font-bold focus:ring-2 focus:ring-primary transition-all" aria-label="تصفية حسب القسم">
-                                        <div className="flex items-center gap-3">
-                                            <GraduationCap className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                                            <SelectValue placeholder="اختر القسم" />
-                                        </div>
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-2xl border-muted shadow-2xl">
-                                        <SelectItem value="all" className="font-bold">جميع الأقسام</SelectItem>
-                                        {departments.map(dept => (
-                                            <SelectItem key={dept} value={dept} className="font-bold">{dept}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="flex items-center gap-3 w-full lg:w-auto justify-end flex-wrap">
-                                <Button 
-                                    variant="secondary" 
-                                    size="icon" 
-                                    className={cn(
-                                        "rounded-2xl h-12 w-12 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]",
-                                        isRefetching && "animate-spin"
-                                    )} 
-                                    onClick={handleRefresh}
-                                    aria-label="تحديث البيانات"
-                                    disabled={isRefetching}
-                                >
-                                    <RefreshCcw size={20} aria-hidden="true" />
-                                </Button>
-
-                                <Button 
-                                    variant="outline" 
-                                    size="icon" 
-                                    className="h-12 w-12 rounded-2xl border-dashed hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all focus-visible:ring-destructive focus-visible:ring-offset-2"
-                                    onClick={handleResetFilters}
-                                    aria-label="إعادة ضبط الفلاتر"
-                                    title="إعادة ضبط الفلاتر"
-                                >
-                                    <RefreshCcw size={18} className="-rotate-90" />
-                                </Button>
-
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button 
-                                            variant="outline" 
-                                            className="h-12 px-6 rounded-2xl gap-2 font-bold border-muted-foreground/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-sm"
-                                            disabled={isExporting}
-                                            aria-label="تصدير البيانات"
-                                        >
-                                            {isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                                            تصدير
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="rounded-2xl p-2 min-w-[160px] shadow-2xl border-muted">
-                                        <DropdownMenuItem onClick={() => handleExport('Excel')} className="rounded-xl gap-3 font-bold p-3 cursor-pointer">
-                                            <FileSpreadsheet className="h-4 w-4 text-green-600" />
-                                            تصدير Excel
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => handleExport('PDF')} className="rounded-xl gap-3 font-bold p-3 cursor-pointer">
-                                            <FileText className="h-4 w-4 text-red-600" />
-                                            تصدير PDF
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                <div className="flex items-center bg-muted/50 rounded-2xl border p-1.5 shadow-inner ml-2" role="group" aria-label="تغيير وضع العرض">
-                                    <ViewModeButton 
-                                        active={viewMode === 'grid'} 
-                                        onClick={() => setViewMode('grid')} 
-                                        icon={<LayoutGrid size={20} />} 
-                                        label="عرض شبكي" 
-                                    />
-                                    <ViewModeButton 
-                                        active={viewMode === 'table'} 
-                                        onClick={() => setViewMode('table')} 
-                                        icon={<List size={20} />} 
-                                        label="عرض جدولي" 
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        <CoursesFilters
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            selectedDepartment={selectedDepartment}
+                            setSelectedDepartment={setSelectedDepartment}
+                            departments={departments}
+                            handleRefresh={handleRefresh}
+                            handleResetFilters={handleResetFilters}
+                            handleExport={handleExport}
+                            isExporting={isExporting}
+                            isRefetching={isRefetching}
+                            viewMode={viewMode}
+                            setViewMode={setViewMode}
+                            setPage={setPage}
+                        />
 
                         {/* ARIA Live Region for Search Results */}
-                        <div 
-                            className="sr-only" 
-                            role="status" 
-                            aria-live="polite" 
+                        <div
+                            className="sr-only"
+                            role="status"
+                            aria-live="polite"
                             aria-atomic="true"
                         >
-                            {courses.length > 0 
-                                ? `تم العثور على ${totalItems} مقرر` 
+                            {courses.length > 0
+                                ? `تم العثور على ${totalItems} مقرر`
                                 : 'لم يتم العثور على نتائج'}
                         </div>
                     </CardHeader>
-                    
+
                     <CardContent className="p-0">
                         {viewMode === 'grid' ? (
                             <div className="p-6" role="region" aria-label="عرض شبكي للمقررات">
@@ -678,9 +594,9 @@ const CoursesPage = () => {
                                                                 تفاصيل
                                                             </Button>
                                                         } />
-                                                        
+
                                                         {user?.role === 'student' && (
-                                                            <Button 
+                                                            <Button
                                                                 variant={isEnrolled(course.id) ? "destructive" : "default"}
                                                                 className="flex-1 h-10 rounded-xl font-bold gap-2 text-xs"
                                                                 onClick={() => isEnrolled(course.id) ? handleUnenroll(course.id) : handleEnroll(course.id)}
@@ -707,9 +623,9 @@ const CoursesPage = () => {
                                                                         <Pencil size={14} />
                                                                     </Button>
                                                                 } />
-                                                                <Button 
-                                                                    variant="outline" 
-                                                                    size="icon" 
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="icon"
                                                                     className="h-10 w-10 rounded-xl border-destructive/20 text-destructive hover:bg-destructive/5 transition-all"
                                                                     onClick={() => handleDelete(course.id)}
                                                                     disabled={deleteMutation.isPending}
@@ -729,7 +645,7 @@ const CoursesPage = () => {
                                                 <Pagination>
                                                     <PaginationContent className="bg-muted/30 p-1 rounded-2xl border border-muted/50 backdrop-blur-sm">
                                                         <PaginationItem>
-                                                            <PaginationPrevious 
+                                                            <PaginationPrevious
                                                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                                                 className={cn(
                                                                     "rounded-xl cursor-pointer hover:bg-background transition-all",
@@ -738,7 +654,7 @@ const CoursesPage = () => {
                                                                 aria-label="الصفحة السابقة"
                                                             />
                                                         </PaginationItem>
-                                                        
+
                                                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                                                             <PaginationItem key={pageNum}>
                                                                 <PaginationLink
@@ -755,7 +671,7 @@ const CoursesPage = () => {
                                                         ))}
 
                                                         <PaginationItem>
-                                                            <PaginationNext 
+                                                            <PaginationNext
                                                                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                                                 className={cn(
                                                                     "rounded-xl cursor-pointer hover:bg-background transition-all",
@@ -780,7 +696,7 @@ const CoursesPage = () => {
                                 )}
                             </div>
                         ) : (
-                            <DataTable 
+                            <DataTable
                                 data={courses}
                                 columns={columns}
                                 searchPlaceholder="بحث في المقررات الحالية..."
@@ -791,9 +707,9 @@ const CoursesPage = () => {
                                 onPageChange={setPage}
                                 totalItems={totalItems}
                                 bulkActions={(selectedItems) => (user?.role === 'admin' || user?.role === 'teacher') && (
-                                    <Button 
-                                        variant="destructive" 
-                                        size="sm" 
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
                                         className="gap-2 rounded-xl font-bold"
                                         onClick={() => {
                                             handleBulkDelete(selectedItems);
@@ -821,9 +737,9 @@ const CoursesPage = () => {
                                             } />
                                         )}
                                         {user?.role === 'student' && (
-                                            <Button 
-                                                variant="ghost" 
-                                                size="sm" 
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
                                                 className={cn("w-full justify-start gap-2 font-bold h-9 rounded-lg", isEnrolled(course.id) && "text-destructive hover:text-destructive hover:bg-destructive/5")}
                                                 onClick={() => isEnrolled(course.id) ? handleUnenroll(course.id) : handleEnroll(course.id)}
                                             >

@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Discount } from '@/services/mockApi'
+import type { Discount } from '@/services/api'
 
 const discountSchema = z.object({
   name: z.string().min(3, 'يجب أن يكون الاسم 3 أحرف على الأقل'),

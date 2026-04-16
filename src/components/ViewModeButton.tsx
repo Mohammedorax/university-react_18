@@ -19,16 +19,16 @@ interface ViewModeButtonProps {
  * @param {ViewModeButtonProps} props - خصائص المكون
  * @returns {JSX.Element} زر تبديل وضع العرض
  */
-export function ViewModeButton({ 
-  active, 
-  onClick, 
-  icon: Icon, 
+export function ViewModeButton({
+  active,
+  onClick,
+  icon: Icon,
   label,
-  className 
+  className
 }: ViewModeButtonProps) {
   const renderIcon = () => {
     if (!Icon) return null;
-    
+
     // Check if Icon is a valid React element (already rendered)
     if (React.isValidElement(Icon)) {
       return Icon;
@@ -39,18 +39,20 @@ export function ViewModeButton({
       const IconComponent = Icon as React.ElementType;
       return <IconComponent size={18} />;
     }
-    
+
     // Fallback for other React nodes (string, number, etc.)
     return Icon as React.ReactNode;
   }
 
   return (
-    <Button 
-      variant="ghost" 
-      size="sm" 
+    <Button
+      variant="ghost"
+      size="sm"
       className={cn(
-        "h-9 px-4 gap-2 rounded-lg transition-all font-bold",
-        active ? "bg-background shadow-md text-primary" : "text-muted-foreground hover:bg-transparent",
+        "h-10 px-4 gap-2 rounded-xl transition-all font-bold",
+        active
+          ? "bg-card shadow-sm text-primary border border-muted dark:bg-muted/40 dark:border-muted/50"
+          : "text-muted-foreground hover:bg-transparent hover:text-foreground dark:hover:bg-muted/20",
         className
       )}
       onClick={onClick}

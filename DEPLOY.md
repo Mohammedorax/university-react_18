@@ -1,8 +1,10 @@
-# 🚀 دليل نشر الإصدار التجريبي على Vercel
+# 🚀 دليل نشر الإصدار التجريبي على Netlify
 
-هذا الدليل يرشدك خطوة بخطوة لنشر المنصة على **Vercel مجانًا** عبر الواجهة (بدون CLI).
+النشر على **Netlify مجانًا** عبر الواجهة (بدون CLI).
 
 الإصدار التجريبي يعمل **بالكامل داخل المتصفح** عبر `mockApi` — لا يحتاج قاعدة بيانات أو سيرفر.
+
+> 💡 إذا احتجت لاحقًا بدائل أخرى (Cloudflare Pages / Surge / GitHub Pages / Render)، راجع القسم الأخير.
 
 ---
 
@@ -10,120 +12,157 @@
 
 | الملف | الغرض |
 |---|---|
-| `vercel.json` | إعدادات Vercel (SPA fallback + رؤوس أمان + كاش للأصول) |
-| `.vercelignore` | استثناء `server/`, tests, storybook من الرفع |
+| `netlify.toml` | إعدادات Netlify (build + SPA + رؤوس أمان + كاش) |
+| `public/_redirects` | نسخة احتياطية لقاعدة SPA fallback |
+| `.vercelignore` | (لا يؤثر، خاص بـVercel فقط) |
 | `package.json` (محدث) | أمر `build` متوافق مع Linux (cross-platform) |
 
-تم اختبار البناء محليًا ونجح: `dist/` جاهز وفيه PWA + code-splitting.
+تم اختبار البناء محليًا ونجح: `dist/` جاهز وفيه PWA + code-splitting + `_redirects`.
 
 ---
 
-## 🧭 الطريقة 1: النشر عبر GitHub (الأسهل والموصى بها)
+## 🧭 الطريقة 1: النشر عبر GitHub (الموصى بها)
 
-### 1) ارفع التغييرات إلى GitHub
+### 1) ادفع التغييرات إلى GitHub
 
 ```bash
-git add vercel.json .vercelignore package.json
-git add docs/STATE_MANAGEMENT.md server/ DEPLOY.md
-git commit -m "chore: prepare Vercel deployment + hybrid state policy + backend skeleton"
+git add netlify.toml public/_redirects package.json
+git add docs/STATE_MANAGEMENT.md server/ DEPLOY.md vercel.json .vercelignore
+git commit -m "chore: Netlify deployment config + hybrid state policy + backend skeleton"
 git push origin main
 ```
 
-### 2) سجّل/ادخل على Vercel
-- افتح: https://vercel.com
-- Sign up / Log in باستخدام **GitHub** (أسرع خيار).
+### 2) سجّل/ادخل على Netlify
+- افتح: **https://app.netlify.com**
+- **Sign up** → اختر **GitHub** (الأسرع) أو **Email**.
+- فعّل الحساب من البريد.
 
 ### 3) Import Project
-1. من لوحة Vercel اضغط **"Add New... → Project"**.
-2. اختر مستودعك `university-react_18`.
-3. Vercel سيكتشف تلقائيًا أنه **Vite** project.
+1. من لوحة Netlify اضغط **"Add new site"** → **"Import an existing project"**.
+2. اختر **"Deploy with GitHub"** → وافق على الصلاحيات.
+3. اختر مستودعك `university-react_18`.
 
-### 4) إعدادات البناء (تحقق فقط، كلها افتراضية صحيحة)
+### 4) إعدادات البناء
+Netlify ستقرأ `netlify.toml` تلقائيًا. تحقق فقط من:
+
 | الحقل | القيمة |
 |---|---|
-| Framework Preset | `Vite` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Install Command | `npm install --legacy-peer-deps` |
-| Node.js Version | **20.x** (مهم — غيّره إذا كان افتراضيًا 18) |
+| Branch to deploy | `main` |
+| Build command | `npm run build` (تلقائي) |
+| Publish directory | `dist` (تلقائي) |
+| Node version | `20` (تلقائي من `netlify.toml`) |
 
-> `--legacy-peer-deps` ضرورية بسبب بعض تعارضات peer بين Storybook + React 18.
+> إذا لم تظهر من الواجهة، فلا تقلق — الملف `netlify.toml` يحددها.
 
 ### 5) Environment Variables (اختياري الآن)
-لا تحتاج أي متغيرات للإصدار التجريبي الحالي (mockApi يعمل في المتصفح).
+لا تحتاج أي متغيرات للإصدار التجريبي الحالي.
 
-إذا أردت لاحقًا ربط الباكند:
+لاحقًا لربط الباكند:
 ```
-VITE_API_BASE_URL=https://your-api.example.com/api
+VITE_API_BASE_URL = https://your-api.example.com/api
 ```
 
-### 6) اضغط **Deploy**
-- البناء يستغرق ~2-3 دقائق.
-- ستحصل على رابط مثل: `https://university-react-18.vercel.app`
+### 6) اضغط **Deploy site**
+- البناء يستغرق ~3-5 دقائق أول مرة.
+- ستحصل على رابط مثل: `https://random-name-12345.netlify.app`
+- يمكنك تغيير الاسم من **Site settings → Change site name**.
 
 ### 7) جرّب التطبيق
-من شاشة اللوغين استخدم حسابات `mockApi` (إن كانت لديك، أو تذكر كلمات المرور الافتراضية من كود `src/services/mockApi/auth.ts`).
+من شاشة اللوغين استخدم حسابات `mockApi` (راجع `src/services/mockApi/auth.ts` للحسابات الافتراضية).
 
 ---
 
 ## 🧭 الطريقة 2: الرفع المباشر (بدون GitHub)
 
-إذا لم ترد استخدام GitHub:
+إذا لم ترد ربط GitHub:
 
 1. شغّل محليًا:
    ```bash
    npm run build
    ```
-2. افتح https://vercel.com → **Add New → Project → "Deploy"**.
-3. اسحب مجلد المشروع كاملاً (أو ملف zip) إلى الصفحة.
-4. نفس إعدادات الخطوة (4) أعلاه.
+2. افتح https://app.netlify.com/drop
+3. **اسحب مجلد `dist/`** إلى الصفحة.
+4. النشر فوري (~30 ثانية).
+
+> ⚠️ كل تحديث يتطلب سحب `dist/` يدويًا مجددًا. الطريقة 1 أفضل.
 
 ---
 
 ## 🔁 التحديثات اللاحقة
 
-- **مع GitHub**: أي `git push` إلى `main` يبني وينشر تلقائيًا.
-- أي branch آخر يحصل على **Preview URL** منفصل للمراجعة قبل الدمج.
+- **مع GitHub**: أي `git push origin main` يبني وينشر تلقائيًا.
+- أي Pull Request يحصل على **Deploy Preview** منفصل للمراجعة.
 
 ---
 
 ## 🛠️ استكشاف الأخطاء الشائعة
 
-### ❌ Build fails: "tsc: command not found"
-→ هذا لن يحدث الآن لأننا أزلنا `tsc -b` من سكريبت البناء. تأكد أنك تستخدم آخر `package.json`.
+### ❌ Build fails: "npm ERR! peer dependency"
+→ `NPM_FLAGS = "--legacy-peer-deps"` موجود في `netlify.toml`. تأكد أن الملف مرفوع.
 
-### ❌ 404 عند الـrefresh داخل الصفحات الداخلية
-→ `vercel.json` يحتوي `rewrites` تعالج هذا. تأكد أن الملف مرفوع.
+### ❌ 404 عند refresh على صفحة داخلية
+→ `public/_redirects` + قاعدة `netlify.toml` تعالجان هذا. تأكد من وجودهما في المستودع.
 
 ### ❌ Build timeout
-→ Vercel المجاني يحدد 45 دقيقة للبناء، ومشروعنا يستغرق ~3 دقائق. لن تحدث.
+→ حد Netlify المجاني 15 دقيقة؛ بناؤنا ~3 دقائق. لن يحدث.
 
-### ❌ Out of memory أثناء البناء
-→ أضف متغير البيئة: `NODE_OPTIONS=--max-old-space-size=4096` من Vercel dashboard.
+### ❌ Out of memory
+→ أضف في `netlify.toml` داخل `[build.environment]`:
+```toml
+NODE_OPTIONS = "--max-old-space-size=4096"
+```
 
-### ⚠️ تحذيرات حجم الـchunks
-→ طبيعية، غير مؤثرة على التشغيل. يمكن تحسينها لاحقًا بـ dynamic imports إضافية.
+### ⚠️ Service Worker (PWA) يعرض نسخة قديمة
+→ طبيعي عند التحديثات. الـ`netlify.toml` يضع `sw.js` بدون cache فيتحدث تلقائيًا عند زيارة جديدة.
 
 ---
 
-## 📊 الحدود المجانية في Vercel (Hobby Plan)
+## 📊 الحدود المجانية في Netlify (Starter Plan)
 
 | المورد | الحد |
 |---|---|
 | Bandwidth | 100 GB/شهر |
-| Build Time | 6,000 دقيقة/شهر |
+| Build minutes | 300 دقيقة/شهر |
+| Concurrent builds | 1 |
 | Deployments | غير محدود |
-| Custom Domain | ✅ مدعوم (مع HTTPS تلقائي) |
-| Team | فردي فقط |
+| Custom Domain | ✅ مع HTTPS تلقائي |
+| Deploy Previews | ✅ لكل PR |
+
+---
+
+## 🌐 بدائل أخرى جاهزة الإعداد
+
+### Cloudflare Pages
+1. https://pages.cloudflare.com
+2. Connect to Git → اختر المستودع.
+3. Build command: `npm run build`
+4. Output: `dist`
+5. Node version env var: `NODE_VERSION=20`
+6. (لا يحتاج `netlify.toml`، الإعدادات من لوحة التحكم)
+
+### Surge.sh (الأبسط على الإطلاق)
+```bash
+npm run build
+npx surge dist your-name.surge.sh
+```
+أول مرة يطلب إيميل + كلمة مرور فقط.
+
+### GitHub Pages
+يحتاج workflow إضافي — اطلب مني إعداده إذا رغبت.
+
+### Render
+1. https://render.com → New → Static Site
+2. اربط المستودع.
+3. Build: `npm run build` | Publish: `dist`
 
 ---
 
 ## 🔜 الخطوة التالية (عند الجاهزية)
 
-لنشر **الباكند + Postgres** على مجاني:
+لنشر **الباكند + Postgres** مجانًا:
 1. **Neon** (Postgres مجاني): https://neon.tech — 500MB + compute
-2. **Railway** / **Render** (Backend): $5 credit شهري مجاني
-3. نحدّث `VITE_API_BASE_URL` في Vercel لتشير إلى الباكند.
+2. **Render** أو **Railway** (Backend Fastify)
+3. نحدّث `VITE_API_BASE_URL` في Netlify Environment → تشير للباكند.
 4. نستبدل `api.dev.ts` بـ HTTP client حقيقي.
 
 قل لي متى تريد البدء بهذه الخطوة.

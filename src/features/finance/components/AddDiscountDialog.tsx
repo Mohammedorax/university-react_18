@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Plus } from 'lucide-react'
-import { useAddDiscount } from '@/features/finance/hooks/useDiscounts'
+import { useAddDiscount, Discount } from '@/features/finance/hooks/useDiscounts'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -71,7 +71,7 @@ export function AddDiscountDialog() {
    */
   const onSubmit = async (data: DiscountFormValues) => {
     try {
-      await addDiscountMutation.mutateAsync(data)
+      await addDiscountMutation.mutateAsync(data as Omit<Discount, 'id'>)
       toast.success('تم إضافة الخصم بنجاح')
       setOpen(false)
       form.reset()
@@ -86,7 +86,8 @@ export function AddDiscountDialog() {
       <DialogTrigger asChild>
         <Button className="flex items-center gap-2 rounded-xl shadow-lg hover:shadow-xl transition-all">
           <Plus size={20} />
-          إضافة خصم/منحة
+          <span className="hidden sm:inline">إضافة خصم/منحة</span>
+          <span className="inline sm:hidden">إضافة</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] rounded-2xl">

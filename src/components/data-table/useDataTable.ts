@@ -26,23 +26,22 @@ export function useDataTable<T extends { id: string | number }>({
   const [internalCurrentPage, setInternalCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
   const [density, setDensity] = useState<Density>('normal');
-  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(() => 
     new Set(columns.filter(col => !col.hidden).map(col => String(col.key)))
   );
   const [announcement, setAnnouncement] = useState('');
   const listRef = useRef(null);
 
   // Optimized filtering with specific field filtering
-  // Optimized filtering with specific field filtering
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
     const lowerSearch = searchTerm.toLowerCase();
-    
+
     // Get searchable columns
-    const searchableColumns = columns.filter(col => 
+    const searchableColumns = columns.filter(col =>
       !col.hidden && col.key
     );
-    
+
     return data.filter(item => {
       return searchableColumns.some(col => {
         const value = item[col.key as keyof T];
@@ -51,96 +50,41 @@ export function useDataTable<T extends { id: string | number }>({
     });
   }, [data, searchTerm, columns]);
 
-  // Sorting
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
-  // Sorting with stable sort and memoization
   // Sorting with stable sort and memoization
   const sortedData = useMemo(() => {
     if (!sortConfig.key || !sortConfig.direction) return filteredData;
-    
+
     // Create a stable sort using index as tie-breaker
-    const indexedData = filteredData.map((item, index) ={
+    const indexedData = filteredData.map((item, index) => {
       return { item: item, index: index };
     });
-    
+
     const sorted = indexedData.sort((a, b) => {
-      const aValue = (a.item as any)[sortConfig.key];
-      const bValue = (b.item as any)[sortConfig.key];
-      
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      const key = sortConfig.key as keyof T;
+      const aValue = a.item[key];
+      const bValue = b.item[key];
+
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (bValue == null) return sortConfig.direction === 'asc' ? 1 : -1;
+
+      // Type-aware comparison for correct numeric sorting
+      const aNum = Number(aValue);
+      const bNum = Number(bValue);
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        const result = aNum - bNum;
+        return sortConfig.direction === 'asc' ? result : -result;
+      }
+
+      // Fallback to string comparison for non-numeric values
+      const aComparable = String(aValue);
+      const bComparable = String(bValue);
+
+      if (aComparable < bComparable) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aComparable > bComparable) return sortConfig.direction === 'asc' ? 1 : -1;
       return a.index - b.index; // stable sort
     }).map(obj => obj.item);
-    
+
     return sorted;
   }, [filteredData, sortConfig]);
 
@@ -223,14 +167,16 @@ export function useDataTable<T extends { id: string | number }>({
   }, [selectedIds, data, onRowSelection]);
 
   const toggleColumnVisibility = useCallback((key: string) => {
-    const newVisible = new Set(visibleColumns);
-    if (newVisible.has(key)) {
-      if (newVisible.size > 1) newVisible.delete(key);
-    } else {
-      newVisible.add(key);
-    }
-    setVisibleColumns(newVisible);
-  }, [visibleColumns]);
+    setVisibleColumns(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        if (next.size > 1) next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }, []);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
@@ -249,32 +195,32 @@ export function useDataTable<T extends { id: string | number }>({
   return {
     // State
     searchTerm,
+    setSearchTerm,
+    handleSearchChange,
     sortConfig,
+    handleSort,
     currentPage,
-    internalCurrentPage,
+    setCurrentPage: setInternalCurrentPage,
+    handlePageClick,
+    totalPages,
+    paginatedData,
+    sortedData,
     selectedIds,
+    selectedItems,
+    toggleSelectRow,
+    toggleSelectAll,
+    clearSelection,
     density,
+    toggleDensity,
     visibleColumns,
+    toggleColumnVisibility,
     announcement,
     listRef,
-    
-    // Derived data
-    filteredData,
-    sortedData,
-    paginatedData,
-    totalPages,
-    selectedItems,
-    
-    // Handlers
-    setSearchTerm,
-    handleSort,
-    handlePageClick,
-    toggleSelectAll,
-    toggleSelectRow,
-    toggleColumnVisibility,
-    handleSearchChange,
-    clearSelection,
-    toggleDensity,
-    setInternalCurrentPage,
+
+    // Metadata
+    isAllSelected: paginatedData.length > 0 && selectedIds.size === paginatedData.length,
+    startIndex: (currentPage - 1) * pageSize,
+    endIndex: Math.min(currentPage * pageSize, sortedData.length),
+    totalItems: sortedData.length
   };
 }

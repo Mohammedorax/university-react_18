@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { mockApi } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
 import { Grade } from '@/features/grades/types'
 
 // Keys
@@ -49,9 +49,9 @@ export const useGradeStatistics = (studentId: string) => {
 // Mutations
 export const useSubmitGrade = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
-        mutationFn: (gradeData: Partial<Grade>) => 
+        mutationFn: (gradeData: Partial<Grade>) =>
             mockApi.submitGrade(gradeData),
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: gradeKeys.all })
@@ -62,17 +62,19 @@ export const useSubmitGrade = () => {
             if (variables.course_id) {
                 queryClient.invalidateQueries({ queryKey: gradeKeys.course(variables.course_id) })
             }
+            queryClient.invalidateQueries({ queryKey: ['audit-logs'] })
         },
     })
 }
 
 export const useDeleteGrade = () => {
     const queryClient = useQueryClient()
-    
+
     return useMutation({
         mutationFn: (id: string) => mockApi.deleteGrade(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: gradeKeys.all })
+            queryClient.invalidateQueries({ queryKey: ['audit-logs'] })
         },
     })
 }

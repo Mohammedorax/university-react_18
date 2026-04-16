@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { mockApi } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
 import { Staff } from '@/features/staff/types'
 
 export const staffKeys = {

@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAddStaff } from "@/features/staff/hooks/useStaff";
+import type { Staff } from "@/features/staff/types";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -44,7 +45,7 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
 
   const onSubmit = async (values: StaffFormValues) => {
     try {
-      await addStaffMutation.mutateAsync(values);
+      await addStaffMutation.mutateAsync(values as Omit<Staff, 'id'>);
       toast.success("تمت إضافة الموظف بنجاح");
       form.reset();
       setIsOpen(false);
@@ -61,8 +62,8 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
     }}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button 
-            className="gap-2 font-bold shadow-lg hover:shadow-primary/20 transition-all active:scale-95" 
+          <Button
+            className="gap-2 font-bold shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
             aria-label="إضافة موظف جديد"
           >
             إضافة موظف جديد
@@ -76,13 +77,13 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
             أدخل تفاصيل الموظف الجديد. تأكد من دقة البيانات المدخلة خاصة البريد الإلكتروني.
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6 bg-background">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-bold text-foreground/70 mr-1">الاسم الكامل</Label>
-              <Input 
-                id="name" 
+              <Input
+                id="name"
                 {...form.register("name")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.name ? 'border-destructive' : ''}`}
                 placeholder="مثال: أحمد محمد"
@@ -94,8 +95,8 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-bold text-foreground/70 mr-1">البريد الإلكتروني</Label>
-              <Input 
-                id="email" 
+              <Input
+                id="email"
                 type="email"
                 {...form.register("email")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.email ? 'border-destructive' : ''}`}
@@ -108,8 +109,8 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="department" className="text-sm font-bold text-foreground/70 mr-1">القسم</Label>
-              <Input 
-                id="department" 
+              <Input
+                id="department"
                 {...form.register("department")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.department ? 'border-destructive' : ''}`}
                 placeholder="مثال: شؤون الطلاب"
@@ -121,8 +122,8 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="job_title" className="text-sm font-bold text-foreground/70 mr-1">المسمى الوظيفي</Label>
-              <Input 
-                id="job_title" 
+              <Input
+                id="job_title"
                 {...form.register("job_title")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.job_title ? 'border-destructive' : ''}`}
                 placeholder="مثال: مدير إداري"
@@ -134,8 +135,8 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
 
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="phone" className="text-sm font-bold text-foreground/70 mr-1">رقم الهاتف</Label>
-              <Input 
-                id="phone" 
+              <Input
+                id="phone"
                 {...form.register("phone")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.phone ? 'border-destructive' : ''}`}
                 placeholder="05XXXXXXXX"
@@ -152,8 +153,8 @@ export function AddStaffDialog({ trigger }: AddStaffDialogProps) {
                 إلغاء
               </Button>
             </DialogClose>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={addStaffMutation.isPending}
               className="h-11 px-8 rounded-xl font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95"
             >

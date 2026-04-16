@@ -1,6 +1,9 @@
 import * as Sentry from '@sentry/react';
 import { logger } from './logger';
 
+/**
+ * إعدادات Sentry للتتبع والمراقبة.
+ */
 type SentryConfig = {
   enabled: boolean;
   dsn?: string;
@@ -9,6 +12,9 @@ type SentryConfig = {
   tracesSampleRate?: number;
 };
 
+/**
+ * عميل Sentry لإدارة التتبع والأخطاء.
+ */
 class SentryClient {
   private config: SentryConfig;
   private isInitialized = false;
@@ -21,6 +27,9 @@ class SentryClient {
     };
   }
 
+  /**
+   * تهيئة عميل Sentry.
+   */
   init(): void {
     if (this.isInitialized) {
       logger.warn('Sentry already initialized');
@@ -65,6 +74,11 @@ class SentryClient {
     }
   }
 
+  /**
+   * التقاط استثناء وإرساله إلى Sentry.
+   * @param error الخطأ المراد التقاطه
+   * @param context معلومات إضافية عن الخطأ
+   */
   captureException(error: Error | unknown, context?: Record<string, unknown>): void {
     if (!this.isInitialized) {
       logger.error('Sentry not initialized, logging error locally:', { error: error instanceof Error ? error.message : String(error), context });
@@ -81,6 +95,12 @@ class SentryClient {
     }
   }
 
+  /**
+   * التقاط رسالة وإرسالها إلى Sentry.
+   * @param message الرسالة
+   * @param level مستوى الرسالة
+   * @param context معلومات إضافية
+   */
   captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', context?: Record<string, unknown>): void {
     if (!this.isInitialized) {
       logger[level](message, context);
@@ -95,6 +115,10 @@ class SentryClient {
     }
   }
 
+  /**
+   * تعيين معلومات المستخدم في Sentry.
+   * @param user معلومات المستخدم
+   */
   setUser(user: { id?: string; email?: string; username?: string }): void {
     if (!this.isInitialized) {
       logger.info('Sentry not initialized, user not set:', user);
@@ -109,6 +133,9 @@ class SentryClient {
     }
   }
 
+  /**
+   * مسح معلومات المستخدم من Sentry.
+   */
   clearUser(): void {
     if (!this.isInitialized) {
       logger.info('Sentry not initialized, user not cleared');
@@ -123,6 +150,10 @@ class SentryClient {
     }
   }
 
+  /**
+   * إضافة breadcrumb للتتبع.
+   * @param breadcrumb معلومات التتبع
+   */
   addBreadcrumb(breadcrumb: {
     category?: string;
     message: string;
@@ -142,6 +173,11 @@ class SentryClient {
     }
   }
 
+  /**
+   * بدء معاملة للتتبع.
+   * @param name اسم المعاملة
+   * @param op نوع العملية
+   */
   startTransaction(name: string, op: string): void {
     if (!this.isInitialized) {
       logger.info('Sentry not initialized, transaction not started:', { name, op });
@@ -157,6 +193,10 @@ class SentryClient {
     }
   }
 
+  /**
+   * التحقق من تمكين Sentry.
+   * @returns true إذا كان Sentry مفعل ومهيأ
+   */
   isEnabled(): boolean {
     return this.isInitialized && this.config.enabled;
   }
@@ -172,6 +212,9 @@ const sentryConfig: SentryConfig = {
 
 export const sentry = new SentryClient(sentryConfig);
 
+/**
+ * تهيئة Sentry عند بدء التطبيق.
+ */
 export function initSentry(): void {
   sentry.init();
 }

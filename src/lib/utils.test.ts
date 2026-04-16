@@ -60,6 +60,13 @@ describe('processArabicText', () => {
     expect(result).toBeDefined()
     expect(typeof result).toBe('string')
   })
+
+  it('should handle visualOrder option', () => {
+    const text = 'مرحبا'
+    const result = processArabicText(text, { visualOrder: true })
+    expect(result).toBeDefined()
+    expect(typeof result).toBe('string')
+  })
 })
 
 describe('Arabic text edge cases', () => {

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { mockApi, Notification, NotificationType } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
+import type { Notification, NotificationType } from '@/services/api'
 import { toast } from 'sonner'
 
 /**

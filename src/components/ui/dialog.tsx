@@ -4,14 +4,26 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * مكون النافذة المنبثقة الجذر.
+ */
 const Dialog = DialogPrimitive.Root
 
+/**
+ * مشغل فتح النافذة المنبثقة.
+ */
 const DialogTrigger = DialogPrimitive.Trigger
 
 const DialogPortal = DialogPrimitive.Portal
 
+/**
+ * زر إغلاق النافذة المنبثقة.
+ */
 const DialogClose = DialogPrimitive.Close
 
+/**
+ * طبقة الخلفية للنافذة المنبثقة.
+ */
 const DialogOverlay = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Overlay>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -27,6 +39,9 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+/**
+ * محتوى النافذة المنبثقة الرئيسي.
+ */
 const DialogContent = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -51,6 +66,9 @@ const DialogContent = React.forwardRef<
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
+/**
+ * رأس النافذة المنبثقة للعنوان والوصف.
+ */
 const DialogHeader = ({
     className,
     ...props
@@ -65,6 +83,9 @@ const DialogHeader = ({
 )
 DialogHeader.displayName = "DialogHeader"
 
+/**
+ * تذييل النافذة المنبثقة للأزرار.
+ */
 const DialogFooter = ({
     className,
     ...props
@@ -79,6 +100,9 @@ const DialogFooter = ({
 )
 DialogFooter.displayName = "DialogFooter"
 
+/**
+ * عنوان النافذة المنبثقة.
+ */
 const DialogTitle = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Title>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
@@ -94,6 +118,9 @@ const DialogTitle = React.forwardRef<
 ))
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
+/**
+ * وصف النافذة المنبثقة.
+ */
 const DialogDescription = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Description>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>

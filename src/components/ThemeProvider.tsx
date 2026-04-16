@@ -39,7 +39,7 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   )
-  
+
   const [primaryColor, setPrimaryColor] = useState<string>(
     () => localStorage.getItem('university-ui-primary') || defaultPrimaryColor
   )
@@ -67,8 +67,8 @@ export function ThemeProvider({
   }, [theme])
 
   useEffect(() => {
-      const root = window.document.documentElement
-      root.style.setProperty('--primary', primaryColor)
+    const root = window.document.documentElement
+    root.style.setProperty('--primary', primaryColor)
   }, [primaryColor])
 
   const value = {
@@ -80,16 +80,16 @@ export function ThemeProvider({
       setTheme(theme)
     },
     setPrimaryColor: (color: string) => {
-        localStorage.setItem('university-ui-primary', color)
-        setPrimaryColor(color)
+      localStorage.setItem('university-ui-primary', color)
+      setPrimaryColor(color)
     },
     setLogo: (logo: string | null) => {
-        if (logo) {
-            localStorage.setItem('university-ui-logo', logo)
-        } else {
-            localStorage.removeItem('university-ui-logo')
-        }
-        setLogo(logo)
+      if (logo) {
+        localStorage.setItem('university-ui-logo', logo)
+      } else {
+        localStorage.removeItem('university-ui-logo')
+      }
+      setLogo(logo)
     }
   }
 
@@ -110,5 +110,5 @@ export const useTheme = () => {
   return context
 }
 
-// @ts-expect-error - Helper for HOC or other non-hook usages if needed
+// Helper for HOC or other non-hook usages if needed
 useTheme.displayName = 'useTheme';

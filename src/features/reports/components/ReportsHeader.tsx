@@ -55,7 +55,7 @@ export const ReportsHeader = memo(function ReportsHeader({
       <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12 pointer-events-none">
         <TrendingUp size={400} aria-hidden="true" />
       </div>
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
           <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-right">
@@ -73,16 +73,14 @@ export const ReportsHeader = memo(function ReportsHeader({
           <StatCard icon={Users} label="إجمالي الطلاب" value={totalStudents} />
           <StatCard icon={BookOpen} label="المقررات" value={totalCourses} />
           <StatCard icon={TrendingUp} label="نسبة النجاح" value={`${successRate.toFixed(1)}%`} />
-          <StatCard 
-            icon={AlertCircle} 
-            label="طلاب متعثرين" 
-            value={failingStudentsCount} 
-            isWarning={failingStudentsCount > 0} 
+          <StatCard
+            icon={AlertCircle}
+            label="طلاب متعثرين"
+            value={failingStudentsCount}
+            isWarning={failingStudentsCount > 0}
           />
         </div>
       </div>
     </div>
   )
 })
-
-export default ReportsHeader

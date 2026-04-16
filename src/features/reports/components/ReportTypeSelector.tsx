@@ -23,7 +23,7 @@ export const ReportTypeSelector = memo(function ReportTypeSelector({
         <Tabs value={activeTab} onValueChange={onTabChange} dir="rtl">
           <TabsList className="bg-transparent h-auto p-0 gap-2" aria-label="تبويبات التقارير">
             {tabs.map((tab) => (
-              <TabsTrigger 
+              <TabsTrigger
                 key={tab.value}
                 value={tab.value}
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-8 py-3 rounded-xl transition-all font-bold flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
@@ -39,5 +39,3 @@ export const ReportTypeSelector = memo(function ReportTypeSelector({
     </div>
   )
 })
-
-export default ReportTypeSelector

@@ -1,51 +1,54 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { mockApi } from '@/services/mockApi'
+import { api as mockApi } from '@/services/api'
 import { useAppDispatch, useAppSelector } from '@/store'
-import { setToken, clearAuth, updateProfile } from '@/store/slices/authSlice'
-import { useNavigate } from 'react-router-dom'
+import { setAuthenticated, clearAuth, updateProfile } from '@/store/slices/authSlice'
+import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
 import { logger } from '@/lib/logger'
 
 /**
- * خطاف مخصص لإدارة واسترجاع حالة المصادقة (Authentication State).
- * يوفر معلومات حول المستخدم الحالي، التوكن، وصلاحيات الوصول.
- * 
- * @returns {Object} كائن يحتوي على حالة المصادقة:
- *  - user: بيانات المستخدم الحالي
- *  - token: توكن الوصول
- *  - isAuthenticated: هل المستخدم مسجل دخوله
- *  - isAdmin: هل المستخدم مسؤول
- *  - isTeacher: هل المستخدم أستاذ
- *  - isStudent: هل المستخدم طالب
+ * Custom hook for managing and retrieving authentication state.
+ * Provides information about the current user, token, and access permissions.
+ *
+ * @returns {Object} Authentication state object containing:
+ *   - user: Current user data
+ *   - token: Access token
+ *   - isAuthenticated: Whether user is logged in
+ *   - isLoading: Whether authentication state is loading
+ *   - isAdmin: Whether user has admin role
+ *   - isTeacher: Whether user has teacher role
+ *   - isStudent: Whether user has student role
+ *   - isStaff: Whether user has staff role
  */
 export const useAuthState = () => {
-    const { user, token } = useAppSelector((state) => state.auth)
+    const { user, isLoading, isAuthenticated } = useAppSelector((state) => state.auth)
     return {
         user,
-        token,
-        isAuthenticated: !!token,
+        isAuthenticated,
+        isLoading,
         isAdmin: user?.role === 'admin',
         isTeacher: user?.role === 'teacher',
-        isStudent: user?.role === 'student'
+        isStudent: user?.role === 'student',
+        isStaff: user?.role === 'staff'
     }
 }
 
 /**
- * خطاف مخصص لعملية تسجيل الدخول.
- * يستخدم React Query Mutation لإرسال بيانات الدخول وتحديث حالة التطبيق.
- * 
- * @returns {UseMutationResult} كائن يحتوي على دالة mutate وحالة العملية
+ * Custom hook for handling user login process.
+ * Uses React Query mutation to send login credentials and update application state.
+ *
+ * @returns {UseMutationResult} Object containing mutate function and operation status
  */
 export const useLogin = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
     return useMutation({
-        mutationFn: ({ email, password }: { email: string; password: string }) => 
+        mutationFn: ({ email, password }: { email: string; password: string }) =>
             mockApi.login(email, password),
-        onSuccess: (data) => {
-            dispatch(setToken(data.token))
-            dispatch(updateProfile(data.user))
+          onSuccess: (data) => {
+            // Token is handled securely via server cookies only, not stored in Redux or localStorage
+            dispatch(setAuthenticated({ user: data.user }))
             toast.success('تم تسجيل الدخول بنجاح')
             navigate(`/${data.user.role}/dashboard`)
         },
@@ -56,10 +59,10 @@ export const useLogin = () => {
 }
 
 /**
- * خطاف مخصص لعملية تسجيل الخروج.
- * يقوم بمسح بيانات المصادقة من الـ Redux Store وتنظيف التخزين المؤقت للاستعلامات.
- * 
- * @returns {UseMutationResult} كائن يحتوي على دالة mutate وحالة العملية
+ * Custom hook for handling user logout process.
+ * Clears authentication data from Redux store and clears query cache.
+ *
+ * @returns {UseMutationResult} Object containing mutate function and operation status
  */
 export const useLogout = () => {
     const dispatch = useAppDispatch()

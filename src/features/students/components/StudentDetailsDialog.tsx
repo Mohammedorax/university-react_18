@@ -16,7 +16,7 @@ import { Student } from "@/features/students/types";
 import { useAssignDiscount, useRemoveDiscount } from "@/features/students/hooks/useStudents";
 import { useEntityDocuments } from "@/hooks/documents/useEntityDocuments";
 import { useDiscounts } from "@/features/finance/hooks/useDiscounts";
-import { StudentDocument } from "@/services/mockApi";
+import type { StudentDocument } from "@/services/api";
 import { Trash2, Plus, User, BookOpen, Percent, FileText, Download, Upload, Loader2 } from "lucide-react";
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
