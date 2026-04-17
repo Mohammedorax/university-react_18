@@ -5,6 +5,8 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
+  # نشر تجريبي: تفعيل mockApi داخل المتصفح (لا يوجد باكند بعد). إزالة أو false عند ربط API حقيقي.
+  VITE_USE_MOCK_API = "true"
 
 # SPA fallback - any route returns index.html so React Router can handle it
 [[redirects]]
