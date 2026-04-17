@@ -53,7 +53,17 @@ function createDevApi(): MockApi {
   });
 }
 
-export const api = import.meta.env.DEV ? createDevApi() : prodApi;
+/**
+ * - التطوير: دائماً mockApi.
+ * - الإنتاج: mockApi فقط إذا `VITE_USE_MOCK_API=true` (مثلاً نشر تجريبي على Netlify).
+ *   عند ربط باكند حقيقي: احذف المتغير أو عيّنه `false` واستخدم عميل HTTP حقيقي بدل prodApi الحالي.
+ */
+function shouldUseMockApi(): boolean {
+  if (import.meta.env.DEV) return true;
+  return import.meta.env.VITE_USE_MOCK_API === 'true';
+}
+
+export const api = shouldUseMockApi() ? createDevApi() : prodApi;
 
 export type {
   Notification,

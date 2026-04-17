@@ -15,8 +15,8 @@ vi.mock('@/services/api', () => ({
   },
 }))
 
-vi.mock('react-router', async () => {
-  const actual = await vi.importActual<typeof import('react-router')>('react-router')
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return {
     ...actual,
     useNavigate: vi.fn(),
@@ -37,7 +37,7 @@ vi.mock('@/lib/logger', () => ({
 }))
 
 import { api } from '@/services/api'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
 const mockApi = vi.mocked(api)
