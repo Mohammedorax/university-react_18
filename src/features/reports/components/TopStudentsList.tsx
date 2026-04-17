@@ -1,13 +1,16 @@
 import { memo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { DataTable, DataTableColumn } from '@/components/data-table'
 import { TrendingUp } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Student } from '@/features/students/types'
 import { cn } from '@/lib/utils'
 
 interface TopStudentsListProps {
   students: Student[]
   maxDisplay?: number
+  onExportPdf?: () => void
+  isExporting?: boolean
 }
 
 const topStudentsColumns: DataTableColumn<Student>[] = [
@@ -35,7 +38,9 @@ const topStudentsColumns: DataTableColumn<Student>[] = [
 
 export const TopStudentsList = memo(function TopStudentsList({
   students,
-  maxDisplay = 6
+  maxDisplay = 6,
+  onExportPdf,
+  isExporting = false,
 }: TopStudentsListProps) {
   const topStudents = students.slice(0, maxDisplay)
 
@@ -47,6 +52,11 @@ export const TopStudentsList = memo(function TopStudentsList({
           <div>
             <CardTitle className="text-xl font-black text-foreground">أوائل الطلاب</CardTitle>
           </div>
+          {onExportPdf ? (
+            <Button size="sm" className="ms-auto" onClick={onExportPdf} disabled={isExporting}>
+              {isExporting ? 'جاري التصدير...' : 'تصدير PDF'}
+            </Button>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent className="p-6">

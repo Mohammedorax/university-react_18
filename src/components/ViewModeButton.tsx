@@ -49,7 +49,7 @@ export function ViewModeButton({
       variant="ghost"
       size="sm"
       className={cn(
-        "h-10 px-4 gap-2 rounded-xl transition-all font-bold",
+        "h-10 px-4 gap-2.5 rounded-xl transition-all font-bold whitespace-nowrap",
         active
           ? "bg-card shadow-sm text-primary border border-muted dark:bg-muted/40 dark:border-muted/50"
           : "text-muted-foreground hover:bg-transparent hover:text-foreground dark:hover:bg-muted/20",
@@ -60,10 +60,10 @@ export function ViewModeButton({
       aria-pressed={active}
       title={label}
     >
-      <span aria-hidden="true">
+      <span aria-hidden="true" className="shrink-0">
         {renderIcon()}
       </span>
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden sm:inline leading-none">{label}</span>
     </Button>
   )
 }

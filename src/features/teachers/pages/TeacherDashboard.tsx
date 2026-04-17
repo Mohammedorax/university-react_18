@@ -26,7 +26,9 @@ import {
     LogOut,
     LayoutDashboard,
     RefreshCcw,
-    UserCheck
+    UserCheck,
+    LayoutGrid,
+    List
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -35,6 +37,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { useDebounce } from '@/hooks/use-debounce'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+import { ViewModeButton } from '@/components/ViewModeButton'
 
 /**
  * @page TeacherDashboard
@@ -57,6 +60,7 @@ export default function TeacherDashboard() {
     const debouncedSearchTerm = useDebounce(searchTerm, 500)
     const [selectedDepartment, setSelectedDepartment] = useState('all')
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid')
 
     /**
      * معالجة تحديث البيانات
@@ -124,7 +128,7 @@ export default function TeacherDashboard() {
     return (
         <div className="min-h-screen bg-background pb-10">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10">
+            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10">
                 <div className="absolute top-0 right-0 p-10 opacity-5" aria-hidden="true">
                     <Briefcase size={300} />
                 </div>
@@ -136,7 +140,7 @@ export default function TeacherDashboard() {
                             </div>
                             <div className="text-center md:text-right">
                                 <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">لوحة تحكم الأستاذ</h1>
-                                <p className="text-primary-foreground/80 text-lg max-w-xl">مرحباً، الدكتور {user?.name} | {user?.department}</p>
+                                <p className="-sm sm:text-lg max-w-xl">مرحباً، الدكتور {user?.name} | {user?.department}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -219,7 +223,7 @@ export default function TeacherDashboard() {
             </div>
 
             {/* Main Content */}
-            <div className="container mx-auto px-4 -mt-16 relative z-20 space-y-8">
+            <div className="container mx-auto px-4 -mt-10 sm:-mt-16 relative z-20 space-y-8">
                 {/* Search and Filter Card */}
                 <Card className="shadow-2xl border-none rounded-3xl overflow-hidden bg-card" role="region" aria-label="أدوات البحث والتصفية">
                     <CardContent className="p-6">
@@ -249,6 +253,10 @@ export default function TeacherDashboard() {
                                     ))}
                                 </select>
                             </div>
+                            <div className="flex items-center bg-muted/50 rounded-xl p-1 h-12 border border-muted" role="group" aria-label="وضع العرض">
+                                <ViewModeButton active={viewMode === 'table'} onClick={() => setViewMode('table')} icon={List} label="جدول" />
+                                <ViewModeButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')} icon={LayoutGrid} label="شبكة" />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -275,9 +283,9 @@ export default function TeacherDashboard() {
                             ))}
                         </div>
                     ) : filteredCourses.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className={cn(viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4")}>
                             {filteredCourses.map((course) => (
-                                <Card key={course.id} className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-none bg-card group relative">
+                                <Card key={course.id} className={cn("overflow-hidden hover:shadow-2xl transition-all duration-300 border-none bg-card group relative", viewMode === 'table' && "rounded-2xl")}>
                                     <div className="absolute top-0 right-0 w-2 h-full bg-primary/10 group-hover:bg-primary transition-colors duration-500" />
                                     <CardHeader className="pb-3 p-6">
                                         <div className="flex justify-between items-start">

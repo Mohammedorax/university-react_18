@@ -7,11 +7,14 @@
  */
 
 export { addAuditLog, getAuditLogs } from './auditLog'
+export { referenceApi } from './reference'
 
 export type {
     Notification,
     NotificationType,
     NotificationSubscriber,
+    Department,
+    Specialization,
     Discount,
     StudentDocument,
     Semester,
@@ -67,6 +70,7 @@ import { financeApi } from './finance'
 import { notificationApi } from './notifications'
 import { documentApi } from './documents'
 import { authApi } from './auth'
+import { referenceApi } from './reference'
 import { addAuditLog, getAuditLogs } from './auditLog'
 
 // Combined mock API object for backward compatibility
@@ -145,6 +149,15 @@ export const mockApi = {
     // System Settings
     getSettings: authApi.getSettings,
     updateSettings: authApi.updateSettings,
+    getDepartments: referenceApi.getDepartments,
+    createDepartment: referenceApi.createDepartment,
+    updateDepartment: referenceApi.updateDepartment,
+    deleteDepartment: referenceApi.deleteDepartment,
+    getSpecializations: referenceApi.getSpecializations,
+    createSpecialization: referenceApi.createSpecialization,
+    updateSpecialization: referenceApi.updateSpecialization,
+    deleteSpecialization: referenceApi.deleteSpecialization,
+    getSemesters: referenceApi.getSemesters,
 
     // Notifications
     getNotifications: notificationApi.getNotifications,

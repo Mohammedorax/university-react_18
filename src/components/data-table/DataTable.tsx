@@ -14,6 +14,7 @@ export const DataTable = function DataTable<T extends { id: string | number }>({
   data,
   columns,
   searchPlaceholder = "بحث...",
+  hideSearch = false,
   pageSize = 10,
   onRowSelection,
   rowActions,
@@ -86,6 +87,7 @@ export const DataTable = function DataTable<T extends { id: string | number }>({
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
         searchPlaceholder={searchPlaceholder}
+        hideSearch={hideSearch}
         visibleColumns={visibleColumns}
         onToggleColumn={toggleColumnVisibility}
         density={density}

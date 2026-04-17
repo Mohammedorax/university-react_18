@@ -91,11 +91,12 @@ export function NotificationCenter() {
                                 <div 
                                     key={notification.id}
                                     className={cn(
-                                        "flex gap-3 p-3 rounded-lg transition-colors relative group",
-                                        notification.read ? "bg-background hover:bg-muted/50" : "bg-muted/30 border-r-2 border-primary"
+                                        "flex gap-3 p-3 rounded-lg transition-colors relative group cursor-pointer",
+                                        notification.read ? "bg-background hover:bg-muted/50" : "bg-muted/30 border-r-2 border-primary hover:bg-muted/50"
                                     )}
                                     role="article"
                                     aria-label={`إشعار: ${notification.title}. المحتوى: ${notification.message}`}
+                                    onClick={() => { if (!notification.read) markAsReadMutation.mutate(notification.id) }}
                                 >
                                     <div className={cn("h-8 w-8 rounded-full flex items-center justify-center shrink-0", getIconColor(notification.type))} aria-hidden="true">
                                         <Bell className="h-4 w-4" />
@@ -127,16 +128,6 @@ export function NotificationCenter() {
                                     </Button>
                                 </div>
                             ))}
-                            <div className="pt-2 border-t border-muted">
-                                <Button 
-                                    variant="ghost" 
-                                    className="w-full text-xs font-bold text-destructive hover:bg-destructive/5 h-10 rounded-xl"
-                                    onClick={() => clearAllNotificationsMutation.mutate()}
-                                    aria-label="مسح كافة الإشعارات"
-                                >
-                                    مسح كافة الإشعارات
-                                </Button>
-                            </div>
                         </div>
                     ) : (
                         <div className="py-12 flex flex-col items-center justify-center text-center px-4">

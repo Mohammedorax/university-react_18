@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { DataTable, DataTableColumn } from '@/components/data-table'
 import { EmptyState } from '@/components/EmptyState'
 import { UserX, BookX, TrendingUp, CheckCircle2, FileText, Calendar, Filter, BookOpen } from 'lucide-react'
 

@@ -1,13 +1,13 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useAuthState } from '@/features/auth/hooks/useAuth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { DataTable, DataTableColumn } from '@/components/data-table'
 import { StatCard } from '@/components/StatCard'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { EditGradeDialog } from '@/features/grades/components/EditGradeDialog'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/EmptyState'
-import { useStudentGrades, useGradeStatistics, useCourseGrades } from '@/features/grades/hooks/useGrades'
+import { useStudentGrades, useGradeStatistics, useCourseGrades, useAllGrades } from '@/features/grades/hooks/useGrades'
 import type { Grade } from '@/features/grades/types'
 import { useCourses } from '@/features/courses/hooks/useCourses'
 import { useStudents } from '@/features/students/hooks/useStudents'
@@ -53,7 +53,7 @@ import React from 'react'
  */
 const GradesPage = () => {
     const { user } = useAuthState()
-    const [selectedCourse, setSelectedCourse] = useState<string>('')
+    const [selectedCourse, setSelectedCourse] = useState<string>('all')
     const [searchTerm, setSearchTerm] = useState('')
     const [page, setPage] = useState(1)
 
@@ -69,6 +69,7 @@ const GradesPage = () => {
     const allStudents = useMemo(() => studentsResponse?.items || [], [studentsResponse])
 
     const { data: courseGrades = [], isLoading: isLoadingCourseGrades, error: courseError, refetch: refetchCourseGrades } = useCourseGrades(selectedCourse)
+    const { data: allGrades = [] } = useAllGrades()
 
     const isLoading = user?.role === 'student'
         ? isLoadingStudentGrades
@@ -82,7 +83,7 @@ const GradesPage = () => {
         try {
             if (user?.role === 'student') {
                 await refetchStudentGrades()
-            } else if (selectedCourse) {
+            } else if (selectedCourse && selectedCourse !== 'all') {
                 await refetchCourseGrades()
             }
             toast.success('تم تحديث البيانات بنجاح')
@@ -123,7 +124,7 @@ const GradesPage = () => {
         if (!selectedCourse) return []
 
         return allStudents.filter(s => {
-            const matchesCourse = s.enrolled_courses.includes(selectedCourse)
+            const matchesCourse = selectedCourse === 'all' || s.enrolled_courses.includes(selectedCourse)
             const matchesSearch = !searchTerm ||
                 s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 s.university_id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -135,11 +136,12 @@ const GradesPage = () => {
      * خريطة درجات الطلاب للمقرر المختار (للوصول السريع بالمعرف)
      */
     const studentGradesMap = useMemo(() => {
-        return courseGrades.reduce((acc: Record<string, any>, grade) => {
+        const source = selectedCourse === 'all' ? allGrades : courseGrades
+        return source.reduce((acc: Record<string, any>, grade) => {
             acc[grade.student_id] = grade;
             return acc;
         }, {});
-    }, [courseGrades]);
+    }, [allGrades, courseGrades, selectedCourse]);
 
     /**
      * أعمدة جدول عرض درجات الطلاب (واجهة المعلم)
@@ -325,7 +327,7 @@ const GradesPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="container mx-auto px-4 -mt-16 relative z-20">
+                <div className="container mx-auto px-4 -mt-10 sm:-mt-16 relative z-20">
                     <Card className="shadow-xl border-none">
                         <CardHeader className="pb-4">
                             <Skeleton className="h-8 w-48 mb-2" />
@@ -368,7 +370,7 @@ const GradesPage = () => {
         return (
             <div className="min-h-screen bg-background pb-10" dir="rtl" lang="ar">
                 {/* Hero Section */}
-                <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10 shadow-2xl">
+                <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10 shadow-2xl">
                     <div className="absolute top-0 right-0 p-10 opacity-10" aria-hidden="true">
                         <Award size={300} />
                     </div>
@@ -379,7 +381,7 @@ const GradesPage = () => {
                             </div>
                             <div className="text-center md:text-right">
                                 <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">سجل الدرجات الأكاديمي</h1>
-                                <p className="text-primary-foreground/80 text-lg font-medium">متابعة الأداء الأكاديمي والمعدل التراكمي</p>
+                                <p className="-sm sm:text-lg font-medium">متابعة الأداء الأكاديمي والمعدل التراكمي</p>
                             </div>
                         </div>
 
@@ -408,7 +410,7 @@ const GradesPage = () => {
                     </div>
                 </div>
 
-                <div className="container mx-auto px-4 -mt-16 relative z-20">
+                <div className="container mx-auto px-4 -mt-10 sm:-mt-16 relative z-20">
                     <Card className="shadow-2xl border-none bg-background/80 backdrop-blur-xl rounded-[2rem] overflow-hidden" role="region" aria-label="كشف الدرجات التفصيلي">
                         <CardHeader className="pb-4 border-b border-muted">
                             <div className="flex justify-between items-center">
@@ -451,7 +453,7 @@ const GradesPage = () => {
     return (
         <div className="min-h-screen bg-background pb-10" dir="rtl" lang="ar">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10 shadow-2xl">
+            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10 shadow-2xl">
                 <div className="absolute top-0 right-0 p-10 opacity-10" aria-hidden="true">
                     <Users size={300} />
                 </div>
@@ -462,7 +464,7 @@ const GradesPage = () => {
                         </div>
                         <div className="text-center md:text-right">
                             <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">إدارة الدرجات الأكاديمية</h1>
-                            <p className="text-primary-foreground/80 text-lg font-medium">رصد ومتابعة نتائج الطلاب في المقررات الدراسية</p>
+                            <p className="-sm sm:text-lg font-medium">رصد ومتابعة نتائج الطلاب في المقررات الدراسية</p>
                         </div>
                     </div>
 
@@ -490,51 +492,49 @@ const GradesPage = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 -mt-16 relative z-20">
+            <div className="container mx-auto px-4 -mt-10 sm:-mt-16 relative z-20">
                 <Card className="shadow-2xl border-none bg-background/80 backdrop-blur-xl rounded-[2rem] overflow-hidden">
-                    <CardHeader className="pb-6 border-b border-muted">
-                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                            <div className="flex flex-col md:flex-row items-center gap-4 w-full lg:w-auto">
-                                <div className="w-full lg:w-80">
-                                    <Select value={selectedCourse} onValueChange={(val) => {
-                                        setSelectedCourse(val)
-                                        setPage(1)
-                                    }}>
-                                        <SelectTrigger className="h-12 rounded-2xl bg-muted/50 border-none font-bold focus:ring-2 focus:ring-primary transition-all" aria-label="اختر المقرر لرصد الدرجات">
-                                            <div className="flex items-center gap-3">
-                                                <BookOpen className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                                                <SelectValue placeholder="اختر المقرر الدراسي" />
-                                            </div>
-                                        </SelectTrigger>
-                                        <SelectContent className="rounded-2xl border-muted shadow-2xl">
-                                            {teacherCourses.map(course => (
-                                                <SelectItem key={course.id} value={course.id} className="font-bold">
-                                                    {course.name} ({course.code})
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {selectedCourse && (
-                                    <div className="relative w-full md:w-64 group">
-                                        <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
-                                        <Input
-                                            placeholder="بحث عن طالب..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="h-12 pr-11 rounded-2xl bg-muted/50 border-none focus-visible:ring-2 focus-visible:ring-primary transition-all font-medium"
-                                            aria-label="البحث عن الطلاب في هذا المقرر"
-                                        />
+                    <CardHeader className="pb-5 border-b border-muted">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]">
+                            {/* Course Selector */}
+                            <Select value={selectedCourse} onValueChange={(val) => {
+                                setSelectedCourse(val)
+                                setPage(1)
+                            }}>
+                                <SelectTrigger className="h-12 rounded-2xl bg-muted/50 border-none font-bold focus:ring-2 focus:ring-primary transition-all" aria-label="اختر المقرر لرصد الدرجات">
+                                    <div className="flex items-center gap-2.5">
+                                        <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                        <SelectValue placeholder="اختر المقرر الدراسي" />
                                     </div>
-                                )}
+                                </SelectTrigger>
+                                <SelectContent className="rounded-2xl border-muted shadow-2xl">
+                                    <SelectItem value="all" className="font-bold">عرض الكل</SelectItem>
+                                    {teacherCourses.map(course => (
+                                        <SelectItem key={course.id} value={course.id} className="font-bold">
+                                            {course.name} ({course.code})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Search */}
+                            <div className="relative group">
+                                <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
+                                <Input
+                                    placeholder="بحث عن طالب بالاسم أو الرقم..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="h-12 pr-11 rounded-2xl bg-muted/50 border-none focus-visible:ring-2 focus-visible:ring-primary transition-all font-medium"
+                                    aria-label="البحث عن الطلاب"
+                                />
                             </div>
 
-                            <div className="flex items-center gap-3 w-full lg:w-auto justify-end flex-wrap">
+                            {/* Info + Refresh */}
+                            <div className="flex items-center gap-3 sm:col-span-2 xl:col-span-1 justify-end flex-wrap">
                                 <Button
                                     variant="secondary"
                                     size="icon"
-                                    className="rounded-2xl h-12 w-12 shadow-xl transition-all hover:scale-[1.05]"
+                                    className="rounded-2xl h-12 w-12 shadow-md transition-all hover:scale-[1.05] shrink-0"
                                     onClick={handleRefresh}
                                     aria-label="تحديث البيانات"
                                     disabled={isLoading}
@@ -543,14 +543,14 @@ const GradesPage = () => {
                                 </Button>
 
                                 {currentCourse && (
-                                    <div className="flex items-center gap-4 bg-primary/5 px-6 py-2 rounded-2xl border border-primary/10">
+                                    <div className="flex items-center gap-3 bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10">
                                         <div className="text-right">
-                                            <p className="text-[10px] text-primary font-black uppercase tracking-widest">المقرر الحالي</p>
-                                            <p className="text-sm font-black text-foreground">{currentCourse.name}</p>
+                                            <p className="text-[10px] text-primary font-black uppercase tracking-widest">المقرر</p>
+                                            <p className="text-sm font-black text-foreground line-clamp-1 max-w-[120px]">{currentCourse.name}</p>
                                         </div>
                                         <div className="w-px h-8 bg-primary/20" />
                                         <div className="text-right">
-                                            <p className="text-[10px] text-primary font-black uppercase tracking-widest">عدد الطلاب</p>
+                                            <p className="text-[10px] text-primary font-black uppercase tracking-widest">الطلاب</p>
                                             <p className="text-sm font-black text-foreground">{enrolledStudents.length}</p>
                                         </div>
                                     </div>
@@ -560,20 +560,12 @@ const GradesPage = () => {
                     </CardHeader>
 
                     <CardContent className="p-0">
-                        {!selectedCourse ? (
-                            <div className="py-24">
-                                <EmptyState
-                                    icon={BookOpen}
-                                    title="اختر مقرراً دراسياً"
-                                    description="يرجى اختيار مقرر دراسي من القائمة أعلاه لعرض قائمة الطلاب ورصد درجاتهم."
-                                />
-                            </div>
-                        ) : enrolledStudents.length === 0 ? (
+                        {enrolledStudents.length === 0 ? (
                             <div className="py-24">
                                 <EmptyState
                                     icon={Users}
-                                    title="لا يوجد طلاب مسجلون"
-                                    description="لا يوجد طلاب مسجلون في هذا المقرر حالياً."
+                                    title={searchTerm ? 'لا توجد نتائج مطابقة' : 'لا يوجد طلاب مسجلون'}
+                                    description={searchTerm ? `لم يتم العثور على طلاب يطابقون "${searchTerm}".` : 'لا يوجد طلاب مسجلون في هذا المقرر حالياً.'}
                                 />
                             </div>
                         ) : (
@@ -582,7 +574,10 @@ const GradesPage = () => {
                                 columns={teacherColumns}
                                 rowActions={teacherRowActions}
                                 pageSize={10}
-                                caption={`قائمة درجات طلاب مقرر ${currentCourse?.name}`}
+                                hideSearch
+                                caption={selectedCourse === 'all' ? 'قائمة درجات جميع الطلاب' : `قائمة درجات طلاب مقرر ${currentCourse?.name}`}
+                                currentPage={page}
+                                onPageChange={handlePageChange}
                             />
                         )}
                     </CardContent>

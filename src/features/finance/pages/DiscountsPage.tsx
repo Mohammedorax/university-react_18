@@ -21,7 +21,7 @@ import { DiscountDetailsDialog } from '@/features/finance/components/DiscountDet
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { toast } from 'sonner'
 import { useMemo, useState, useCallback } from 'react'
-import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { DataTable, DataTableColumn } from '@/components/data-table'
 import { StatCard } from '@/components/StatCard'
 import { ViewModeButton } from '@/components/ViewModeButton'
 import type { Discount } from '@/services/api'

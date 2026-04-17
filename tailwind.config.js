@@ -36,12 +36,12 @@ module.exports = {
 					foreground: 'hsl(var(--primary-foreground) / <alpha-value>)',
 				},
 				secondary: {
-					DEFAULT: '#4A90E2',
-					foreground: 'hsl(var(--secondary-foreground))',
+					DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
+					foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)',
 				},
 				accent: {
-					DEFAULT: '#F5A623',
-					foreground: 'hsl(var(--accent-foreground))',
+					DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
+					foreground: 'hsl(var(--accent-foreground) / <alpha-value>)',
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',

@@ -21,6 +21,17 @@ export interface Notification {
 
 export type NotificationSubscriber = (notification: Notification) => void;
 
+export interface Department {
+    id: string
+    name: string
+}
+
+export interface Specialization {
+    id: string
+    name: string
+    departmentId: string
+}
+
 export interface Discount {
     id: string
     name: string
@@ -57,6 +68,8 @@ export interface StorageKeys {
     courses: string
     grades: string
     inventory: string
+    departments: string
+    specializations: string
     audit_logs: string
     auth_user: string
 }
@@ -74,6 +87,8 @@ export const STORAGE_KEYS: StorageKeys = {
     courses: 'courses',
     grades: 'grades',
     inventory: 'inventory',
+    departments: 'departments',
+    specializations: 'specializations',
     audit_logs: 'audit_logs',
     auth_user: 'auth_user',
 };

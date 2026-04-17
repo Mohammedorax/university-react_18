@@ -14,7 +14,7 @@ interface CoursesFiltersProps {
     setSelectedDepartment: (value: string) => void;
     departments: string[];
     handleRefresh: () => void;
-    handleResetFilters: () => void;
+    handleResetFilters?: () => void;
     handleExport: (type: 'Excel' | 'PDF') => void;
     isExporting: boolean;
     isRefetching: boolean;
@@ -30,7 +30,6 @@ export const CoursesFilters: React.FC<CoursesFiltersProps> = ({
     setSelectedDepartment,
     departments,
     handleRefresh,
-    handleResetFilters,
     handleExport,
     isExporting,
     isRefetching,
@@ -39,8 +38,9 @@ export const CoursesFilters: React.FC<CoursesFiltersProps> = ({
     setPage,
 }) => {
     return (
-        <div className="filter-container">
-            <div className="relative group lg:col-span-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_auto]">
+            {/* Search */}
+            <div className="relative group">
                 <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
                 <Input
                     placeholder="بحث عن مقرر دراسي..."
@@ -54,32 +54,32 @@ export const CoursesFilters: React.FC<CoursesFiltersProps> = ({
                 />
             </div>
 
-            <div className="relative">
-                <Select value={selectedDepartment} onValueChange={(val) => {
-                    setSelectedDepartment(val);
-                    setPage(1);
-                }}>
-                    <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب القسم">
-                        <div className="flex items-center gap-3">
-                            <GraduationCap className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                            <SelectValue placeholder="اختر القسم" />
-                        </div>
-                    </SelectTrigger>
-                    <SelectContent className="rounded-2xl border-muted shadow-2xl">
-                        <SelectItem value="all" className="font-bold">جميع الأقسام</SelectItem>
-                        {departments.map(dept => (
-                            <SelectItem key={dept} value={dept} className="font-bold">{dept}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+            {/* Department */}
+            <Select value={selectedDepartment} onValueChange={(val) => {
+                setSelectedDepartment(val);
+                setPage(1);
+            }}>
+                <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب القسم">
+                    <div className="flex items-center gap-2.5">
+                        <GraduationCap className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                        <SelectValue placeholder="اختر القسم" />
+                    </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-muted shadow-2xl">
+                    <SelectItem value="all" className="font-bold">جميع الأقسام</SelectItem>
+                    {departments.map(dept => (
+                        <SelectItem key={dept} value={dept} className="font-bold">{dept}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
 
-            <div className="flex items-center gap-3 w-full justify-end flex-wrap lg:col-span-1">
+            {/* Actions */}
+            <div className="flex items-center gap-2 sm:col-span-2 xl:col-span-1 justify-end flex-wrap">
                 <Button
                     variant="secondary"
                     size="icon"
                     className={cn(
-                        "btn-unified h-12 w-12 shadow-md",
+                        "h-12 w-12 rounded-xl shadow-md transition-all active:scale-95",
                         isRefetching && "animate-spin"
                     )}
                     onClick={handleRefresh}
@@ -89,22 +89,11 @@ export const CoursesFilters: React.FC<CoursesFiltersProps> = ({
                     <RefreshCcw size={20} aria-hidden="true" />
                 </Button>
 
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-12 w-12 rounded-xl border-dashed hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all active:scale-95 dark:border-muted-foreground/30"
-                    onClick={handleResetFilters}
-                    aria-label="إعادة ضبط الفلاتر"
-                    title="إعادة ضبط الفلاتر"
-                >
-                    <RefreshCcw size={18} className="-rotate-90" />
-                </Button>
-
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
                             variant="outline"
-                            className="h-12 px-6 rounded-xl gap-2 font-bold border-muted-foreground/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-sm active:scale-95"
+                            className="h-12 px-5 rounded-xl gap-2 font-bold border-muted-foreground/20 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-sm active:scale-95"
                             disabled={isExporting}
                             aria-label="تصدير البيانات"
                         >

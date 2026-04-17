@@ -16,11 +16,15 @@ import {
     TrendingUp,
     Loader2,
     RefreshCw,
-    Search
+    Search,
+    List,
+    LayoutGrid
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useDebounce } from '@/hooks/use-debounce'
 import { toast } from 'sonner'
+import { ViewModeButton } from '@/components/ViewModeButton'
+import { cn } from '@/lib/utils'
 
 /**
  * لوحة تحكم الطالب - تعرض الملخص الأكاديمي، المعدل التراكمي، والمقررات المسجلة
@@ -32,6 +36,7 @@ export default function StudentDashboard() {
     const { user } = useAuthState()
     const logoutMutation = useLogout()
     const [searchTerm, setSearchTerm] = useState('')
+    const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid')
     const debouncedSearchTerm = useDebounce(searchTerm, 500)
     
     // React Query Hooks
@@ -109,77 +114,67 @@ export default function StudentDashboard() {
     return (
         <div className="min-h-screen bg-background pb-10">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10">
-                <div className="absolute top-0 right-0 p-10 opacity-10" aria-hidden="true">
-                    <GraduationCap size={300} />
+            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10">
+                <div className="absolute top-0 right-0 p-10 opacity-10 hero-bg-icon" aria-hidden="true">
+                    <GraduationCap size={220} />
                 </div>
                 <div className="container mx-auto px-4 relative z-10">
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-                        <div className="flex flex-col md:flex-row items-center gap-6">
-                            <div className="bg-primary-foreground/10 backdrop-blur-md p-4 rounded-2xl border border-primary-foreground/20 shadow-xl" aria-hidden="true">
-                                <GraduationCap size={48} className="text-primary-foreground" />
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-primary-foreground/10 backdrop-blur-md p-3 rounded-2xl border border-primary-foreground/20 shadow-xl shrink-0" aria-hidden="true">
+                                <GraduationCap size={36} className="text-primary-foreground" />
                             </div>
-                            <div className="text-center md:text-right">
-                                <h1 className="text-3xl md:text-4xl font-bold mb-2 tracking-tight">لوحة تحكم الطالب</h1>
-                                <p className="text-primary-foreground/80 text-lg max-w-xl">مرحباً، {user?.name} | {user?.department}</p>
+                            <div>
+                                <h1 className="text-xl sm:text-3xl md:text-4xl font-bold tracking-tight">لوحة تحكم الطالب</h1>
+                                <p className="text-primary-foreground/80 text-sm sm:text-base truncate max-w-[200px] sm:max-w-none">مرحباً، {user?.name}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
                             <Button
                                 variant="secondary"
+                                size="icon"
                                 onClick={handleRefresh}
-                                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 backdrop-blur-sm transition-all hover:scale-105"
+                                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 h-9 w-9 rounded-xl"
                                 aria-label="تحديث البيانات"
                             >
                                 <RefreshCw className={`h-4 w-4 ${coursesLoading || gradesLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
-                                <span className="hidden sm:inline ml-2">تحديث</span>
                             </Button>
                             <Button 
                                 variant="secondary" 
+                                size="sm"
                                 onClick={handleLogout} 
-                                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 backdrop-blur-sm transition-all hover:scale-105"
+                                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-primary-foreground/10 rounded-xl h-9 gap-2"
                                 disabled={logoutMutation.isPending}
                                 aria-label="تسجيل الخروج من النظام"
                             >
                                 {logoutMutation.isPending ? (
-                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                                 ) : (
-                                    <LogOut className="ml-2 h-4 w-4" aria-hidden="true" />
+                                    <LogOut className="h-4 w-4" aria-hidden="true" />
                                 )}
-                                <span className="hidden sm:inline ml-2">تسجيل الخروج</span>
+                                <span className="text-xs">خروج</span>
                             </Button>
                         </div>
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8" role="region" aria-label="إحصائيات سريعة">
-                        <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 border border-primary-foreground/10 flex items-center gap-4 transition-all hover:bg-primary-foreground/15 shadow-lg">
-                            <div className="p-3 bg-primary-foreground/20 rounded-xl" aria-hidden="true">
-                                <Award size={24} />
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4" role="region" aria-label="إحصائيات سريعة">
+                        {[
+                            { icon: Award, label: 'المعدل التراكمي', value: statistics?.cumulative_gpa?.toFixed(2) || '0.00' },
+                            { icon: BookOpen, label: 'المقررات', value: enrolledCourses.length },
+                            { icon: TrendingUp, label: 'الساعات', value: statistics?.earned_credits || 0 },
+                        ].map(({ icon: Icon, label, value }) => (
+                            <div key={label} className="bg-primary-foreground/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-primary-foreground/10 flex items-center gap-2 sm:gap-4 shadow-lg">
+                                <div className="p-2 sm:p-3 bg-primary-foreground/20 rounded-lg sm:rounded-xl shrink-0" aria-hidden="true">
+                                    <Icon size={18} className="sm:hidden" />
+                                    <Icon size={22} className="hidden sm:block" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[10px] sm:text-sm opacity-80 font-bold truncate">{label}</p>
+                                    <p className="text-lg sm:text-2xl font-black">{value}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm opacity-80 font-bold uppercase tracking-wider mb-0.5">المعدل التراكمي</p>
-                                <p className="text-2xl font-black">{statistics?.cumulative_gpa?.toFixed(2) || '0.00'}</p>
-                            </div>
-                        </div>
-                        <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 border border-primary-foreground/10 flex items-center gap-4 transition-all hover:bg-primary-foreground/15 shadow-lg">
-                            <div className="p-3 bg-primary-foreground/20 rounded-xl" aria-hidden="true">
-                                <BookOpen size={24} />
-                            </div>
-                            <div>
-                                <p className="text-sm opacity-80 font-bold uppercase tracking-wider mb-0.5">المقررات المسجلة</p>
-                                <p className="text-2xl font-black">{enrolledCourses.length}</p>
-                            </div>
-                        </div>
-                        <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-4 border border-primary-foreground/10 flex items-center gap-4 transition-all hover:bg-primary-foreground/15 shadow-lg">
-                            <div className="p-3 bg-primary-foreground/20 rounded-xl" aria-hidden="true">
-                                <TrendingUp size={24} />
-                            </div>
-                            <div>
-                                <p className="text-sm opacity-80 font-bold uppercase tracking-wider mb-0.5">الساعات المكتسبة</p>
-                                <p className="text-2xl font-black">{statistics?.earned_credits || 0}</p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -232,22 +227,28 @@ export default function StudentDashboard() {
                 <Card className="shadow-2xl border-none rounded-3xl overflow-hidden bg-card" role="region" aria-label="المقررات الحالية">
                     <CardHeader className="bg-card border-b border-muted flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <CardTitle className="text-xl font-black text-foreground">المقررات الحالية</CardTitle>
-                        <div className="relative w-full sm:w-72">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                            <Input
-                                placeholder="بحث في المقررات..."
-                                className="pr-10 bg-muted/50 border-none focus-visible:ring-primary rounded-xl"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                aria-label="البحث في المقررات الحالية"
-                            />
+                        <div className="flex w-full sm:w-auto items-center gap-2">
+                            <div className="relative w-full sm:w-72">
+                                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                                <Input
+                                    placeholder="بحث في المقررات..."
+                                    className="pr-10 bg-muted/50 border-none focus-visible:ring-primary rounded-xl"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    aria-label="البحث في المقررات الحالية"
+                                />
+                            </div>
+                            <div className="flex items-center bg-muted/50 rounded-xl p-1 h-10 border border-muted" role="group" aria-label="وضع العرض">
+                                <ViewModeButton active={viewMode === 'table'} onClick={() => setViewMode('table')} icon={List} label="جدول" />
+                                <ViewModeButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')} icon={LayoutGrid} label="شبكة" />
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
                         {filteredCourses.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className={cn(viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4")}>
                                 {filteredCourses.map((course: Course) => (
-                                    <div key={course.id} className="p-6 rounded-3xl border border-muted hover:shadow-xl hover:bg-muted/5 transition-all group relative overflow-hidden" role="listitem">
+                                    <div key={course.id} className={cn("p-6 border border-muted hover:shadow-xl hover:bg-muted/5 transition-all group relative overflow-hidden", viewMode === 'grid' ? "rounded-3xl" : "rounded-2xl")} role="listitem">
                                         <div className="absolute top-0 right-0 w-2 h-full bg-primary/10" aria-hidden="true"></div>
                                         <div className="flex justify-between items-start mb-4">
                                             <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-bold font-mono">{course.code}</Badge>

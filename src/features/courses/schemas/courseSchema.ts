@@ -9,8 +9,12 @@ export const courseSchema = z.object({
   name: commonSchemas.name,
   description: commonSchemas.description.and(z.string().min(10, "يجب أن يكون الوصف 10 أحرف على الأقل")),
   code: z.string().min(2, "يجب أن يكون رمز المقرر حرفين على الأقل"),
-  credits: commonSchemas.positiveNumber("عدد الساعات").min(1, "يجب أن يكون عدد الساعات ساعة واحدة على الأقل"),
+  credits: commonSchemas
+    .positiveNumber("عدد الساعات")
+    .min(1, "يجب أن يكون عدد الساعات ساعة واحدة على الأقل")
+    .max(3, "عدد الساعات يجب أن يكون بين 1 و3 فقط"),
   department: commonSchemas.department,
+  semester: z.string().min(2, "يرجى اختيار الفصل الدراسي"),
   max_students: commonSchemas.positiveNumber("الحد الأقصى للطلاب").min(1, "يجب أن يكون الحد الأقصى للطلاب طالب واحد على الأقل"),
 });
 

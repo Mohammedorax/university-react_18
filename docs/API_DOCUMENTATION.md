@@ -607,6 +607,6 @@ VITE_SENTRY_ENABLED=true
 ## الدعم
 
 للمساعدة والمزيد من المعلومات، راجع:
-- [دليل التطوير](./DEVELOPMENT_GUIDE.md)
-- [دليل النشر](./PRODUCTION_GUIDE.md)
-- [أرشيف الأخطاء](./TROUBLESHOOTING.md)
+- [فهرس التوثيق](./README.md)
+- [دليل النشر](../DEPLOY.md) (Netlify وبدائل)
+- [أرشيف تقارير قديمة](./archive/) (مرجع فقط)

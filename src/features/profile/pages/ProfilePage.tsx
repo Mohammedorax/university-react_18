@@ -119,7 +119,7 @@ const ProfilePage = () => {
     return (
         <div className="min-h-screen bg-background pb-10">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10" role="region" aria-label="رأس الملف الشخصي">
+            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10" role="region" aria-label="رأس الملف الشخصي">
                 <div className="absolute top-0 right-0 p-10 opacity-10">
                     <User size={300} aria-hidden="true" />
                 </div>
@@ -136,7 +136,7 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 -mt-16 relative z-20">
+            <div className="container mx-auto px-4 -mt-10 sm:-mt-16 relative z-20">
                 <Card className="max-w-3xl mx-auto shadow-xl border-none">
                     <CardHeader className="border-b bg-muted/30 pb-6">
                         <CardTitle>بيانات الحساب</CardTitle>

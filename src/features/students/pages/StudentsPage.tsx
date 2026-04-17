@@ -43,7 +43,7 @@ import { useDebounce } from '@/hooks/use-debounce'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { EmptyState } from '@/components/EmptyState'
-import { DataTable } from '@/components/DataTable'
+import { DataTable } from '@/components/data-table'
 import { ViewModeButton } from '@/components/ViewModeButton'
 import { Student } from '../types'
 
@@ -103,7 +103,7 @@ export default function StudentsPage() {
   const deleteStudentMutation = useDeleteStudent()
 
   const totalItems = studentsResponse?.total || 0
-  const limit = 10
+  const limit = 30
 
   // تصفية محلية للسنة الدراسية لأن API قد لا يدعمها حالياً بشكل مباشر
   const students = useMemo(() => {
@@ -336,40 +336,41 @@ export default function StudentsPage() {
             ? `تم العثور على ${totalItems} طالب`
             : 'لم يتم العثور على نتائج'}
         </div>
-        <div className="bg-primary/90 text-primary-foreground pb-24 pt-10 px-4 md:px-8">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="bg-primary-foreground/10 p-2.5 rounded-2xl backdrop-blur-md border border-primary-foreground/20 shadow-xl" aria-hidden="true">
-                  <GraduationCap className="text-primary-foreground h-6 w-6" />
+        <div className="bg-primary/90 text-primary-foreground pb-16 pt-6 px-4 sm:pb-24 sm:pt-10 md:px-8">
+          <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-3">
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="bg-primary-foreground/10 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl backdrop-blur-md border border-primary-foreground/20 shadow-xl shrink-0" aria-hidden="true">
+                  <GraduationCap className="text-primary-foreground h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                <h1 className="text-3xl font-black tracking-tight">إدارة الطلاب</h1>
+                <h1 className="text-xl sm:text-3xl font-black tracking-tight">إدارة الطلاب</h1>
               </div>
-              <p className="text-primary-foreground/80 font-medium flex items-center gap-2">
-                <Users size={16} className="text-primary-foreground" aria-hidden="true" />
+              <p className="text-primary-foreground/80 text-xs sm:text-sm font-medium hidden sm:flex items-center gap-2">
+                <Users size={14} className="text-primary-foreground" aria-hidden="true" />
                 متابعة وإدارة كافة شؤون الطلاب المسجلين في النظام
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
               <Button
                 variant="secondary"
                 size="icon"
                 className={cn(
-                  "rounded-2xl h-12 w-12 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]",
+                  "rounded-xl h-9 w-9 sm:h-10 sm:w-10 shadow-xl transition-all",
                   isRefetching && "animate-spin"
                 )}
                 onClick={handleRefresh}
                 aria-label="تحديث البيانات"
                 disabled={isRefetching}
               >
-                <RefreshCcw size={20} aria-hidden="true" />
+                <RefreshCcw size={16} aria-hidden="true" />
               </Button>
               <AddStudentDialog
                 trigger={
-                  <Button variant="secondary" className="rounded-2xl h-12 px-6 font-bold gap-2 shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]" aria-label="إضافة طالب جديد">
-                    <UserPlus size={20} aria-hidden="true" />
-                    إضافة طالب جديد
+                  <Button variant="secondary" className="rounded-xl h-9 sm:h-10 px-3 sm:px-5 font-bold gap-1.5 shadow-xl text-xs sm:text-sm" aria-label="إضافة طالب جديد">
+                    <UserPlus size={16} aria-hidden="true" />
+                    <span className="hidden xs:inline">إضافة طالب</span>
+                    <span className="xs:hidden">+</span>
                   </Button>
                 }
               />
@@ -377,7 +378,7 @@ export default function StudentsPage() {
           </div>
         </div>
 
-        <div className="page-container -mt-16 relative z-20">
+        <div className="page-container -mt-10 sm:-mt-16 relative z-20">
           <Card className="card-unified shadow-2xl overflow-hidden mb-8">
             <CardHeader className="p-6 border-b">
               <StudentFilters
@@ -426,6 +427,7 @@ export default function StudentsPage() {
                   totalPages={Math.ceil(totalItems / limit)}
                   onPageChange={setPage}
                   totalItems={totalItems}
+                  pageSize={limit}
                 />
               </CardContent>
             </Card>

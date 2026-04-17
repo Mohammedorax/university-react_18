@@ -12,6 +12,8 @@ export interface DataTableProps<T extends { id: string | number }> {
   data: T[];
   columns: DataTableColumn<T>[];
   searchPlaceholder?: string;
+  /** إخفاء شريط البحث الداخلي عندما يكون لدينا بحث خارجي */
+  hideSearch?: boolean;
   pageSize?: number;
   onRowSelection?: (selectedItems: T[]) => void;
   rowActions?: (item: T) => React.ReactNode;

@@ -43,6 +43,7 @@ interface CourseDetailsDialogProps {
  */
 export function CourseDetailsDialog({ course, trigger }: CourseDetailsDialogProps) {
   const { documents, isLoading: isLoadingDocs, isUploading, uploadDocument, deleteDocument } = useEntityDocuments(course.id, 'course');
+  const youtubeResources = course.resources || []
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -190,6 +191,33 @@ export function CourseDetailsDialog({ course, trigger }: CourseDetailsDialogProp
 
           {/* Resources Tab (New) */}
           <TabsContent value="resources" className="space-y-4 py-4" role="region" aria-label="المصادر التعليمية والوثائق">
+            {youtubeResources.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm text-foreground">مرئيات وشروحات YouTube الخاصة بالمقرر</h4>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {youtubeResources.map((video) => (
+                    <article key={video.id} className="rounded-xl border bg-card p-2.5">
+                      <div className="overflow-hidden rounded-lg border bg-muted/20">
+                        <iframe
+                          src={video.embedUrl}
+                          title={video.title}
+                          className="h-44 w-full"
+                          loading="lazy"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          allowFullScreen
+                        />
+                      </div>
+                      <div className="mt-2">
+                        <p className="line-clamp-1 text-sm font-bold">{video.title}</p>
+                        <p className="text-xs text-muted-foreground">القناة: {video.channel}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold flex items-center gap-2">
                 <FileText className="h-4 w-4" aria-hidden="true" />

@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { DataTable } from '@/components/DataTable'
+import { DataTable } from '@/components/data-table'
 import { StatCard } from '@/components/StatCard'
 import { ViewModeButton } from '@/components/ViewModeButton'
 import { Staff } from '../types'
@@ -391,6 +391,7 @@ export default function StaffPage() {
                   <DataTable
                     data={staff}
                     columns={columns}
+                    hideSearch
                     rowActions={rowActions}
                     onRowSelection={setSelectedStaff}
                     bulkActions={(selectedItems) => (

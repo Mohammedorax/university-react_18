@@ -49,15 +49,16 @@
 
 ```
 university-react/
-├── docs/                           # التوثيق التقني
-│   ├── COMPREHENSIVE_DOCUMENTATION.md
+├── docs/                           # التوثيق (انظر docs/README.md للفهرس)
+│   ├── README.md
+│   ├── STATE_MANAGEMENT.md
+│   ├── LIBRARIES.md
+│   ├── TEST_ACCOUNTS.md
+│   ├── archive/                    # تقارير قديمة (مرجع فقط)
 │   └── DOCUMENTATION_AR.md         # هذا الملف
 │
-├── assets/                         # الأصول الثابتة
-│   ├── fonts/                      # الخطوط (Cairo, Tajawal, Norsal)
-│   └── imgs/                       # الصور
-│
-├── public/                         # الملفات العامة
+├── deploy/                         # إعدادات Docker (nginx للـ SPA)
+├── public/                         # الأصول العامة (Vite)
 │   ├── manifest.json               # إعدادات PWA
 │   └── offline.html                # صفحة عدم الاتصال
 │
@@ -149,10 +150,9 @@ university-react/
 │   │   │   │   ├── CourseDetailsDialog.tsx
 │   │   │   │   ├── CourseStudentsDialog.tsx
 │   │   │   │   └── CoursesFilters.tsx
-│   │   │   ├── hooks/useCourses.ts
+│   │   │   ├── hooks/useCourses.ts   # React Query (بيانات الخادم)
 │   │   │   ├── pages/CoursesPage.tsx
 │   │   │   ├── schemas/courseSchema.ts
-│   │   │   ├── slice/coursesSlice.ts
 │   │   │   └── types/index.ts
 │   │   │
 │   │   ├── finance/                # وحدة الخصومات المالية
@@ -549,18 +549,16 @@ function MyComponent() {
 
 #### Redux Toolkit
 
-يستخدم المشروع Redux Toolkit لإدارة الحالة العامة:
+يستخدم المشروع Redux Toolkit **للحالة العمومية الخفيفة** (مثل المصادقة). بيانات الخادم (مقررات، طلاب، …) تُدار عبر **React Query** — انظر `docs/STATE_MANAGEMENT.md`.
 
 ```typescript
 // src/store/index.ts
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from '@/store/slices/authSlice'
-import coursesSlice from '@/features/courses/slice/coursesSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authSlice,
-    courses: coursesSlice,
   },
 })
 

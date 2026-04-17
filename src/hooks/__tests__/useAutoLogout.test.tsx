@@ -1,3 +1,4 @@
+import React from 'react';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -5,19 +6,10 @@ import { useAutoLogout } from '../useAutoLogout';
 import authReducer from '../../store/slices/authSlice';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-// Mock timers
 vi.useFakeTimers();
 
-// Mock document event listeners
-const mockAddEventListener = vi.fn();
-const mockRemoveEventListener = vi.fn();
-
-Object.defineProperty(document, 'addEventListener', {
-  value: mockAddEventListener,
-});
-Object.defineProperty(document, 'removeEventListener', {
-  value: mockRemoveEventListener,
-});
+const addListenerSpy = vi.spyOn(document, 'addEventListener')
+const removeListenerSpy = vi.spyOn(document, 'removeEventListener')
 
 describe('useAutoLogout', () => {
   let store: ReturnType<typeof configureStore>;
@@ -30,7 +22,8 @@ describe('useAutoLogout', () => {
     });
 
     vi.clearAllTimers();
-    vi.clearAllMocks();
+    addListenerSpy.mockClear()
+    removeListenerSpy.mockClear()
   });
 
   afterEach(() => {
@@ -117,19 +110,20 @@ describe('useAutoLogout', () => {
 
       renderHook(() => useAutoLogout(), { wrapper });
 
-      // Simulate some activity by advancing partial time
       act(() => {
-        vi.advanceTimersByTime(15 * 60 * 1000); // 15 minutes
+        vi.advanceTimersByTime(15 * 60 * 1000);
       });
 
-      // Simulate user activity (this should reset the timer)
+      // يعيد ضبط مؤقت الخمول (الموصول بـ document في useAutoLogout)
       act(() => {
-        // Trigger activity by calling the internal reset function
-        // Since we can't easily trigger DOM events, we'll test the reset logic
-        vi.advanceTimersByTime(15 * 60 * 1000); // Another 15 minutes
+        document.dispatchEvent(new Event('click', { bubbles: true }));
       });
 
-      // Should not have logged out yet since timer was reset
+      // بعد إعادة الضبط: 15 دقيقة لا تكفي لإنهاء 30 دقيقة خمول
+      act(() => {
+        vi.advanceTimersByTime(15 * 60 * 1000);
+      });
+
       const state = store.getState().auth;
       expect(state.isAuthenticated).toBe(true);
     });
@@ -243,11 +237,8 @@ describe('useAutoLogout', () => {
 
       unmount();
 
-      // Should have added event listeners
-      expect(mockAddEventListener).toHaveBeenCalled();
-
-      // Should have removed event listeners on unmount
-      expect(mockRemoveEventListener).toHaveBeenCalled();
+      expect(addListenerSpy).toHaveBeenCalled();
+      expect(removeListenerSpy).toHaveBeenCalled();
     });
   });
 

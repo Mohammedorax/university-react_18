@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Course } from "@/features/courses/types";
@@ -19,6 +20,7 @@ import { useUpdateCourse } from "@/features/courses/hooks/useCourses";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { courseSchema, CourseFormValues } from "../schemas/courseSchema";
+import { useDepartments, useSemesters } from '@/features/admin/hooks/useReferenceData';
 
 interface EditCourseDialogProps {
   course: Course;
@@ -33,6 +35,8 @@ interface EditCourseDialogProps {
 export function EditCourseDialog({ course, trigger }: EditCourseDialogProps) {
   const updateCourseMutation = useUpdateCourse();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: departments = [] } = useDepartments();
+  const { data: semesters = [] } = useSemesters();
 
   const form = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
@@ -42,6 +46,7 @@ export function EditCourseDialog({ course, trigger }: EditCourseDialogProps) {
       code: course.code,
       credits: course.credits,
       department: course.department,
+      semester: course.semester,
       max_students: course.max_students,
     },
   });
@@ -73,16 +78,16 @@ export function EditCourseDialog({ course, trigger }: EditCourseDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl">
-        <DialogHeader className="p-6 bg-primary text-primary-foreground">
+      <DialogContent className="sm:max-w-[500px] max-h-[88vh] p-0 border-none shadow-2xl">
+        <DialogHeader className="p-4 sm:p-5 bg-primary text-primary-foreground">
           <DialogTitle className="text-2xl font-black">تعديل المقرر: {course.name}</DialogTitle>
           <DialogDescription className="text-primary-foreground/80 font-medium">
             عدل تفاصيل المقرر الدراسي هنا. تأكد من صحة التعديلات قبل الحفظ.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6 bg-background">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 sm:p-5 space-y-4 bg-background">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edit-name" className="text-sm font-bold text-foreground/70 mr-1">اسم المقرر</Label>
               <Input 
@@ -109,11 +114,16 @@ export function EditCourseDialog({ course, trigger }: EditCourseDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="edit-department" className="text-sm font-bold text-foreground/70 mr-1">القسم</Label>
-              <Input 
-                id="edit-department" 
-                {...form.register("department")}
-                className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.department ? 'border-destructive' : ''}`}
-              />
+              <Select value={form.watch("department")} onValueChange={(v) => form.setValue("department", v)}>
+                <SelectTrigger className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.department ? 'border-destructive' : ''}`}>
+                  <SelectValue placeholder="اختر القسم" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem key={department.id} value={department.name}>{department.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {form.formState.errors.department && (
                 <p className="text-xs font-bold text-destructive mr-1">{form.formState.errors.department.message}</p>
               )}
@@ -124,12 +134,28 @@ export function EditCourseDialog({ course, trigger }: EditCourseDialogProps) {
               <Input 
                 id="edit-credits" 
                 type="number"
+                min={1}
+                max={3}
                 {...form.register("credits")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.credits ? 'border-destructive' : ''}`}
               />
               {form.formState.errors.credits && (
                 <p className="text-xs font-bold text-destructive mr-1">{form.formState.errors.credits.message}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-semester" className="text-sm font-bold text-foreground/70 mr-1">الفصل الدراسي</Label>
+              <Select value={form.watch("semester")} onValueChange={(v) => form.setValue("semester", v)}>
+                <SelectTrigger className="h-11 rounded-xl border-muted-foreground/20">
+                  <SelectValue placeholder="اختر الفصل" />
+                </SelectTrigger>
+                <SelectContent>
+                  {semesters.map((semester) => (
+                    <SelectItem key={semester} value={semester}>{semester}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

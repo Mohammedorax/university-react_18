@@ -90,9 +90,10 @@ describe('Zod Schemas Validation', () => {
     const validCourse = {
       code: 'CS101',
       name: 'مقدمة في البرمجة',
-      description: 'أساسيات البرمجة',
+      description: 'أساسيات البرمجة والمفاهيم الأولية للمطورين',
       department: 'علوم الحاسب',
       credits: 3,
+      semester: 'الفصل الأول',
       max_students: 50,
     };
 

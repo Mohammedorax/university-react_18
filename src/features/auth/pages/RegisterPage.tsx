@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, User, Mail, Hash, BookOpen, Lock, Eye, EyeOff } from 'lucide-react'
+import { UniversityLogo } from '@/components/UniversityLogo'
 import { useState } from 'react'
 import {
     Form,
@@ -96,20 +97,23 @@ export default function RegisterPage() {
     }, [errors])
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 dark:from-background dark:to-muted p-4 py-12" dir="rtl" lang="ar" role="main" aria-labelledby="register-title">
-            <Card className="w-full max-w-md shadow-2xl border-none">
-                <CardHeader className="space-y-1 pb-8">
+        <div className="flex w-full min-h-0 flex-col items-center justify-center" dir="rtl" lang="ar" role="main" aria-labelledby="register-title">
+            <Card className="mx-auto w-full border border-border/60 shadow-md rounded-2xl">
+                <CardHeader className="space-y-1.5 px-4 pb-2 pt-4 sm:px-5 sm:pt-5">
+                    <div className="flex justify-center">
+                        <UniversityLogo className="h-16 w-28 sm:h-20 sm:w-36" />
+                    </div>
                     <CardTitle asChild>
-                        <h1 id="register-title" className="text-3xl font-black text-center tracking-tight">إنشاء حساب جديد</h1>
+                        <h1 id="register-title" className="text-center text-lg font-black tracking-tight sm:text-xl">إنشاء حساب جديد</h1>
                     </CardTitle>
-                    <CardDescription className="text-center text-lg">
+                    <CardDescription className="text-center text-[11px] sm:text-xs">
                         انضم إلى نظام إدارة الجامعة المتكامل
                     </CardDescription>
                 </CardHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} noValidate aria-describedby="register-description">
                         <div id="register-description" className="sr-only">نموذج لإنشاء حساب طالب جديد يتطلب الاسم والبريد الإلكتروني والرقم الجامعي والقسم وكلمة المرور</div>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-2 px-3.5 pb-1 sm:px-4 sm:space-y-2.5">
                             <FormField
                                 control={form.control}
                                 name="name"
@@ -122,7 +126,7 @@ export default function RegisterPage() {
                                                 <Input 
                                                     {...field} 
                                                     placeholder="أدخل اسمك الثلاثي" 
-                                                    className="pr-10 h-12 text-right"
+                                                    className="h-9 pr-9 text-right text-sm"
                                                     aria-required="true"
                                                     aria-invalid={!!errors.name}
                                                 />
@@ -146,7 +150,7 @@ export default function RegisterPage() {
                                                     {...field} 
                                                     type="email" 
                                                     placeholder="example@university.edu" 
-                                                    className="pr-10 h-12 text-right"
+                                                    className="h-9 pr-9 text-right text-sm"
                                                     dir="ltr"
                                                     aria-required="true"
                                                     aria-invalid={!!errors.email}
@@ -158,7 +162,7 @@ export default function RegisterPage() {
                                 )}
                             />
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-2.5">
                                 <FormField
                                     control={form.control}
                                     name="universityId"
@@ -171,7 +175,7 @@ export default function RegisterPage() {
                                                     <Input 
                                                         {...field} 
                                                         placeholder="2024XXXX" 
-                                                        className="pr-10 h-12 text-right"
+                                                        className="h-9 pr-9 text-right text-sm"
                                                         aria-required="true"
                                                         aria-invalid={!!errors.universityId}
                                                     />
@@ -194,7 +198,7 @@ export default function RegisterPage() {
                                                     <Input 
                                                         {...field} 
                                                         placeholder="مثال: علوم الحاسوب" 
-                                                        className="pr-10 h-12 text-right"
+                                                        className="h-9 pr-9 text-right text-sm"
                                                         aria-required="true"
                                                         aria-invalid={!!errors.department}
                                                     />
@@ -219,7 +223,7 @@ export default function RegisterPage() {
                                                     {...field} 
                                                     type={showPassword ? "text" : "password"} 
                                                     placeholder="••••••••" 
-                                                    className="pr-10 pl-10 h-12 text-right"
+                                                    className="h-9 pr-9 pl-9 text-right text-sm"
                                                     aria-required="true"
                                                     aria-invalid={!!errors.password}
                                                 />
@@ -251,7 +255,7 @@ export default function RegisterPage() {
                                                     {...field} 
                                                     type={showConfirmPassword ? "text" : "password"} 
                                                     placeholder="••••••••" 
-                                                    className="pr-10 pl-10 h-12 text-right"
+                                                    className="h-9 pr-9 pl-9 text-right text-sm"
                                                     aria-required="true"
                                                     aria-invalid={!!errors.confirmPassword}
                                                 />
@@ -270,10 +274,10 @@ export default function RegisterPage() {
                                 )}
                             />
                         </CardContent>
-                        <CardFooter className="flex flex-col space-y-4 pt-6">
+                        <CardFooter className="flex flex-col space-y-2 px-3.5 pb-3.5 pt-1 sm:px-4 sm:space-y-2.5 sm:pb-4">
                             <Button 
                                 type="submit" 
-                                className="w-full h-12 text-lg font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]" 
+                                className="h-9 w-full rounded-xl text-xs font-bold transition-all hover:scale-[1.01] active:scale-[0.99] sm:h-10 sm:text-sm" 
                                 disabled={isLoading}
                                 aria-live="polite"
                             >
@@ -284,7 +288,7 @@ export default function RegisterPage() {
                                     </>
                                 ) : 'إنشاء حساب'}
                             </Button>
-                            <div className="text-center text-sm text-muted-foreground">
+                            <div className="text-center text-xs text-muted-foreground">
                                 لديك حساب بالفعل؟{' '}
                                 <button 
                                     type="button"

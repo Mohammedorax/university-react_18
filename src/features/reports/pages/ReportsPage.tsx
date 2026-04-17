@@ -1,7 +1,7 @@
 import { useState, useMemo, memo } from 'react'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DataTableColumn } from '@/components/DataTable'
+import { DataTableColumn } from '@/components/data-table'
 import { DateRange } from 'react-day-picker'
 import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
@@ -247,7 +247,7 @@ export default function ReportsPage() {
           render: (value: number) => (
             <span className={cn(
               "font-bold",
-              value >= 3.5 ? "text-green-600" : value >= 2.0 ? "text-blue-600" : "text-red-600"
+              value >= 3.5 ? "text-primary" : value >= 2.0 ? "text-secondary-foreground" : "text-destructive"
             )}>
               {value.toFixed(2)}
             </span>
@@ -266,7 +266,7 @@ export default function ReportsPage() {
           render: (value: number) => (
             <span className={cn(
               "font-medium",
-              value >= 90 ? "text-green-600" : value >= 75 ? "text-amber-600" : "text-red-600"
+              value >= 90 ? "text-primary" : value >= 75 ? "text-secondary-foreground" : "text-destructive"
             )}>
               {value}%
             </span>
@@ -278,7 +278,7 @@ export default function ReportsPage() {
           render: (value: string) => (
             <span className={cn(
               "border px-2 py-1 rounded-full text-xs font-medium",
-              value === 'نشط' ? "bg-green-100 text-green-700 border-green-200" : "bg-gray-100 text-gray-700 border-gray-200"
+              value === 'نشط' ? "bg-primary/10 text-primary border-primary/20" : "bg-muted text-muted-foreground border-border"
             )}>
               {value}
             </span>
@@ -320,6 +320,10 @@ export default function ReportsPage() {
 
   // Handlers
   const handlePrint = () => window.print()
+  const handleExportTopStudentsPdf = () => {
+    setActiveTab('academic')
+    void handleExport('PDF')
+  }
 
   const handleRefresh = async () => {
     try {
@@ -378,16 +382,39 @@ export default function ReportsPage() {
       if (type === 'Excel') {
         const XLSX = await import('xlsx')
         const workbook = XLSX.utils.book_new()
-        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportData])
 
+        // ورقة ملخص الإحصائيات
+        const summarySheet = XLSX.utils.aoa_to_sheet([
+          ['إجمالي الطلاب', 'نسبة النجاح', 'عدد المقررات'],
+          [filteredStudents.length, `${successRate.toFixed(1)}%`, filteredCourses.length],
+        ])
+        summarySheet['!dir'] = 'rtl'
+        if (!summarySheet['!views']) summarySheet['!views'] = []
+        summarySheet['!views'].push({ RTL: true })
+        summarySheet['!cols'] = [{ wch: 20 }, { wch: 18 }, { wch: 18 }]
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'الملخص')
+
+        // ورقة البيانات التفصيلية
+        const worksheet = XLSX.utils.aoa_to_sheet([headers, ...exportData])
         worksheet['!dir'] = 'rtl'
         if (!worksheet['!views']) worksheet['!views'] = []
         worksheet['!views'].push({ RTL: true })
 
-        const colWidths = headers.map(() => ({ wch: 25 }))
+        // عرض الأعمدة بناءً على المحتوى
+        const colWidths = headers.map((h, idx) => {
+          const maxDataLen = exportData.reduce((max, row) => {
+            return Math.max(max, String(row[idx] ?? '').length)
+          }, 0)
+          return { wch: Math.min(Math.max(h.length * 2, maxDataLen + 4, 12), 45) }
+        })
         worksheet['!cols'] = colWidths
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'البيانات')
 
-        XLSX.utils.book_append_sheet(workbook, worksheet, "التقرير الأكاديمي")
+        // RTL على مستوى المصنف
+        if (!workbook.Workbook) workbook.Workbook = {}
+        if (!workbook.Workbook.Views) workbook.Workbook.Views = []
+        workbook.Workbook.Views[0] = { RTL: true }
+
         XLSX.writeFile(workbook, `${filename}.xlsx`)
         setExportProgress(80)
       } else {
@@ -408,13 +435,12 @@ export default function ReportsPage() {
         let fontRegistered = false
         try {
           const fontData = await getCairoFont()
-          if (fontData && fontData.length > 100) {
+          if (fontData && fontData.length > 1000) {
             try {
-              // ensure it's not a data URL
               const cleanBase64 = fontData.includes(',') ? fontData.split(',')[1] : fontData
               doc.addFileToVFS('Cairo-Regular.ttf', cleanBase64)
               doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal')
-              doc.setFont('Cairo')
+              doc.setFont('Cairo', 'normal')
               fontRegistered = true
             } catch (fontError) {
               logger.warn('Could not register Cairo font, using fallback', fontError)
@@ -424,18 +450,20 @@ export default function ReportsPage() {
           logger.warn('Failed to fetch Cairo font', fontFetchError)
         }
 
+        // إذا تعذّر تحميل الخط نستخدم visualOrder لضمان ظهور النص صحيحاً
+        const arabicOpts = fontRegistered ? {} : { visualOrder: true as const }
+
         doc.setFillColor(...headerColor)
         doc.rect(0, 0, 210, 35, 'F')
 
         doc.setTextColor(255, 255, 255)
         doc.setFontSize(16)
-        doc.setFont(fontRegistered ? 'Cairo' : 'helvetica', 'bold')
-        doc.text(processArabicText(universityName, { visualOrder: true }), 105, 14, { align: 'center' })
+        doc.setFont(fontRegistered ? 'Cairo' : 'helvetica', 'normal')
+        doc.text(processArabicText(universityName, arabicOpts), 105, 14, { align: 'center' })
 
         doc.setFontSize(11)
-        doc.setFont(fontRegistered ? 'Cairo' : 'helvetica', 'normal')
         const headerSubtitle = systemSettings?.reportHeaderSubtitle || 'نظام إدارة الجامعة المتكامل'
-        doc.text(processArabicText(headerSubtitle, { visualOrder: true }), 105, 23, { align: 'center' })
+        doc.text(processArabicText(headerSubtitle, arabicOpts), 105, 23, { align: 'center' })
 
         doc.setDrawColor(...headerColor)
         doc.setLineWidth(0.5)
@@ -443,8 +471,7 @@ export default function ReportsPage() {
 
         doc.setFontSize(16)
         doc.setTextColor(33, 33, 33)
-        const processedTitle = processArabicText(title, { visualOrder: true })
-        doc.text(processedTitle, 105, 48, { align: 'center' })
+        doc.text(processArabicText(title, arabicOpts), 105, 48, { align: 'center' })
 
         setExportProgress(60)
 
@@ -454,7 +481,7 @@ export default function ReportsPage() {
         if (dateRange?.from) {
           dateSummaryStr = `${format(dateRange.from, 'dd/MM/yyyy')} - ${dateRange.to ? format(dateRange.to, 'dd/MM/yyyy') : 'الآن'}`
         }
-        doc.text(processArabicText(`تاريخ التقرير: ${dateSummaryStr}`, { visualOrder: true }), 195, 55, { align: 'left' })
+        doc.text(processArabicText(`تاريخ التقرير: ${dateSummaryStr}`, arabicOpts), 195, 55, { align: 'left' })
 
         let currentY = 65
         if (statsSummary.length > 0) {
@@ -467,7 +494,7 @@ export default function ReportsPage() {
 
           statsSummary.forEach((stat, index) => {
             const xPos = 35 + (index * 60)
-            doc.text(processArabicText(stat.label, { visualOrder: true }), xPos, currentY + 8, { align: 'center' })
+            doc.text(processArabicText(stat.label, arabicOpts), xPos, currentY + 8, { align: 'center' })
             doc.setFontSize(12)
             doc.setTextColor(...headerColor)
             doc.text(stat.value, xPos, currentY + 16, { align: 'center' })
@@ -480,10 +507,10 @@ export default function ReportsPage() {
         setExportProgress(80)
 
         autoTable(doc, {
-          head: [headers.map(h => processArabicText(h))],
-          body: exportData.map(row => row.map((cell: any) => {
+          head: [headers.map(h => processArabicText(h, arabicOpts))],
+          body: exportData.map(row => row.map((cell: string | number) => {
             if (typeof cell === 'string') {
-              return processArabicText(cell)
+              return processArabicText(cell, arabicOpts)
             }
             return cell
           })),
@@ -491,17 +518,19 @@ export default function ReportsPage() {
           margin: { top: 15, right: 15, bottom: 25, left: 15 },
           styles: {
             font: fontRegistered ? 'Cairo' : 'helvetica',
-            halign: 'center',
+            halign: 'right',
             fontSize: 9,
             cellPadding: 4,
             lineWidth: 0.1,
-            lineColor: [220, 220, 220]
+            lineColor: [220, 220, 220],
+            direction: 'rtl',
           },
           headStyles: {
             fillColor: headerColor,
             textColor: [255, 255, 255],
             fontStyle: 'bold',
-            fontSize: 10
+            fontSize: 10,
+            halign: 'right',
           },
           alternateRowStyles: {
             fillColor: [249, 250, 251]
@@ -514,7 +543,7 @@ export default function ReportsPage() {
 
             const footerMain = `${universityName} - صفحة ${drawData.pageNumber}`
             doc.text(
-              processArabicText(footerMain, { visualOrder: true }),
+              processArabicText(footerMain, arabicOpts),
               105,
               284,
               { align: 'center' }
@@ -522,7 +551,7 @@ export default function ReportsPage() {
 
             const footerSub = systemSettings?.reportFooterText || 'تقرير سري - للاستخدام الإداري فقط'
             doc.text(
-              processArabicText(footerSub, { visualOrder: true }),
+              processArabicText(footerSub, arabicOpts),
               105,
               290,
               { align: 'center' }
@@ -543,7 +572,7 @@ export default function ReportsPage() {
     } catch (error) {
       logger.error('Export error:', { error: error instanceof Error ? error.message : String(error) })
       toast.error('حدث خطأ أثناء التصدير', {
-        description: 'يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى',
+        description: 'تعذر إعداد خط PDF العربي. تم استخدام بديل افتراضي، جرّب التصدير مرة أخرى.',
         icon: <AlertCircle className="h-5 w-5 text-destructive" />
       })
     } finally {
@@ -709,7 +738,11 @@ export default function ReportsPage() {
                   emptyDescription="لا تتوفر بيانات طلاب حالياً لعرض توزيع الدرجات."
                 />
               </div>
-              <TopStudentsList students={topStudents} />
+              <TopStudentsList
+                students={topStudents}
+                onExportPdf={handleExportTopStudentsPdf}
+                isExporting={isExporting}
+              />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

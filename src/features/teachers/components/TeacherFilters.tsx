@@ -37,23 +37,23 @@ export function TeacherFilters({
     return (
         <Card className="card-unified mb-8" role="region" aria-label="أدوات البحث والتصفية">
             <CardContent className="p-4 lg:p-6">
-                <div className="filter-container">
-                    <div className="relative group lg:col-span-2">
+                <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.35fr)_minmax(220px,0.8fr)_auto]">
+                    <div className="relative group min-w-0">
                         <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} aria-hidden="true" />
                         <Input
                             placeholder="بحث عن مدرس بالاسم أو التخصص..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="input-unified pr-12 font-bold"
+                            className="input-unified h-12 pr-12 font-bold"
                             aria-label="بحث عن مدرس بالاسم أو التخصص"
                             aria-describedby="search-results-count"
                         />
                     </div>
 
-                    <div className="relative">
+                    <div className="relative min-w-0">
                         <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                            <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب القسم">
-                                <div className="flex items-center gap-3">
+                            <SelectTrigger className="input-unified h-12 font-bold" aria-label="تصفية حسب القسم">
+                                <div className="flex min-w-0 items-center gap-2.5">
                                     <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                                     <SelectValue placeholder="القسم الإداري" />
                                 </div>
@@ -67,23 +67,19 @@ export function TeacherFilters({
                         </Select>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <div className="flex bg-muted/30 dark:bg-muted/20 p-1 rounded-xl h-12 flex-1" role="group" aria-label="وضع العرض: جدول أو شبكة">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                        <div className="flex h-12 items-center rounded-xl border bg-muted/30 p-1 dark:bg-muted/20" role="group" aria-label="وضع العرض: جدول أو شبكة">
                             <ViewModeButton
                                 active={viewMode === 'table'}
                                 onClick={() => setViewMode('table')}
                                 icon={List}
                                 label="جدول"
-                                className="flex-1 h-full"
-                                aria-label="عرض الجدول"
                             />
                             <ViewModeButton
                                 active={viewMode === 'grid'}
                                 onClick={() => setViewMode('grid')}
                                 icon={LayoutGrid}
                                 label="شبكة"
-                                className="flex-1 h-full"
-                                aria-label="عرض الشبكة"
                             />
                         </div>
 

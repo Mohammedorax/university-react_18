@@ -63,33 +63,40 @@ export const exportToExcel = <T>(
   if (data.length === 0) return;
 
   const visibleCols = columns.filter(col => visibleColumns.has(String(col.key)) && !col.hidden);
-  const exportData = data.map(item => {
-    const row: Record<string, string | number> = {};
-    visibleCols.forEach(col => {
-      row[col.title] = (item as Record<string, string | number>)[col.key as string];
-    });
-    return row;
+
+  const headers = visibleCols.map(col => col.title);
+  const rows = data.map(item =>
+    visibleCols.map(col => {
+      const val = (item as Record<string, unknown>)[col.key as string];
+      if (val === null || val === undefined) return '';
+      return val as string | number;
+    })
+  );
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+  // عرض الأعمدة التلقائي بناءً على المحتوى
+  const colWidths = visibleCols.map((col, colIdx) => {
+    const headerLen = col.title.length * 2;
+    const maxDataLen = rows.reduce((max, row) => {
+      const cellLen = String(row[colIdx] ?? '').length;
+      return Math.max(max, cellLen);
+    }, 0);
+    return { wch: Math.min(Math.max(headerLen, maxDataLen + 4, 12), 45) };
   });
+  worksheet['!cols'] = colWidths;
 
-  const worksheet = XLSX.utils.json_to_sheet(exportData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
+  // تفعيل RTL للورقة والمصنف
   worksheet['!dir'] = 'rtl';
+  if (!worksheet['!views']) worksheet['!views'] = [];
+  worksheet['!views'].push({ RTL: true });
 
-  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-  for (let R = range.s.r; R <= range.e.r; ++R) {
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-      const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
-      if (!worksheet[cell_address]) continue;
-      if (!worksheet[cell_address].s) worksheet[cell_address].s = {};
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'البيانات');
 
-      worksheet[cell_address].s.alignment = {
-        horizontal: 'right',
-        readingOrder: 2
-      };
-    }
-  }
+  if (!workbook.Workbook) workbook.Workbook = {};
+  if (!workbook.Workbook.Views) workbook.Workbook.Views = [];
+  workbook.Workbook.Views[0] = { RTL: true };
 
   XLSX.writeFile(workbook, `${fileName}_${new Date().getTime()}.xlsx`);
 };
@@ -111,7 +118,6 @@ export const exportToPDF = async <T>(
       unit: 'mm',
       format: 'a4',
       putOnlyUsedFonts: true,
-      filters: ['ASCIIHexEncode']
     });
 
     const universityName = options?.universityName || 'جامعة العرب';
@@ -145,13 +151,15 @@ export const exportToPDF = async <T>(
     }
 
     const visibleCols = columns.filter(col => visibleColumns.has(String(col.key)) && !col.hidden);
-    const headers = visibleCols.map(col => processArabicText(col.title));
+    // إذا كان خط Cairo محملاً فالـ autoTable يتولى RTL تلقائياً، وإلا نستخدم visualOrder كاحتياط
+    const arabicOpts = fontRegistered ? {} : { visualOrder: true };
+    const headers = visibleCols.map(col => processArabicText(col.title, arabicOpts));
 
     const body = data.map(item =>
       visibleCols.map(col => {
         const val = (item as Record<string, unknown>)[col.key as string];
         if (typeof val === 'string') {
-          return processArabicText(val);
+          return processArabicText(val, arabicOpts);
         }
         return String(val ?? '-');
       })
@@ -197,15 +205,15 @@ export const exportToPDF = async <T>(
         lineWidth: 0.1,
         lineColor: [220, 220, 220],
         overflow: 'linebreak',
+        direction: 'rtl',
       },
       headStyles: {
         fillColor: headerColor,
         textColor: [255, 255, 255],
         fontStyle: 'bold',
         fontSize: 11,
-        halign: 'center',
+        halign: 'right',
       },
-      columnStyles: {},
       alternateRowStyles: {
         fillColor: [250, 252, 255]
       },

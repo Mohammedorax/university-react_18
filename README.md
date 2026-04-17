@@ -1,120 +1,80 @@
-# University Management System 🎓
+# University Management System
 
-نظام إدارة جامعي متكامل | React 18 + Fastify + SQLite
+نظام إدارة جامعي — **React 18 + TypeScript + Vite**.  
+في التطوير يعتمد الواجهة على **`mockApi`** داخل المتصفح؛ يوجد هيكل **باكند** اختياري في `server/` (Fastify + Prisma + PostgreSQL).
 
-## 🚀 التشغيل السريع
-
-```bash
-# Frontend
-cd university-react && pnpm install && pnpm dev
-
-# Backend
-cd server && pnpm install && npx prisma db push && npx tsx src/seed-admin.ts && npm run dev
-```
-
-## 📁 البنية
-
-```
-university-react/
-├── src/           # Frontend (React + TypeScript)
-├── server/        # Backend API
-│   ├── src/       # Routes, Server
-│   ├── prisma/    # Database Schema
-│   └── dev.db     # SQLite Database
-└── tests/         # Tests
-```
-
-## 🔗 الروابط
-
-| الخدمة | العنوان |
-|--------|---------|
-| Frontend | http://localhost:5173 |
-| Backend | http://localhost:4000 |
-| API Health | http://localhost:4000/api/health |
-
-## 🔐 تسجيل الدخول
-
-| الحقل | القيمة |
-|-------|--------|
-| Email | admin@university.edu |
-| Password | admin123 |
-
-## 📡 API Endpoints
-
-### المصادقة
-- `POST /api/auth/login` - تسجيل الدخول
-- `POST /api/auth/register` - إنشاء حساب
-- `POST /api/auth/refresh` - تجديد Token
-- `POST /api/auth/logout` - تسجيل خروج
-
-### الموارد
-- `GET/POST /api/students` - الطلاب
-- `GET/POST /api/teachers` - المعلمين
-- `GET/POST /api/courses` - المواد
-- `GET/POST /api/grades` - الدرجات
-- `GET/POST /api/enrollments` - التسجيل
-- `GET/POST /api/attendance` - الحضور
-- `GET/POST /api/payments` - المدفوعات
-
-## 🧪 الاختبارات
+## التشغيل السريع (الواجهة)
 
 ```bash
-# Unit Tests
-pnpm test
-
-# E2E Tests
-pnpm test:e2e
+npm install --legacy-peer-deps
+npm run dev
 ```
 
-## 🔧 الأوامر المفيدة
+يفتح المتصفح عادةً على `http://localhost:3000` (حسب `vite.config.ts`).
+
+## البنية (مستوى عالٍ)
+
+```
+├── src/                 # تطبيق React (ميزات، مكونات، خدمات)
+├── public/              # أصول ثابتة (شعارات، manifest، PWA)
+├── server/              # (اختياري) API + Prisma + Postgres
+├── docs/                # توثيق منظم — ابدأ من docs/README.md
+├── deploy/              # إعدادات Docker (nginx للـ SPA)
+├── Dockerfile           # بناء صورة واجهة ثابتة + nginx
+├── netlify.toml / vercel.json  # نشر استضافة سحابية
+└── DEPLOY.md            # خطوات Netlify / بدائل
+```
+
+## حسابات التجربة (Mock)
+
+انظر [`docs/TEST_ACCOUNTS.md`](docs/TEST_ACCOUNTS.md).
+
+## الباكند (اختياري)
 
 ```bash
-# Frontend
-pnpm dev          # تشغيل التطوير
-pnpm build        # بناء الإنتاج
-pnpm lint         # فحص الأخطاء
-pnpm storybook    # Storybook
-
-# Backend
 cd server
-npm run dev       # تشغيل السيرفر
-npx prisma studio # إدارة Database
-npx prisma db push # إنشاء/تحديث Database
+cp .env.example .env
+# شغّل Postgres محلياً (مثلاً docker compose up -d)
+npm install
+npm run prisma:generate
+npm run prisma:migrate -- --name init
+npm run db:seed
+npm run dev
 ```
 
-## 🛠️ التقنيات
+- صحة الخدمة: `GET http://localhost:4000/health`
+- قاعدة البيانات: `GET http://localhost:4000/health/db`
 
-### Frontend
-- React 18 + TypeScript + Vite
-- Tailwind CSS + Radix UI
-- TanStack Query + Redux
-- Recharts + Sonner + Zod
+تفاصيل إضافية: [`server/README.md`](server/README.md).
 
-### Backend
-- Fastify 5 + TypeScript
-- Prisma ORM + SQLite
-- JWT + bcrypt + Zod
-
-## 📝 ملاحظات
-
-- **محلي:** SQLite (مثبت مسبقاً)
-- **إنتاج:** غيّر `DATABASE_URL` لـ PostgreSQL
-- **أمان:** غيّر `JWT_SECRET` قبل النشر
-
-## ✅ التحقق
+## الاختبارات
 
 ```bash
-# Health Check
-curl http://localhost:4000/health
-
-# API Health (Database)
-curl http://localhost:4000/api/health
-
-# Login Test
-curl -X POST http://localhost:4000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@university.edu","password":"admin123"}'
+npm test
 ```
+
+## البناء للإنتاج
+
+```bash
+npm run build
+```
+
+معاينة محلية: `npx vite preview` (أو إعدادات `preview` في Vite).
+
+## Docker (واجهة فقط)
+
+```bash
+docker build -t university-ui .
+docker run -p 8080:80 university-ui
+```
+
+ثم افتح `http://localhost:8080`.
+
+## التوثيق
+
+- [docs/README.md](docs/README.md) — فهرس الوثائق
+- [docs/STATE_MANAGEMENT.md](docs/STATE_MANAGEMENT.md) — إدارة الحالة
 
 ---
-**تحديث:** فبراير 2026
+
+**آخر تحديث للبنية:** أبريل 2026

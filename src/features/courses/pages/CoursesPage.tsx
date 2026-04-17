@@ -47,7 +47,7 @@ import { cn } from '@/lib/utils'
 import { useCourses, useDeleteCourse, useEnrollStudentInCourse, useUnenrollStudentFromCourse } from '@/features/courses/hooks/useCourses'
 import { useStudent } from '@/features/students/hooks/useStudents'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DataTable } from '@/components/DataTable'
+import { DataTable } from '@/components/data-table'
 import { CoursesFilters } from '../components/CoursesFilters';
 import { StatCard } from '@/components/StatCard'
 import { ViewModeButton } from '@/components/ViewModeButton'
@@ -389,7 +389,7 @@ const CoursesPage = () => {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background pb-10" role="alert" aria-busy="true" aria-label="جاري تحميل المقررات الدراسية">
-                <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10">
+                <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10">
                     <div className="container mx-auto px-4 relative z-10">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
                             <div className="flex flex-col md:flex-row items-center gap-6">
@@ -408,7 +408,7 @@ const CoursesPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="container mx-auto px-4 -mt-16 relative z-20">
+                <div className="container mx-auto px-4 -mt-10 sm:-mt-16 relative z-20">
                     <Card className="shadow-xl border-none">
                         <CardHeader className="pb-4">
                             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -452,7 +452,7 @@ const CoursesPage = () => {
     return (
         <div className="min-h-screen bg-background pb-10" dir="rtl" lang="ar">
             {/* Hero Section */}
-            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-24 pt-10 shadow-2xl">
+            <div className="relative overflow-hidden bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10 shadow-2xl">
                 <div className="absolute top-0 right-0 p-10 opacity-10" aria-hidden="true">
                     <BookOpen size={300} />
                 </div>
@@ -496,7 +496,7 @@ const CoursesPage = () => {
                 </div>
             </div>
 
-            <div className="page-container -mt-16 relative z-20">
+            <div className="page-container -mt-10 sm:-mt-16 relative z-20">
                 <Card className="card-unified shadow-2xl overflow-hidden mb-8">
                     <CardHeader className="pb-6 border-b border-muted">
                         <CoursesFilters
@@ -706,6 +706,7 @@ const CoursesPage = () => {
                                 totalPages={totalPages}
                                 onPageChange={setPage}
                                 totalItems={totalItems}
+                                pageSize={limit}
                                 bulkActions={(selectedItems) => (user?.role === 'admin' || user?.role === 'teacher') && (
                                     <Button
                                         variant="destructive"

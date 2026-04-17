@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { DataTable } from './DataTable';
+import { DataTable } from './data-table';
 import { Badge } from './ui/badge';
 
 const meta: Meta<typeof DataTable> = {

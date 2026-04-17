@@ -40,7 +40,11 @@ export const useNotifications = () => {
             })
         })
 
-        return () => unsubscribe()
+        return () => {
+            if (typeof unsubscribe === 'function') {
+                unsubscribe()
+            }
+        }
     }, [queryClient])
 
     return useQuery({

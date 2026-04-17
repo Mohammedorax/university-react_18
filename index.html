@@ -24,7 +24,6 @@
     connect-src 'self' https: wss: http://localhost:* ws://localhost:*;
     base-uri 'self';
     form-action 'self';
-    frame-ancestors 'none';
     object-src 'none';
     worker-src 'self' blob:;
     manifest-src 'self';
@@ -33,6 +32,7 @@
   ">
   
   <!-- Apple Web App Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="University App" />
@@ -40,10 +40,11 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json" />
   
-  <!-- Favicon and Icons -->
-  <link rel="icon" type="image/svg+xml" sizes="192x192" href="/assets/icons/pwa-192x192.svg" />
-  <link rel="apple-touch-icon" sizes="192x192" href="/assets/icons/pwa-192x192.svg" />
-  <link rel="icon" type="image/svg+xml" sizes="512x512" href="/assets/icons/pwa-512x512.svg" />
+  <!-- Favicon and Icons — شعار الجامعة (logo.png) -->
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/logo.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/assets/logo.png" />
   
   <title>نظام الجامعة الإلكتروني</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">

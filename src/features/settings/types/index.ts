@@ -24,3 +24,14 @@ export interface AppearanceSettings {
     primaryColor: string
     logo: string | null
 }
+
+export interface Department {
+    id: string
+    name: string
+}
+
+export interface Specialization {
+    id: string
+    name: string
+    departmentId: string
+}

@@ -11,6 +11,7 @@ interface DataTableHeaderProps<T> {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
+  hideSearch?: boolean;
   visibleColumns: Set<string>;
   onToggleColumn: (key: string) => void;
   density: Density;
@@ -26,6 +27,7 @@ export const DataTableHeader = function DataTableHeader<T>({
   searchTerm,
   onSearchChange,
   searchPlaceholder,
+  hideSearch = false,
   visibleColumns,
   onToggleColumn,
   density,
@@ -37,11 +39,13 @@ export const DataTableHeader = function DataTableHeader<T>({
 }: DataTableHeaderProps<T>) {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center justify-between px-1">
-      <DataTableSearch
-        value={searchTerm}
-        onChange={onSearchChange}
-        placeholder={searchPlaceholder}
-      />
+      {!hideSearch && (
+        <DataTableSearch
+          value={searchTerm}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+        />
+      )}
 
       <div className="flex items-center gap-2 w-full md:w-auto">
         <DataTableExport

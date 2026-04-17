@@ -22,9 +22,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { studentSchema, StudentFormValues } from "../schemas/studentSchema";
 import { UserPlus, Loader2 } from "lucide-react";
 import { sanitizeText, isValidEmail, isValidUniversityId, containsDangerousContent } from '@/lib/security';
+import { useDepartments } from '@/features/admin/hooks/useReferenceData'
 
 interface AddStudentDialogProps {
   trigger?: React.ReactNode;
@@ -40,6 +42,7 @@ export function AddStudentDialog({ trigger }: AddStudentDialogProps) {
   const students = studentsResponse?.items || [];
   const addStudentMutation = useAddStudent();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: departments = [] } = useDepartments()
 
   const form = useForm<StudentFormValues>({
     resolver: zodResolver(studentSchema),
@@ -122,7 +125,7 @@ export function AddStudentDialog({ trigger }: AddStudentDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-none shadow-2xl">
+      <DialogContent className="sm:max-w-[500px] max-h-[88vh] rounded-[2rem] border-none shadow-2xl">
         <DialogHeader className="space-y-3 pb-4 border-b">
           <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center text-primary">
             <UserPlus className="h-6 w-6" />
@@ -135,8 +138,8 @@ export function AddStudentDialog({ trigger }: AddStudentDialogProps) {
           </div>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -183,7 +186,18 @@ export function AddStudentDialog({ trigger }: AddStudentDialogProps) {
                   <FormItem>
                     <FormLabel className="font-bold">القسم الأكاديمي</FormLabel>
                     <FormControl>
-                      <Input placeholder="علوم الحاسب" {...field} className="rounded-xl h-11 border-muted-foreground/20 focus:ring-primary/20" />
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="rounded-xl h-11 border-muted-foreground/20 focus:ring-primary/20">
+                          <SelectValue placeholder="اختر القسم" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {departments.map((department) => (
+                            <SelectItem key={department.id} value={department.name}>
+                              {department.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

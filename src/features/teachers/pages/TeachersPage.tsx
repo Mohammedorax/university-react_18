@@ -8,7 +8,7 @@ import { useTeachers, useDeleteTeacher } from '@/features/teachers/hooks/useTeac
 import { Teacher } from '@/features/teachers/types'
 import { useDebounce } from '@/hooks/use-debounce'
 import { EmptyState } from '@/components/EmptyState'
-import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { DataTable, DataTableColumn } from '@/components/data-table'
 import { ViewModeButton } from '@/components/ViewModeButton'
 import {
   Trash2,
@@ -54,6 +54,7 @@ import {
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
+import { RoleAvatar } from '@/components/RoleAvatar'
 
 /**
  * صفحة إدارة أعضاء هيئة التدريس.
@@ -166,9 +167,7 @@ export default function TeachersPage() {
       sortable: true,
       render: (_, teacher) => (
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xl shadow-sm" aria-hidden="true">
-            {teacher.name.charAt(0)}
-          </div>
+          <RoleAvatar userRole="teacher" name={teacher.name} className="h-12 w-12 rounded-2xl shadow-sm" />
           <div>
             <div className="font-bold text-foreground group-hover:text-primary transition-colors">{teacher.name}</div>
             <div className="text-xs text-muted-foreground font-medium">{teacher.email}</div>
@@ -219,7 +218,7 @@ export default function TeachersPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background pb-10">
-        <div className="bg-primary/90 text-primary-foreground pb-24 pt-10 px-4 md:px-8">
+        <div className="bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10 px-4 md:px-8">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
@@ -232,7 +231,7 @@ export default function TeachersPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-16 relative z-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-10 sm:-mt-16 relative z-20">
           <Card className="border-none shadow-xl bg-card rounded-3xl mb-8">
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -281,14 +280,14 @@ export default function TeachersPage() {
     <>
       <div className="min-h-screen bg-background pb-10" dir="rtl" lang="ar" role="main" aria-labelledby="teachers-page-title">
         {/* Header Section with Primary Background */}
-        <div className="bg-primary/90 text-primary-foreground pb-24 pt-10 px-4 md:px-8">
+        <div className="bg-primary/90 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10 px-4 md:px-8">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="bg-primary-foreground/20 p-2.5 rounded-2xl backdrop-blur-md" aria-hidden="true">
                   <GraduationCap className="text-primary-foreground h-6 w-6" />
                 </div>
-                <h1 id="teachers-page-title" className="text-3xl font-black tracking-tight">إدارة أعضاء هيئة التدريس</h1>
+                <h1 id="teachers-page-title" className="text-xl sm:text-3xl font-black tracking-tight">إدارة أعضاء هيئة التدريس</h1>
               </div>
               <p className="text-primary-foreground/80 font-medium flex items-center gap-2">
                 <Users size={16} aria-hidden="true" />
@@ -307,7 +306,7 @@ export default function TeachersPage() {
           </div>
         </div>
 
-        <div className="page-container -mt-16 relative z-20">
+        <div className="page-container -mt-10 sm:-mt-16 relative z-20">
           <Card className="card-unified shadow-2xl overflow-hidden mb-8">
             <CardHeader className="p-6 border-b">
               <TeacherFilters
@@ -346,7 +345,7 @@ export default function TeachersPage() {
               ) : (
                 <>
                   {/* Desktop Table View */}
-                  <div className={cn("hidden md:block", viewMode === 'grid' && "md:hidden")} role="region" aria-label="جدول المدرسين">
+                  <div className={cn(viewMode === 'grid' && "hidden")} role="region" aria-label="جدول المدرسين">
                     <DataTable
                       data={teachers}
                       columns={columns}
@@ -412,9 +411,7 @@ export default function TeachersPage() {
                         <div className="h-2 w-full bg-primary/20" aria-hidden="true" />
                         <CardContent className="p-6">
                           <div className="flex justify-between items-start mb-6">
-                            <div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center text-primary font-black text-2xl shadow-inner group-hover:scale-110 transition-transform duration-500" aria-hidden="true">
-                              {teacher.name.charAt(0)}
-                            </div>
+                            <RoleAvatar userRole="teacher" name={teacher.name} className="h-14 w-14 rounded-2xl shadow-inner group-hover:scale-110 transition-transform duration-500" />
                             <Badge variant="secondary" className="font-bold bg-primary/5 text-primary border-none px-3 py-1 rounded-lg">
                               {teacher.department}
                             </Badge>

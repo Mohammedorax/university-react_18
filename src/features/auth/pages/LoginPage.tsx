@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { useLogin } from '@/features/auth/hooks/useAuth'
-import { Loader2, Mail, Lock, Eye, EyeOff, GraduationCap, ShieldCheck, BookOpen, Users } from 'lucide-react'
+import { Loader2, Mail, Lock, Eye, EyeOff, ShieldCheck, BookOpen, Users } from 'lucide-react'
+import { UniversityLogo } from '@/components/UniversityLogo'
 import {
     Form,
     FormControl,
@@ -16,12 +16,9 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { sanitizeText, isValidEmail, containsDangerousContent, getCSRFToken, detectInjectionAttempt } from '@/lib/security'
+} from '@/components/ui/form'
+import { sanitizeText, isValidEmail, containsDangerousContent } from '@/lib/security'
 
-/**
- * مخطط التحقق من صحة بيانات تسجيل الدخول باستخدام Zod
- */
 const loginSchema = z.object({
     email: z.string().email('البريد الإلكتروني غير صحيح'),
     password: z.string().min(6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'),
@@ -29,45 +26,37 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
-/** حسابات تجريبية للعرض والاختبار */
 const DEMO_ACCOUNTS = [
     {
         role: 'مسؤول',
         email: 'admin@university.edu',
-        password: 'password',
+        password: '123456',
         icon: ShieldCheck,
-        color: 'bg-rose-500/10 text-rose-600 border-rose-200',
+        color: 'bg-primary/10 text-primary border-primary/25 hover:bg-primary/15',
     },
     {
         role: 'مدرس',
         email: 'teacher@university.edu',
-        password: 'password',
+        password: '123456',
         icon: BookOpen,
-        color: 'bg-amber-500/10 text-amber-600 border-amber-200',
+        color: 'bg-muted text-foreground border-border hover:bg-accent',
     },
     {
         role: 'طالب',
         email: 'student@university.edu',
-        password: 'password',
+        password: '123456',
         icon: Users,
-        color: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
+        color: 'bg-muted text-foreground border-border hover:bg-accent',
     },
 ]
 
-/**
- * @page LoginPage
- * @description صفحة تسجيل الدخول للنظام مع دعم الحسابات التجريبية.
- */
 export default function LoginPage() {
     const navigate = useNavigate()
     const loginMutation = useLogin()
     const [showPassword, setShowPassword] = useState(false)
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
-        defaultValues: {
-            email: '',
-            password: '',
-        },
+        defaultValues: { email: '', password: '' },
     })
 
     const { errors } = form.formState
@@ -87,27 +76,23 @@ export default function LoginPage() {
     const onSubmit = (data: LoginFormValues) => {
         const sanitizedEmail = sanitizeText(data.email)
         const sanitizedPassword = sanitizeText(data.password)
-        const sanitizedData: LoginFormValues = {
-            email: sanitizedEmail,
-            password: sanitizedPassword,
-        }
 
-        if (!isValidEmail(sanitizedData.email)) {
+        if (!isValidEmail(sanitizedEmail)) {
             form.setError('email', { type: 'manual', message: 'البريد الإلكتروني غير صالح' })
             return
         }
 
-        if (containsDangerousContent(sanitizedData.email)) {
+        if (containsDangerousContent(sanitizedEmail)) {
             form.setError('email', { type: 'manual', message: 'تم اكتشاف محتوى غير آمن' })
             return
         }
 
-        if (containsDangerousContent(sanitizedData.password)) {
+        if (containsDangerousContent(sanitizedPassword)) {
             form.setError('password', { type: 'manual', message: 'تم اكتشاف محتوى غير آمن' })
             return
         }
 
-        loginMutation.mutate({ email: sanitizedData.email, password: sanitizedData.password })
+        loginMutation.mutate({ email: sanitizedEmail, password: sanitizedPassword })
     }
 
     const fillDemo = (email: string, password: string) => {
@@ -117,38 +102,48 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10 dark:from-background dark:to-muted p-4" dir="rtl" lang="ar" role="main" aria-labelledby="login-title">
-            <Card className="w-full max-w-md shadow-2xl border-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <CardHeader className="space-y-4 pb-6 text-center">
+        <div
+            className="flex w-full flex-col items-stretch justify-center"
+            dir="rtl"
+            lang="ar"
+            role="main"
+            aria-labelledby="login-title"
+        >
+            <Card className="w-full border border-border/80 shadow-xl shadow-primary/10 animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-2xl">
+                <CardHeader className="space-y-2 px-4 pb-1 pt-4 text-center sm:px-6 sm:pt-5 sm:space-y-3">
                     <div className="flex justify-center">
-                        <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center shadow-xl shadow-primary/30 transition-transform hover:scale-105">
-                            <GraduationCap className="h-8 w-8 text-primary-foreground" />
-                        </div>
+                        <UniversityLogo className="h-20 w-32 sm:h-28 sm:w-44 transition-transform hover:scale-[1.02]" />
                     </div>
                     <CardTitle asChild>
-                        <h1 id="login-title" className="text-3xl font-black tracking-tight">مرحباً بك</h1>
+                        <h1 id="login-title" className="text-2xl font-black tracking-tight sm:text-3xl">
+                            مرحباً بك
+                        </h1>
                     </CardTitle>
-                    <CardDescription className="text-base">
+                    <CardDescription className="text-sm sm:text-base">
                         أدخل بياناتك للوصول إلى لوحة التحكم
                     </CardDescription>
                 </CardHeader>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-3 px-4 sm:px-6">
                             <FormField
                                 control={form.control}
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-right block">البريد الإلكتروني</FormLabel>
+                                        <FormLabel className="block text-right text-sm">البريد الإلكتروني</FormLabel>
                                         <FormControl>
-                                            <div className="relative group">
-                                                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
+                                            <div className="group relative">
+                                                <Mail
+                                                    className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary"
+                                                    aria-hidden="true"
+                                                />
                                                 <Input
                                                     {...field}
                                                     type="email"
                                                     placeholder="student@university.edu"
-                                                    className="pr-10 text-right rounded-xl h-12 focus:ring-primary/20 transition-all"
+                                                    className="h-10 rounded-xl pr-10 text-right text-sm focus:ring-primary/20 sm:h-11 sm:pr-11 sm:text-base"
                                                     disabled={loginMutation.isPending}
                                                     aria-required="true"
                                                     autoComplete="email"
@@ -164,15 +159,18 @@ export default function LoginPage() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-right block">كلمة المرور</FormLabel>
+                                        <FormLabel className="block text-right text-sm">كلمة المرور</FormLabel>
                                         <FormControl>
-                                            <div className="relative group">
-                                                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
+                                            <div className="group relative">
+                                                <Lock
+                                                    className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary"
+                                                    aria-hidden="true"
+                                                />
                                                 <Input
                                                     {...field}
-                                                    type={showPassword ? "text" : "password"}
+                                                    type={showPassword ? 'text' : 'password'}
                                                     placeholder="••••••••"
-                                                    className="pr-10 pl-10 text-right rounded-xl h-12 focus:ring-primary/20 transition-all"
+                                                    className="h-10 rounded-xl pr-10 pl-10 text-right text-sm focus:ring-primary/20 sm:h-11 sm:pr-11 sm:pl-11 sm:text-base"
                                                     disabled={loginMutation.isPending}
                                                     aria-required="true"
                                                     autoComplete="current-password"
@@ -180,10 +178,10 @@ export default function LoginPage() {
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowPassword(!showPassword)}
-                                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded-md p-1 transition-colors"
-                                                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
+                                                    aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}
                                                 >
-                                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                                 </button>
                                             </div>
                                         </FormControl>
@@ -192,30 +190,32 @@ export default function LoginPage() {
                                 )}
                             />
 
-                            {/* Demo Accounts Section */}
-                            <div className="pt-2">
-                                <p className="text-xs text-center text-muted-foreground mb-3 font-medium">حسابات تجريبية للتجربة السريعة</p>
-                                <div className="grid grid-cols-3 gap-2">
+                            <div className="pt-1">
+                                <p className="mb-2 text-center text-xs font-medium text-muted-foreground sm:text-sm">
+                                    حسابات تجريبية للتجربة السريعة
+                                </p>
+                                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                                     {DEMO_ACCOUNTS.map((acc) => (
                                         <button
                                             key={acc.role}
                                             type="button"
                                             onClick={() => fillDemo(acc.email, acc.password)}
                                             disabled={loginMutation.isPending}
-                                            className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border text-xs font-bold transition-all hover:scale-[1.03] active:scale-[0.97] ${acc.color}`}
+                                            className={`flex min-w-0 flex-col items-center gap-1 rounded-xl border p-2 text-[11px] font-bold transition-all hover:scale-[1.02] active:scale-[0.98] sm:gap-1.5 sm:p-3 sm:text-xs ${acc.color}`}
                                             aria-label={`تسجيل الدخول كـ ${acc.role}`}
                                         >
-                                            <acc.icon size={16} aria-hidden="true" />
+                                            <acc.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                                             {acc.role}
                                         </button>
                                     ))}
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter className="flex flex-col space-y-4 pt-2">
+
+                        <CardFooter className="flex flex-col space-y-2.5 px-4 pb-5 pt-1 sm:px-6">
                             <Button
                                 type="submit"
-                                className="w-full h-12 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                className="h-10 w-full rounded-xl text-sm font-bold shadow-md shadow-primary/15 transition-all hover:scale-[1.01] active:scale-[0.98] sm:h-11 sm:text-base"
                                 disabled={loginMutation.isPending}
                                 aria-busy={loginMutation.isPending}
                             >
@@ -224,14 +224,16 @@ export default function LoginPage() {
                                         <Loader2 className="ml-2 h-5 w-5 animate-spin" aria-hidden="true" />
                                         <span>جاري تسجيل الدخول...</span>
                                     </div>
-                                ) : 'تسجيل الدخول'}
+                                ) : (
+                                    'تسجيل الدخول'
+                                )}
                             </Button>
-                            <div className="text-sm text-center text-muted-foreground pt-1" aria-label="روابط بديلة">
+                            <div className="text-center text-xs text-muted-foreground sm:text-sm" aria-label="روابط بديلة">
                                 ليس لديك حساب؟{' '}
                                 <button
                                     type="button"
                                     onClick={() => navigate('/register')}
-                                    className="text-primary font-bold hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm"
+                                    className="font-bold text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                                     aria-label="الانتقال لصفحة إنشاء حساب جديد"
                                 >
                                     إنشاء حساب جديد

@@ -5,6 +5,7 @@ dist
 .cursor
 .qwen
 .memory
+.kilo
 coverage
 playwright-report
 test-results

@@ -18,5 +18,11 @@ export interface Course {
     room: string
   }[]
   prerequisites?: string[]
+  resources?: {
+    id: string
+    title: string
+    channel: string
+    embedUrl: string
+  }[]
   created_at?: string
 }

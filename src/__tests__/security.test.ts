@@ -24,6 +24,7 @@ import {
   strictSanitizeHTML,
   sanitizeForDatabase,
   detectInjectionAttempt,
+  generateCSPNonce,
 } from '../lib/security'
 
 describe('sanitizeHTML', () => {
@@ -190,6 +191,14 @@ describe('containsDangerousContent', () => {
 
   it('should return false for safe content', () => {
     expect(containsDangerousContent('Hello World')).toBe(false)
+  })
+})
+
+describe('generateCSPNonce', () => {
+  it('should generate a non-empty string', () => {
+    const nonce = generateCSPNonce()
+    expect(typeof nonce).toBe('string')
+    expect(nonce.length).toBeGreaterThan(0)
   })
 })
 

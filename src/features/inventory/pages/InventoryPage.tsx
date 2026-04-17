@@ -15,7 +15,13 @@ import {
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { useInventory, useCategories, useDeleteInventoryItem } from '@/features/inventory/hooks/useInventory'
 import { AddInventoryDialog } from '@/features/inventory/components/AddInventoryDialog'
@@ -25,7 +31,7 @@ import { InventoryItem } from '@/features/inventory/types'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/EmptyState'
-import { DataTable, DataTableColumn } from '@/components/DataTable'
+import { DataTable, DataTableColumn } from '@/components/data-table'
 import { StatCard } from '@/components/StatCard'
 import { ViewModeButton } from '@/components/ViewModeButton'
 import { Input } from '@/components/ui/input'
@@ -240,7 +246,7 @@ export default function InventoryPage() {
     <>
       <div className="min-h-screen bg-background pb-10" dir="rtl" lang="ar">
         {/* Hero Section */}
-        <div className="relative overflow-hidden bg-primary/95 text-primary-foreground pb-24 pt-10">
+        <div className="relative overflow-hidden bg-primary/95 text-primary-foreground pb-16 pt-6 sm:pb-24 sm:pt-10">
           <div className="absolute top-0 right-0 p-10 opacity-5" aria-hidden="true">
             <Package size={300} />
           </div>
@@ -252,7 +258,7 @@ export default function InventoryPage() {
                 </div>
                 <div className="text-center md:text-right">
                   <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">إدارة المخزون والمستودعات</h1>
-                  <p className="text-primary-foreground/80 text-lg font-medium">متابعة الأصول والعهدة والمستلزمات المركزية للجامعة</p>
+                  <p className="-sm sm:text-lg font-medium">متابعة الأصول والعهدة والمستلزمات المركزية للجامعة</p>
                 </div>
               </div>
 
@@ -274,34 +280,35 @@ export default function InventoryPage() {
         <div className="page-container -mt-10 relative z-20">
           <Card className="card-unified shadow-2xl overflow-hidden">
             <CardHeader className="pb-6 border-b border-muted">
-              <div className="filter-container items-center">
-                <div className="relative group lg:col-span-2">
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_auto] xl:items-center">
+                <div className="relative group min-w-0">
                   <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" aria-hidden="true" />
                   <Input
                     placeholder="بحث في المخزون (الاسم، الرمز...)"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="input-unified pr-11 font-medium"
+                    className="input-unified h-12 pr-11 font-medium"
                     aria-label="البحث في المخزون"
                   />
                 </div>
 
-                <div className="bg-muted/50 p-1.5 rounded-xl border flex items-center w-full h-12 overflow-x-auto scrollbar-hide">
-                  <Tabs defaultValue="all" value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-                    <TabsList className="bg-transparent h-9 gap-1">
-                      <TabsTrigger value="all" className="rounded-lg px-4 text-sm font-bold data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:text-primary border-none">
-                        الكل
-                      </TabsTrigger>
+                <div className="min-w-0">
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="h-12 w-full rounded-xl border bg-muted/50 px-4 text-sm font-bold">
+                      <SelectValue placeholder="اختر القسم" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">كل الأقسام</SelectItem>
                       {categories.map((cat) => (
-                        <TabsTrigger key={cat} value={cat} className="rounded-lg px-4 text-sm font-bold data-[state=active]:bg-card data-[state=active]:shadow-sm data-[state=active]:text-primary border-none">
+                        <SelectItem key={cat} value={cat}>
                           {cat}
-                        </TabsTrigger>
+                        </SelectItem>
                       ))}
-                    </TabsList>
-                  </Tabs>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="flex items-center gap-2 justify-end">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                   <Button
                     variant="secondary"
                     size="icon"
@@ -323,7 +330,7 @@ export default function InventoryPage() {
                     <RefreshCcw size={18} className="-rotate-90" />
                   </Button>
 
-                  <div className="flex items-center bg-muted/50 rounded-xl p-1 h-12 border border-muted" role="group" aria-label="عرض العناصر">
+                  <div className="flex h-12 items-center rounded-xl border border-muted bg-muted/50 p-1" role="group" aria-label="عرض العناصر">
                     <ViewModeButton active={viewMode === 'table'} onClick={() => setViewMode('table')} icon={List} label="جدول" />
                     <ViewModeButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')} icon={LayoutGrid} label="شبكة" />
                   </div>
@@ -336,9 +343,9 @@ export default function InventoryPage() {
                 <DataTable
                   data={filteredItems}
                   columns={columns}
+                  hideSearch
                   virtualized={filteredItems.length > 50}
                   virtualHeight={600}
-                  searchPlaceholder="بحث في المخزون (الاسم، الرمز...)"
                   emptyMessage="لم يتم العثور على أي عناصر في المخزون"
                   onRowSelection={setSelectedItems}
                   bulkActions={(selected) => (
@@ -383,7 +390,7 @@ export default function InventoryPage() {
                 </div>
               )}
 
-              {filteredItems.length === 0 && (
+              {viewMode === 'grid' && filteredItems.length === 0 && (
                 <EmptyState
                   icon={Package}
                   title="لا توجد نتائج"
@@ -410,85 +417,131 @@ export default function InventoryPage() {
 
 // --- المكونات الفرعية المساعدة ---
 
-const InventoryCard = ({ item, onDelete }: { item: InventoryItem; onDelete: (id: string) => void }) => (
-  <Card className="group overflow-hidden border-muted/60 hover:border-primary/30 transition-all hover:shadow-xl hover:-translate-y-1" role="article" aria-labelledby={`item-title-${item.id}`}>
-    <CardContent className="p-0">
-      <div className="relative h-48 w-full bg-muted/30 overflow-hidden">
+const InventoryCard = ({ item, onDelete }: { item: InventoryItem; onDelete: (id: string) => void }) => {
+  const statusConfig = {
+    available: { label: 'متوفر', cls: 'bg-emerald-500/10 text-emerald-700 border-emerald-200 dark:border-emerald-800' },
+    low_stock: { label: 'كمية قليلة', cls: 'bg-amber-500/10 text-amber-700 border-amber-200 dark:border-amber-800' },
+    out_of_stock: { label: 'نفذت الكمية', cls: 'bg-rose-500/10 text-rose-700 border-rose-200 dark:border-rose-800' },
+  }
+  const status = statusConfig[item.status as keyof typeof statusConfig] ?? statusConfig.available
+  const isLow = item.quantity < item.min_quantity
+
+  return (
+    <Card
+      className="group flex flex-col overflow-hidden border-border/60 hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
+      role="article"
+      aria-labelledby={`item-title-${item.id}`}
+    >
+      {/* Image / Icon area */}
+      <div className="relative h-36 w-full bg-muted/30 overflow-hidden shrink-0">
         {item.image ? (
           <LazyImage
             src={item.image}
             alt={item.name}
-            height={192} // h-48 = 12rem = 192px
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            height={144}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
-            <Package size={64} />
+          <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10">
+            <Package size={48} className="text-primary/20 group-hover:text-primary/40 transition-colors" />
           </div>
         )}
-        <div className="absolute top-2 right-2">
-          <Badge variant="outline" className="bg-background/80 backdrop-blur-sm font-bold shadow-sm" aria-label={`التصنيف: ${item.category}`}>{item.category}</Badge>
+        {/* Status + Category overlay */}
+        <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+          <Badge variant="outline" className={cn('text-[10px] font-bold border', status.cls)} role="status">
+            {status.label}
+          </Badge>
+        </div>
+        <div className="absolute top-2 left-2">
+          <Badge variant="secondary" className="text-[10px] font-bold bg-background/80 backdrop-blur-sm border-none shadow-sm">
+            {item.category}
+          </Badge>
         </div>
       </div>
-      <div className="p-5 space-y-4">
-        <div className="flex justify-between items-start gap-4">
-          <div className="space-y-1">
-            <h3 id={`item-title-${item.id}`} className="font-black text-lg group-hover:text-primary transition-colors line-clamp-1" title={item.name}>{item.name}</h3>
-            <p className="text-xs font-mono text-muted-foreground bg-muted w-fit px-2 py-0.5 rounded-md" aria-label={`رمز المنتج: ${item.sku}`}>SKU: {item.sku}</p>
-          </div>
+
+      <CardContent className="flex-1 flex flex-col p-4 gap-3">
+        {/* Name + SKU */}
+        <div>
+          <h3
+            id={`item-title-${item.id}`}
+            className="font-black text-base leading-tight group-hover:text-primary transition-colors line-clamp-1"
+            title={item.name}
+          >
+            {item.name}
+          </h3>
+          <p className="text-[10px] font-mono text-muted-foreground mt-0.5 bg-muted/50 w-fit px-1.5 py-0.5 rounded">
+            {item.sku}
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 py-4 border-y border-dashed">
-          <div>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">الكمية</p>
-            <div className="flex items-baseline gap-1">
-              <span className={cn("text-2xl font-black", item.quantity < item.min_quantity ? "text-rose-500" : "")} aria-label={item.quantity < item.min_quantity ? `كمية منخفضة: ${item.quantity}` : `الكمية: ${item.quantity}`}>
+        {/* Stats row */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className={cn(
+            "rounded-xl p-2.5 border text-center",
+            isLow ? "bg-rose-50/50 border-rose-200 dark:bg-rose-500/5 dark:border-rose-800" : "bg-muted/40 border-border/50"
+          )}>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">الكمية</p>
+            <div className="flex items-baseline justify-center gap-1">
+              <span className={cn("text-xl font-black tabular-nums", isLow ? "text-rose-600" : "text-foreground")}>
                 {item.quantity}
               </span>
-              <span className="text-xs font-bold text-muted-foreground" aria-hidden="true">{item.unit}</span>
+              <span className="text-[10px] text-muted-foreground font-medium">{item.unit}</span>
             </div>
           </div>
-          <div>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">السعر</p>
-            <p className="text-2xl font-black" aria-label={`السعر: ${item.price.toLocaleString()} ريال سعودي`}>{item.price.toLocaleString()}</p>
+          <div className="rounded-xl p-2.5 border bg-muted/40 border-border/50 text-center">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">السعر</p>
+            <div className="flex items-baseline justify-center gap-0.5">
+              <span className="text-xl font-black tabular-nums text-foreground">{item.price.toLocaleString()}</span>
+              <span className="text-[9px] text-muted-foreground">ر.س</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-2">
-          <Badge
-            variant="secondary"
-            className={cn(
-              "font-bold",
-              item.status === 'available' && "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-              item.status === 'low_stock' && "bg-amber-500/10 text-amber-600 border-amber-200",
-              item.status === 'out_of_stock' && "bg-rose-500/10 text-rose-600 border-rose-200"
-            )}
-            role="status"
+        {/* Progress bar for quantity */}
+        {item.min_quantity > 0 && (
+          <div className="space-y-1">
+            <div className="flex justify-between text-[9px] text-muted-foreground font-medium">
+              <span>المخزون</span>
+              <span>{item.quantity}/{item.min_quantity * 3} الحد الأدنى: {item.min_quantity}</span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all",
+                  isLow ? "bg-rose-500" : "bg-emerald-500"
+                )}
+                style={{ width: `${Math.min(100, (item.quantity / (item.min_quantity * 3)) * 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-2 mt-auto pt-1" role="group" aria-label={`إجراءات لـ ${item.name}`}>
+          <EditInventoryDialog
+            item={item}
+            trigger={
+              <Button
+                variant="outline"
+                className="flex-1 h-9 rounded-xl gap-2 text-xs font-bold hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                aria-label={`تعديل ${item.name}`}
+              >
+                <Pencil size={13} aria-hidden="true" />
+                تعديل
+              </Button>
+            }
+          />
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-9 w-9 shrink-0 rounded-xl hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
+            onClick={() => onDelete(item.id)}
+            aria-label={`حذف ${item.name}`}
           >
-            {item.status === 'available' ? 'متوفر' : item.status === 'low_stock' ? 'كمية قليلة' : 'نفذت'}
-          </Badge>
-
-          <div className="flex gap-2" role="group" aria-label={`إجراءات لـ ${item.name}`}>
-            <EditInventoryDialog
-              item={item}
-              trigger={
-                <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary hover:text-white transition-all" aria-label={`تعديل ${item.name}`}>
-                  <Pencil size={16} aria-hidden="true" />
-                </Button>
-              }
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 rounded-xl hover:bg-rose-500 hover:text-white transition-all"
-              onClick={() => onDelete(item.id)}
-              aria-label={`حذف ${item.name}`}
-            >
-              <Trash2 size={16} aria-hidden="true" />
-            </Button>
-          </div>
+            <Trash2 size={14} aria-hidden="true" />
+          </Button>
         </div>
-      </div>
-    </CardContent>
-  </Card>
-)
+      </CardContent>
+    </Card>
+  )
+}

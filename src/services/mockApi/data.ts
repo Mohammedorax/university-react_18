@@ -6,7 +6,7 @@ import { Grade } from '@/features/grades/types'
 import { InventoryItem } from '@/features/inventory/types'
 import { SystemSettings } from '@/features/settings/types'
 import { User } from '@/store/slices/authSlice'
-import { StudentDocument, Discount, Notification } from './types'
+import { Department, Specialization, StudentDocument, Discount, Notification } from './types'
 
 // ==========================================
 // المستندات (Documents)
@@ -60,6 +60,36 @@ export const initialDocuments: StudentDocument[] = [
         type: 'application/pdf',
         size: 1024 * 350,
         uploadDate: new Date(Date.now() - 86400000 * 15).toISOString(),
+        url: '#'
+    },
+    {
+        id: 'doc6',
+        entityId: 's4',
+        entityType: 'student',
+        name: 'كشف درجات.pdf',
+        type: 'application/pdf',
+        size: 1024 * 420,
+        uploadDate: new Date(Date.now() - 86400000 * 10).toISOString(),
+        url: '#'
+    },
+    {
+        id: 'doc7',
+        entityId: 't3',
+        entityType: 'teacher',
+        name: 'الشهادات الأكاديمية.pdf',
+        type: 'application/pdf',
+        size: 1024 * 950,
+        uploadDate: new Date(Date.now() - 86400000 * 90).toISOString(),
+        url: '#'
+    },
+    {
+        id: 'doc8',
+        entityId: 'st1',
+        entityType: 'staff',
+        name: 'عقد العمل.pdf',
+        type: 'application/pdf',
+        size: 1024 * 700,
+        uploadDate: new Date(Date.now() - 86400000 * 120).toISOString(),
         url: '#'
     }
 ]
@@ -166,6 +196,42 @@ export const initialNotifications: Notification[] = [
         read: true,
         createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
         link: '/settings'
+    },
+    {
+        id: '6',
+        title: 'تنبيه: مخزون منخفض',
+        message: 'الكمبيوتر المحمول Dell وصل إلى حد المخزون المنخفض (2 متاح)',
+        type: 'warning',
+        read: false,
+        createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+        link: '/inventory'
+    },
+    {
+        id: '7',
+        title: 'طلب إجازة جديد',
+        message: 'تم تقديم طلب إجازة من قبل د. محمود علي للمراجعة',
+        type: 'info',
+        read: false,
+        createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+        link: '/admin/staff'
+    },
+    {
+        id: '8',
+        title: 'اكتمال دورة التدريب',
+        message: 'تم تسجيل 45 طالب جديد في هذا الأسبوع',
+        type: 'success',
+        read: true,
+        createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+        link: '/admin/students'
+    },
+    {
+        id: '9',
+        title: 'تحديث سياسة الخصومات',
+        message: 'تم تفعيل خصم الدفع المبكر بنسبة 5% لبداية الفصل القادم',
+        type: 'info',
+        read: true,
+        createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+        link: '/discounts'
     }
 ]
 
@@ -180,6 +246,27 @@ export const initialInventoryCategories: string[] = [
     'كتب ومراجع',
     'معدات تنظيف',
     'قطع غيار'
+]
+
+export const initialDepartments: Department[] = [
+    { id: 'dep-cs', name: 'علوم الحاسب' },
+    { id: 'dep-se', name: 'هندسة البرمجيات' },
+    { id: 'dep-is', name: 'نظم المعلومات' },
+    { id: 'dep-ai', name: 'الذكاء الاصطناعي' },
+    { id: 'dep-cy', name: 'الأمن السيبراني' },
+    { id: 'dep-eng', name: 'الهندسة' },
+    { id: 'dep-math', name: 'الرياضيات' },
+]
+
+export const initialSpecializations: Specialization[] = [
+    { id: 'sp-se', name: 'هندسة البرمجيات', departmentId: 'dep-cs' },
+    { id: 'sp-ai', name: 'الذكاء الاصطناعي', departmentId: 'dep-ai' },
+    { id: 'sp-ml', name: 'تعلم الآلة', departmentId: 'dep-ai' },
+    { id: 'sp-net', name: 'الشبكات', departmentId: 'dep-cy' },
+    { id: 'sp-sec', name: 'أمن المعلومات', departmentId: 'dep-cy' },
+    { id: 'sp-ana', name: 'تحليل البيانات', departmentId: 'dep-is' },
+    { id: 'sp-elec', name: 'الهندسة الكهربائية', departmentId: 'dep-eng' },
+    { id: 'sp-math', name: 'الرياضيات التطبيقية', departmentId: 'dep-math' },
 ]
 
 // ==========================================
@@ -517,6 +604,20 @@ export const initialCourses: Course[] = [
             { day: 'الأحد', start_time: '08:00', end_time: '10:00', room: 'A101' },
             { day: 'الثلاثاء', start_time: '08:00', end_time: '10:00', room: 'A101' },
         ],
+        resources: [
+            {
+                id: 'c1-r1',
+                title: 'مقدمة Python للمبتدئين',
+                channel: 'Programming with Mosh',
+                embedUrl: 'https://www.youtube.com/embed/_uQrJ0TkZlc',
+            },
+            {
+                id: 'c1-r2',
+                title: 'شرح المتغيرات والجمل الشرطية في Python',
+                channel: 'Elzero Web School',
+                embedUrl: 'https://www.youtube.com/embed/kqtD5dpn9C8',
+            },
+        ],
     },
     {
         id: 'c2',
@@ -524,7 +625,7 @@ export const initialCourses: Course[] = [
         name: 'هياكل البيانات',
         description: 'دراسة هياكل البيانات والخوارزميات',
         department: 'علوم الحاسب',
-        credits: 4,
+        credits: 3,
         teacher_id: '2',
         teacher_name: 'د. سارة أحمد',
         semester: 'الفصل الأول',
@@ -536,6 +637,20 @@ export const initialCourses: Course[] = [
             { day: 'الأربعاء', start_time: '10:00', end_time: '12:00', room: 'B202' },
         ],
         prerequisites: ['c1'],
+        resources: [
+            {
+                id: 'c2-r1',
+                title: 'Data Structures Easy to Advanced Course',
+                channel: 'freeCodeCamp.org',
+                embedUrl: 'https://www.youtube.com/embed/RBSGKlAvoiM',
+            },
+            {
+                id: 'c2-r2',
+                title: 'شرح القوائم المرتبطة والمكدسات والطوابير',
+                channel: 'Neso Academy',
+                embedUrl: 'https://www.youtube.com/embed/B31LgI4Y4DQ',
+            },
+        ],
     },
     {
         id: 'c3',
@@ -552,8 +667,23 @@ export const initialCourses: Course[] = [
         enrolled_students: 22,
         schedule: [
             { day: 'الأحد', start_time: '13:00', end_time: '15:00', room: 'C303' },
+            { day: 'الخميس', start_time: '09:00', end_time: '11:00', room: 'C303' },
         ],
         prerequisites: ['c2'],
+        resources: [
+            {
+                id: 'c3-r1',
+                title: 'مقدمة الذكاء الاصطناعي وتعلم الآلة',
+                channel: 'Simplilearn',
+                embedUrl: 'https://www.youtube.com/embed/JMUxmLyrhSk',
+            },
+            {
+                id: 'c3-r2',
+                title: 'Machine Learning Full Course',
+                channel: 'freeCodeCamp.org',
+                embedUrl: 'https://www.youtube.com/embed/i_LwzRVP7bg',
+            },
+        ],
     },
     {
         id: 'c4',
@@ -561,7 +691,7 @@ export const initialCourses: Course[] = [
         name: 'التفاضل والتكامل',
         description: 'أساسيات التفاضل والتكامل مع التطبيقات',
         department: 'الرياضيات',
-        credits: 4,
+        credits: 3,
         teacher_id: 't3',
         teacher_name: 'د. نورة السالم',
         semester: 'الفصل الأول',
@@ -571,6 +701,14 @@ export const initialCourses: Course[] = [
         schedule: [
             { day: 'الأحد', start_time: '10:00', end_time: '12:00', room: 'D101' },
             { day: 'الثلاثاء', start_time: '10:00', end_time: '12:00', room: 'D101' },
+        ],
+        resources: [
+            {
+                id: 'c4-r1',
+                title: 'Calculus 1 Full Course',
+                channel: 'The Organic Chemistry Tutor',
+                embedUrl: 'https://www.youtube.com/embed/WUvTyaaNkzM',
+            },
         ],
     },
     {
@@ -590,6 +728,14 @@ export const initialCourses: Course[] = [
             { day: 'الاثنين', start_time: '08:00', end_time: '10:00', room: 'E201' },
             { day: 'الأربعاء', start_time: '08:00', end_time: '10:00', room: 'E201' },
         ],
+        resources: [
+            {
+                id: 'c5-r1',
+                title: 'Cyber Security Full Course for Beginners',
+                channel: 'Simplilearn',
+                embedUrl: 'https://www.youtube.com/embed/U_P23SqJaDc',
+            },
+        ],
     },
     {
         id: 'c6',
@@ -597,7 +743,7 @@ export const initialCourses: Course[] = [
         name: 'الهندسة الكهربائية',
         description: 'أساسيات الدوائر الكهربائية والإلكترونيات',
         department: 'الهندسة',
-        credits: 4,
+        credits: 3,
         teacher_id: 't5',
         teacher_name: 'د. منال الحربي',
         semester: 'الفصل الأول',
@@ -607,6 +753,14 @@ export const initialCourses: Course[] = [
         schedule: [
             { day: 'الأحد', start_time: '15:00', end_time: '17:00', room: 'F101' },
             { day: 'الثلاثاء', start_time: '15:00', end_time: '17:00', room: 'F101' },
+        ],
+        resources: [
+            {
+                id: 'c6-r1',
+                title: 'Electrical Engineering Basics',
+                channel: 'Neso Academy',
+                embedUrl: 'https://www.youtube.com/embed/WF5L5YB0SIk',
+            },
         ],
     },
     {
@@ -624,8 +778,17 @@ export const initialCourses: Course[] = [
         enrolled_students: 18,
         schedule: [
             { day: 'الاثنين', start_time: '13:00', end_time: '15:00', room: 'G201' },
+            { day: 'الأربعاء', start_time: '13:00', end_time: '15:00', room: 'G201' },
         ],
         prerequisites: ['c1'],
+        resources: [
+            {
+                id: 'c7-r1',
+                title: 'Big Data Full Course',
+                channel: 'edureka!',
+                embedUrl: 'https://www.youtube.com/embed/hn9f0I7w8pA',
+            },
+        ],
     }
 ]
 
@@ -672,7 +835,7 @@ export const initialGrades: Grade[] = [
         total_score: 82.0,
         letter_grade: 'B+',
         grade_points: 3.5,
-        credits: 4,
+        credits: 3,
         teacher_id: '2',
         teacher_name: 'د. سارة أحمد'
     },
@@ -846,6 +1009,78 @@ export const initialGrades: Grade[] = [
         credits: 4,
         teacher_id: '2',
         teacher_name: 'د. سارة أحمد'
+    },
+    {
+        id: 'g11',
+        student_id: 's8',
+        course_id: 'c4',
+        course_name: 'التفاضل والتكامل',
+        course_code: 'MATH101',
+        semester: 'الفصل الأول',
+        year: 2024,
+        assignments: [{ name: 'الواجب 1', score: 18, max_score: 20, weight: 0.2 }],
+        midterm_score: 35,
+        final_score: 82,
+        total_score: 85.0,
+        letter_grade: 'A',
+        grade_points: 4.0,
+        credits: 3,
+        teacher_id: 't3',
+        teacher_name: 'د. نورة السالم'
+    },
+    {
+        id: 'g12',
+        student_id: 's9',
+        course_id: 'c7',
+        course_name: 'تحليل البيانات الضخمة',
+        course_code: 'IS301',
+        semester: 'الفصل الأول',
+        year: 2024,
+        assignments: [{ name: 'الواجب 1', score: 13, max_score: 20, weight: 0.2 }],
+        midterm_score: 26,
+        final_score: 60,
+        total_score: 64.0,
+        letter_grade: 'C',
+        grade_points: 2.0,
+        credits: 3,
+        teacher_id: 't6',
+        teacher_name: 'د. عبدالله الدوسري'
+    },
+    {
+        id: 'g13',
+        student_id: 's10',
+        course_id: 'c1',
+        course_name: 'مقدمة في البرمجة',
+        course_code: 'CS101',
+        semester: 'الفصل الأول',
+        year: 2024,
+        assignments: [{ name: 'الواجب 1', score: 19, max_score: 20, weight: 0.2 }],
+        midterm_score: 38,
+        final_score: 90,
+        total_score: 92.0,
+        letter_grade: 'A+',
+        grade_points: 4.0,
+        credits: 3,
+        teacher_id: '2',
+        teacher_name: 'د. سارة أحمد'
+    },
+    {
+        id: 'g14',
+        student_id: 's6',
+        course_id: 'c5',
+        course_name: 'أساسيات الأمن السيبراني',
+        course_code: 'CYB201',
+        semester: 'الفصل الثاني',
+        year: 2024,
+        assignments: [{ name: 'الواجب 1', score: 16, max_score: 20, weight: 0.2 }],
+        midterm_score: 30,
+        final_score: 78,
+        total_score: 80.0,
+        letter_grade: 'B+',
+        grade_points: 3.5,
+        credits: 3,
+        teacher_id: 't4',
+        teacher_name: 'د. فهد الراشد'
     }
 ]
 
@@ -972,5 +1207,65 @@ export const initialInventory: InventoryItem[] = [
         sku: 'CBL-010',
         min_quantity: 10,
         unit: 'كابل'
+    },
+    {
+        id: 'inv11',
+        name: 'حبر طابعة أسود',
+        category: 'قرطاسية',
+        quantity: 0,
+        location: 'المستودع الرئيسي',
+        status: 'out_of_stock',
+        price: 180,
+        sku: 'INK-011',
+        min_quantity: 5,
+        unit: 'عبوة'
+    },
+    {
+        id: 'inv12',
+        name: 'سبورة ذكية تفاعلية',
+        category: 'أجهزة إلكترونية',
+        quantity: 3,
+        location: 'القاعات الذكية',
+        status: 'available',
+        price: 8500,
+        sku: 'SB-012',
+        min_quantity: 1,
+        unit: 'سبورة'
+    },
+    {
+        id: 'inv13',
+        name: 'أدوات كيمياء (طقم)',
+        category: 'معدات مختبرات',
+        quantity: 1,
+        location: 'مختبر الكيمياء',
+        status: 'low_stock',
+        price: 1200,
+        sku: 'CHM-013',
+        min_quantity: 2,
+        unit: 'طقم'
+    },
+    {
+        id: 'inv14',
+        name: 'كتاب: هياكل البيانات',
+        category: 'كتب ومراجع',
+        quantity: 22,
+        location: 'المكتبة المركزية',
+        status: 'available',
+        price: 95,
+        sku: 'BK-014',
+        min_quantity: 5,
+        unit: 'نسخة'
+    },
+    {
+        id: 'inv15',
+        name: 'ورق طباعة A4',
+        category: 'قرطاسية',
+        quantity: 0,
+        location: 'غرفة الطباعة',
+        status: 'out_of_stock',
+        price: 20,
+        sku: 'PPR-015',
+        min_quantity: 20,
+        unit: 'رزمة'
     }
 ]

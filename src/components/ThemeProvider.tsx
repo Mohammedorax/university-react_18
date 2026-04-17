@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { DEFAULT_UNIVERSITY_LOGO_SRC } from '@/lib/branding'
 
 type Theme = 'dark' | 'light' | 'system'
 
@@ -12,7 +13,10 @@ interface ThemeProviderProps {
 interface ThemeProviderState {
   theme: Theme
   primaryColor: string
+  /** شعار مخصص من التخزين المحلي؛ null يعني استخدام الشعار الافتراضي */
   logo: string | null
+  /** عنوان الصورة المعروض دائماً (مخصص أو الافتراضي من `public/assets/`) */
+  displayLogo: string
   setTheme: (theme: Theme) => void
   setPrimaryColor: (color: string) => void
   setLogo: (logo: string | null) => void
@@ -22,6 +26,7 @@ const initialState: ThemeProviderState = {
   theme: 'system',
   primaryColor: '142.1 76.2% 36.3%',
   logo: null,
+  displayLogo: DEFAULT_UNIVERSITY_LOGO_SRC,
   setTheme: () => null,
   setPrimaryColor: () => null,
   setLogo: () => null,
@@ -46,6 +51,11 @@ export function ThemeProvider({
 
   const [logo, setLogo] = useState<string | null>(
     () => localStorage.getItem('university-ui-logo')
+  )
+
+  const displayLogo = useMemo(
+    () => (logo && logo.trim() !== '' ? logo : DEFAULT_UNIVERSITY_LOGO_SRC),
+    [logo]
   )
 
   useEffect(() => {
@@ -75,6 +85,7 @@ export function ThemeProvider({
     theme,
     primaryColor,
     logo,
+    displayLogo,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme)
       setTheme(theme)

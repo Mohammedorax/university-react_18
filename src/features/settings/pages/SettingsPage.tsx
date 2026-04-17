@@ -23,16 +23,17 @@ import {
     Monitor,
     Calendar,
     ShieldAlert,
-    RefreshCcw
+    RefreshCcw,
+    ListChecks
 } from 'lucide-react'
 import { useEffect, useState, useMemo } from 'react'
 import { useSettings, useUpdateSettings } from '@/features/settings/hooks/useSettings'
 import { useTheme } from '@/components/ThemeProvider'
+import { UniversityLogo } from '@/components/UniversityLogo'
 import { SystemSettings } from '@/features/settings/types'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
     Select,
     SelectContent,
@@ -40,6 +41,7 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select'
+import { useCreateDepartment, useDepartments, useSemesters, useSpecializations } from '@/features/admin/hooks/useReferenceData'
 
 /**
  * صفحة إعدادات النظام - تتيح للمسؤولين التحكم في الخيارات العامة، المظهر، الأمان، والتنبيهات
@@ -50,10 +52,17 @@ import {
 export default function SettingsPage() {
     const { data: settings, isLoading } = useSettings()
     const updateSettingsMutation = useUpdateSettings()
-    const { theme, setTheme, primaryColor, setPrimaryColor, setLogo } = useTheme()
+    const { theme, setTheme, primaryColor, setPrimaryColor } = useTheme()
+    const { data: departments = [] } = useDepartments()
+    const { data: specializations = [] } = useSpecializations()
+    const { data: semesters = [] } = useSemesters()
+    const createDepartmentMutation = useCreateDepartment()
 
     const [formData, setFormData] = useState<Partial<SystemSettings>>({})
     const [activeSection, setActiveSection] = useState('general')
+    const [newDepartmentName, setNewDepartmentName] = useState('')
+    const [securityForm, setSecurityForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    const [securityToggles, setSecurityToggles] = useState({ twoFactor: false, loginAlerts: true, sessionTimeout: true })
 
     useEffect(() => {
         if (settings) {
@@ -227,6 +236,7 @@ export default function SettingsPage() {
                             { id: 'security', label: 'الأمان والخصوصية', icon: Lock },
                             { id: 'notifications', label: 'التنبيهات', icon: Bell },
                             { id: 'system', label: 'حالة النظام', icon: Database },
+                            { id: 'references', label: 'القوائم المرجعية', icon: ListChecks },
                         ].map((item) => (
                             <li key={item.id}>
                                 <button
@@ -299,9 +309,11 @@ export default function SettingsPage() {
                                                 <SelectValue placeholder="اختر الفصل" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="الخريف">الخريف</SelectItem>
-                                                <SelectItem value="الربيع">الربيع</SelectItem>
-                                                <SelectItem value="الصيف">الصيف</SelectItem>
+                                                <SelectItem value="خريف 2024">خريف 2024</SelectItem>
+                                                <SelectItem value="ربيع 2025">ربيع 2025</SelectItem>
+                                                <SelectItem value="صيف 2025">صيف 2025</SelectItem>
+                                                <SelectItem value="خريف 2025">خريف 2025</SelectItem>
+                                                <SelectItem value="ربيع 2026">ربيع 2026</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -348,15 +360,32 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="logo-url">رابط الشعار (URL)</Label>
-                                    <Input
-                                        id="logo-url"
-                                        value={formData.logoUrl || ''}
-                                        onChange={(e) => handleInputChange('logoUrl', e.target.value)}
-                                        placeholder="https://example.com/logo.png"
-                                        className="rounded-xl h-11 border-muted-foreground/20 font-medium"
-                                    />
+                                <div className="space-y-4">
+                                    <div className="flex flex-wrap items-center gap-4 rounded-xl border bg-muted/30 p-4">
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-semibold">شعار الواجهة الحالي</p>
+                                            <p className="text-xs text-muted-foreground">يُعرض في الشريط الجانبي وصفحات الدخول؛ يمكن تغييره من رابط خارجي عبر الحقل أدناه بعد الحفظ.</p>
+                                        </div>
+                                        <UniversityLogo className="h-14 w-14 shrink-0 rounded-lg ring-1 ring-border" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="logo-url">رابط الشعار للتقارير (URL)</Label>
+                                        <Input
+                                            id="logo-url"
+                                            value={formData.logoUrl || ''}
+                                            onChange={(e) => handleInputChange('logoUrl', e.target.value)}
+                                            placeholder="https://example.com/logo.png"
+                                            className="rounded-xl h-11 border-muted-foreground/20 font-medium"
+                                        />
+                                        {formData.logoUrl ? (
+                                            <div className="flex items-center gap-3 pt-2">
+                                                <span className="text-xs text-muted-foreground">معاينة رابط التقارير:</span>
+                                                <img src={formData.logoUrl} alt="" className="h-10 w-auto max-w-[120px] rounded object-contain" />
+                                            </div>
+                                        ) : (
+                                            <p className="pt-1 text-xs text-muted-foreground">بدون رابط: تُستخدم ترويسة النص الافتراضية في التقارير.</p>
+                                        )}
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -434,6 +463,143 @@ export default function SettingsPage() {
                                 </div>
                             </CardContent>
                         </Card>
+                    )}
+
+                    {activeSection === 'security' && (
+                        <div className="space-y-6">
+                            {/* تغيير كلمة المرور */}
+                            <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm rounded-3xl overflow-hidden">
+                                <CardHeader>
+                                    <CardTitle className="text-xl flex items-center gap-2">
+                                        <Lock className="h-5 w-5 text-primary" aria-hidden="true" />
+                                        تغيير كلمة المرور
+                                    </CardTitle>
+                                    <CardDescription>يُنصح بتغيير كلمة المرور بشكل دوري لتعزيز الأمان</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2 md:col-span-2">
+                                            <Label htmlFor="current-password">كلمة المرور الحالية</Label>
+                                            <Input
+                                                id="current-password"
+                                                type="password"
+                                                value={securityForm.currentPassword}
+                                                onChange={e => setSecurityForm(p => ({ ...p, currentPassword: e.target.value }))}
+                                                className="rounded-xl h-11"
+                                                placeholder="••••••••"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="new-password">كلمة المرور الجديدة</Label>
+                                            <Input
+                                                id="new-password"
+                                                type="password"
+                                                value={securityForm.newPassword}
+                                                onChange={e => setSecurityForm(p => ({ ...p, newPassword: e.target.value }))}
+                                                className="rounded-xl h-11"
+                                                placeholder="••••••••"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="confirm-password">تأكيد كلمة المرور</Label>
+                                            <Input
+                                                id="confirm-password"
+                                                type="password"
+                                                value={securityForm.confirmPassword}
+                                                onChange={e => setSecurityForm(p => ({ ...p, confirmPassword: e.target.value }))}
+                                                className="rounded-xl h-11"
+                                                placeholder="••••••••"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={() => {
+                                            if (!securityForm.currentPassword || !securityForm.newPassword) {
+                                                toast.error('يرجى ملء جميع الحقول')
+                                                return
+                                            }
+                                            if (securityForm.newPassword !== securityForm.confirmPassword) {
+                                                toast.error('كلمتا المرور غير متطابقتين')
+                                                return
+                                            }
+                                            if (securityForm.newPassword.length < 6) {
+                                                toast.error('يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل')
+                                                return
+                                            }
+                                            setSecurityForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
+                                            toast.success('تم تغيير كلمة المرور بنجاح')
+                                        }}
+                                        className="rounded-xl gap-2"
+                                    >
+                                        <Lock className="h-4 w-4" aria-hidden="true" />
+                                        حفظ كلمة المرور الجديدة
+                                    </Button>
+                                </CardContent>
+                            </Card>
+
+                            {/* خيارات الأمان المتقدمة */}
+                            <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm rounded-3xl overflow-hidden">
+                                <CardHeader>
+                                    <CardTitle className="text-xl flex items-center gap-2">
+                                        <ShieldAlert className="h-5 w-5 text-primary" aria-hidden="true" />
+                                        خيارات الأمان المتقدمة
+                                    </CardTitle>
+                                    <CardDescription>التحقق الثنائي وإدارة الجلسات</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {[
+                                        { key: 'twoFactor' as const, label: 'التحقق الثنائي (2FA)', desc: 'طبقة حماية إضافية عند تسجيل الدخول' },
+                                        { key: 'loginAlerts' as const, label: 'تنبيهات تسجيل الدخول', desc: 'إرسال إشعار عند تسجيل الدخول من جهاز جديد' },
+                                        { key: 'sessionTimeout' as const, label: 'انتهاء الجلسة التلقائي', desc: 'تسجيل الخروج تلقائياً بعد فترة خمول' },
+                                    ].map(item => (
+                                        <div key={item.key} className="flex items-center justify-between p-4 rounded-xl bg-muted/30">
+                                            <div>
+                                                <p className="font-bold text-sm">{item.label}</p>
+                                                <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                                            </div>
+                                            <Switch
+                                                checked={securityToggles[item.key]}
+                                                onCheckedChange={v => {
+                                                    setSecurityToggles(p => ({ ...p, [item.key]: v }))
+                                                    toast.success(`تم ${v ? 'تفعيل' : 'تعطيل'} ${item.label}`)
+                                                }}
+                                                aria-label={item.label}
+                                            />
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+
+                            {/* معلومات الخصوصية */}
+                            <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm rounded-3xl overflow-hidden">
+                                <CardHeader>
+                                    <CardTitle className="text-xl flex items-center gap-2">
+                                        <User className="h-5 w-5 text-primary" aria-hidden="true" />
+                                        الخصوصية وإدارة البيانات
+                                    </CardTitle>
+                                    <CardDescription>التحكم في كيفية استخدام بياناتك</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                                        <p className="text-sm font-bold text-amber-800 dark:text-amber-200">معلومات هامة</p>
+                                        <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                                            بياناتك محفوظة بشكل آمن ولا تُشارك مع أطراف خارجية. للاطلاع على سياسة الخصوصية الكاملة تواصل مع فريق الدعم.
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        <Button variant="outline" className="rounded-xl gap-2 text-sm"
+                                            onClick={() => toast.info('سيتم إرسال ملف البيانات إلى بريدك الإلكتروني خلال 24 ساعة')}>
+                                            <Cloud className="h-4 w-4" aria-hidden="true" />
+                                            تصدير بياناتي
+                                        </Button>
+                                        <Button variant="outline" className="rounded-xl gap-2 text-sm text-destructive border-destructive/30 hover:bg-destructive/5"
+                                            onClick={() => toast.error('هذه الميزة متاحة فقط عبر فريق الدعم')}>
+                                            حذف الحساب
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
                     )}
 
                     {activeSection === 'notifications' && (
@@ -529,6 +695,54 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                 ))}
+                            </CardContent>
+                        </Card>
+                    )}
+                    {activeSection === 'references' && (
+                        <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm rounded-3xl overflow-hidden">
+                            <CardHeader>
+                                <CardTitle className="text-xl">القوائم المرجعية</CardTitle>
+                                <CardDescription>إدارة الأقسام والتخصصات والفصول الدراسية على مستوى النظام</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-3">
+                                        <Label>الأقسام الأكاديمية</Label>
+                                        <div className="rounded-xl border p-3 space-y-2 max-h-56 overflow-auto">
+                                            {departments.map((department) => (
+                                                <div key={department.id} className="rounded-lg bg-muted/50 px-3 py-2 text-sm font-medium">{department.name}</div>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Input value={newDepartmentName} onChange={(e) => setNewDepartmentName(e.target.value)} placeholder="إضافة قسم جديد" />
+                                            <Button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (!newDepartmentName.trim()) return
+                                                    createDepartmentMutation.mutate({ name: newDepartmentName.trim() })
+                                                    setNewDepartmentName('')
+                                                }}
+                                                disabled={createDepartmentMutation.isPending}
+                                            >
+                                                إضافة
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <Label>التخصصات</Label>
+                                        <div className="rounded-xl border p-3 space-y-2 max-h-56 overflow-auto">
+                                            {specializations.map((specialization) => (
+                                                <div key={specialization.id} className="rounded-lg bg-muted/50 px-3 py-2 text-sm font-medium">{specialization.name}</div>
+                                            ))}
+                                        </div>
+                                        <Label>الفصول الدراسية</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {semesters.map((semester) => (
+                                                <span key={semester} className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold">{semester}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     )}

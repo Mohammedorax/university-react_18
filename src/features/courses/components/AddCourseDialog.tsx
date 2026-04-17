@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useAddCourse } from "@/features/courses/hooks/useCourses";
@@ -21,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { courseSchema, CourseFormValues } from "../schemas/courseSchema";
 import { sanitizeText, containsDangerousContent } from '@/lib/security';
+import { useDepartments, useSemesters } from '@/features/admin/hooks/useReferenceData';
 
 interface AddCourseDialogProps {
   trigger?: React.ReactNode;
@@ -35,6 +37,8 @@ export function AddCourseDialog({ trigger }: AddCourseDialogProps) {
   const { user } = useAuthState();
   const addCourseMutation = useAddCourse();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: departments = [] } = useDepartments();
+  const { data: semesters = [] } = useSemesters();
 
   const form = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
@@ -45,6 +49,7 @@ export function AddCourseDialog({ trigger }: AddCourseDialogProps) {
       credits: 3,
       department: "",
       max_students: 50,
+      semester: "الفصل الأول",
     },
   });
 
@@ -81,7 +86,7 @@ export function AddCourseDialog({ trigger }: AddCourseDialogProps) {
         max_students: values.max_students,
         teacher_id: user.id,
         teacher_name: user.name,
-        semester: "Fall 2024",
+        semester: values.semester,
         year: 2024,
         schedule: [],
         created_at: new Date().toISOString(),
@@ -113,16 +118,16 @@ export function AddCourseDialog({ trigger }: AddCourseDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none shadow-2xl">
-        <DialogHeader className="p-6 bg-primary text-primary-foreground">
+      <DialogContent className="sm:max-w-[500px] max-h-[88vh] p-0 border-none shadow-2xl">
+        <DialogHeader className="p-4 sm:p-5 bg-primary text-primary-foreground">
           <DialogTitle className="text-2xl font-black">إضافة مقرر جديد</DialogTitle>
           <DialogDescription className="text-primary-foreground/80 font-medium">
             أدخل تفاصيل المقرر الدراسي الجديد. تأكد من دقة البيانات المدخلة.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6 bg-background">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="p-4 sm:p-5 space-y-4 bg-background">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-bold text-foreground/70 mr-1">اسم المقرر</Label>
               <Input 
@@ -151,12 +156,16 @@ export function AddCourseDialog({ trigger }: AddCourseDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="department" className="text-sm font-bold text-foreground/70 mr-1">القسم</Label>
-              <Input 
-                id="department" 
-                {...form.register("department")}
-                className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.department ? 'border-destructive' : ''}`}
-                placeholder="مثال: علوم الحاسوب"
-              />
+              <Select value={form.watch("department")} onValueChange={(v) => form.setValue("department", v)}>
+                <SelectTrigger className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.department ? 'border-destructive' : ''}`}>
+                  <SelectValue placeholder="اختر القسم" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((department) => (
+                    <SelectItem key={department.id} value={department.name}>{department.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {form.formState.errors.department && (
                 <p className="text-xs font-bold text-destructive mr-1">{form.formState.errors.department.message}</p>
               )}
@@ -167,12 +176,28 @@ export function AddCourseDialog({ trigger }: AddCourseDialogProps) {
               <Input 
                 id="credits" 
                 type="number"
+                min={1}
+                max={3}
                 {...form.register("credits")}
                 className={`h-11 rounded-xl border-muted-foreground/20 focus:border-primary focus:ring-primary/20 transition-all ${form.formState.errors.credits ? 'border-destructive' : ''}`}
               />
               {form.formState.errors.credits && (
                 <p className="text-xs font-bold text-destructive mr-1">{form.formState.errors.credits.message}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="semester" className="text-sm font-bold text-foreground/70 mr-1">الفصل الدراسي</Label>
+              <Select value={form.watch("semester")} onValueChange={(v) => form.setValue("semester", v)}>
+                <SelectTrigger className="h-11 rounded-xl border-muted-foreground/20">
+                  <SelectValue placeholder="اختر الفصل" />
+                </SelectTrigger>
+                <SelectContent>
+                  {semesters.map((semester) => (
+                    <SelectItem key={semester} value={semester}>{semester}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

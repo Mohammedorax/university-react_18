@@ -32,18 +32,7 @@ export default defineConfig({
         short_name: 'UniReact',
         description: 'A React application for university management',
         theme_color: '#ffffff',
-        icons: [
-          {
-            src: 'assets/icons/pwa-192x192.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml'
-          },
-          {
-            src: 'assets/icons/pwa-512x512.svg',
-            sizes: '512x512',
-            type: 'image/svg+xml'
-          }
-        ]
+        icons: []
       }
     })
   ],
@@ -153,7 +142,6 @@ export default defineConfig({
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: blob:",
         "connect-src 'self' https://localhost:4000 wss://localhost:4000",
-        "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",
         "object-src 'none'",

@@ -37,7 +37,6 @@ class SentryClient {
     }
 
     if (!this.config.enabled) {
-      logger.info('Sentry is disabled');
       return;
     }
 

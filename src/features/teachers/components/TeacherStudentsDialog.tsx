@@ -9,7 +9,7 @@ import {
   DialogTrigger,
   DialogClose
 } from "@/components/ui/dialog";
-import { DataTable, DataTableColumn } from "@/components/DataTable";
+import { DataTable, DataTableColumn } from "@/components/data-table";
 import { useStudents } from "@/features/students/hooks/useStudents";
 import { Loader2, Users } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";

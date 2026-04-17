@@ -52,9 +52,10 @@ export const processArabicText = (text: string, options?: { visualOrder?: boolea
   const reshaped = reshape(text);
   let result = reshaped;
 
-  // الترتيب البصري (Visual Ordering) - مفيد لـ jsPDF عندما لا نستخدم autoTable
+  // الترتيب البصري — واجهة bidi-js الصحيحة: getEmbeddingLevels + getReorderedString
   if (options?.visualOrder) {
-    result = bidi.getVisuallyOrdered(reshaped);
+    const embeddingLevels = bidi.getEmbeddingLevels(reshaped, 'rtl');
+    result = bidi.getReorderedString(reshaped, embeddingLevels);
   }
 
   // إدارة حجم الكاش لتجنب استهلاك الذاكرة

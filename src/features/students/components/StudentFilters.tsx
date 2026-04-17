@@ -40,9 +40,10 @@ export function StudentFilters({
 }: StudentFiltersProps) {
     return (
         <Card className="card-unified mb-8" role="search" aria-label="فلاتر البحث والتصفية">
-            <CardContent className="p-4 lg:p-6">
-                <div className="filter-container">
-                    <div className="relative group lg:col-span-2">
+            <CardContent className="p-4 lg:p-5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+                    {/* Search */}
+                    <div className="relative group sm:col-span-2 xl:col-span-1">
                         <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} aria-hidden="true" />
                         <Input
                             placeholder="بحث عن طالب بالاسم أو الرقم الجامعي..."
@@ -53,41 +54,40 @@ export function StudentFilters({
                         />
                     </div>
 
-                    <div className="relative">
-                        <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                            <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب القسم">
-                                <div className="flex items-center gap-3">
-                                    <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                                    <SelectValue placeholder="كل الأقسام" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl border-muted shadow-2xl">
-                                <SelectItem value="all" className="font-bold">كل الأقسام</SelectItem>
-                                {departments.map(dept => (
-                                    <SelectItem key={dept} value={dept} className="font-bold">{dept}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {/* Department */}
+                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                        <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب القسم">
+                            <div className="flex items-center gap-2.5">
+                                <Filter className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                <SelectValue placeholder="كل الأقسام" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent className="rounded-2xl border-muted shadow-2xl">
+                            <SelectItem value="all" className="font-bold">كل الأقسام</SelectItem>
+                            {departments.map(dept => (
+                                <SelectItem key={dept} value={dept} className="font-bold">{dept}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                    <div className="relative">
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                            <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب السنة الدراسية">
-                                <div className="flex items-center gap-3">
-                                    <BookOpen className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                                    <SelectValue placeholder="كل السنوات" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl border-muted shadow-2xl">
-                                <SelectItem value="all" className="font-bold">كل السنوات</SelectItem>
-                                {years.map(year => (
-                                    <SelectItem key={year} value={year} className="font-bold">السنة {year}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {/* Year */}
+                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                        <SelectTrigger className="input-unified font-bold" aria-label="تصفية حسب السنة الدراسية">
+                            <div className="flex items-center gap-2.5">
+                                <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                <SelectValue placeholder="كل السنوات" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent className="rounded-2xl border-muted shadow-2xl">
+                            <SelectItem value="all" className="font-bold">كل السنوات</SelectItem>
+                            {years.map(year => (
+                                <SelectItem key={year} value={year} className="font-bold">السنة {year}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                    <div className="flex items-center gap-2 lg:col-span-2">
+                    {/* View Mode + Reset */}
+                    <div className="flex items-center gap-2 sm:col-span-2 xl:col-span-1">
                         <div className="flex bg-muted/30 dark:bg-muted/20 p-1 rounded-xl h-12 flex-1" role="group" aria-label="تبديل وضع العرض">
                             <ViewModeButton
                                 active={viewMode === 'table'}
@@ -108,7 +108,7 @@ export function StudentFilters({
                         <Button
                             variant="outline"
                             size="icon"
-                            className="h-12 w-12 rounded-xl border-dashed hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all active:scale-95 dark:border-muted-foreground/30"
+                            className="h-12 w-12 shrink-0 rounded-xl border-dashed hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all active:scale-95 dark:border-muted-foreground/30"
                             onClick={onReset}
                             aria-label="إعادة ضبط الفلاتر"
                             title="إعادة ضبط الفلاتر"

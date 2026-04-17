@@ -15,7 +15,25 @@ export const setStorageData = <T>(key: keyof typeof STORAGE_KEYS, data: T) => {
     localStorage.setItem(fullKey, JSON.stringify(data))
 }
 
-export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const DELAY_SCALE = (() => {
+    try {
+        const env = (import.meta as { env?: Record<string, string | undefined> }).env;
+        const raw = env?.VITE_MOCK_DELAY_SCALE;
+        if (raw !== undefined) {
+            const parsed = Number(raw);
+            if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+        }
+        return env?.DEV ? 0.1 : 0.2;
+    } catch {
+        return 0.2;
+    }
+})();
+
+export const delay = (ms: number) => {
+    const scaled = Math.max(0, Math.floor(ms * DELAY_SCALE));
+    if (scaled === 0) return Promise.resolve();
+    return new Promise((resolve) => setTimeout(resolve, scaled));
+};
 
 export const applySearch = <T>(data: T[], query: string, fields: (keyof T)[]): T[] => {
     if (!query) return data;

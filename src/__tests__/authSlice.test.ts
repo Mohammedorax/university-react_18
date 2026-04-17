@@ -8,11 +8,16 @@ import reducer, {
 } from '../store/slices/authSlice'
 
 describe('authSlice', () => {
+  /** يطابق `initialState` في `authSlice.ts` (isLoading الافتراضي false) */
   const initialState = {
     user: null,
     isAuthenticated: false,
-    isLoading: true,
+    isLoading: false,
   }
+
+  it('should return the initial state', () => {
+    expect(reducer(undefined, { type: undefined })).toEqual(initialState)
+  })
 
   describe('updateProfile', () => {
     it('should update existing user profile', () => {
