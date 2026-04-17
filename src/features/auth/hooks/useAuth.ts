@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api as mockApi } from '@/services/api'
 import { useAppDispatch, useAppSelector } from '@/store'
 import { setAuthenticated, clearAuth, updateProfile } from '@/store/slices/authSlice'
-import { useNavigate } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { logger } from '@/lib/logger'
 
